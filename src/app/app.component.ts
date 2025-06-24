@@ -184,15 +184,57 @@ export class AppComponent implements OnInit {
     if (this.panelTextIndex < this.numPanels) this.panelTextIndex++;
     this.panelText = this.annotations[this.currentAnnotationIndex]["annotation text " + this.panelTextIndex]
   }
-  toggleAnimation(value){
-    console.log(value.checked);
-    this.showingAnimations=value.checked;
-    if(this.showingAnimations){
-      //remove annotations
-    }
-    else{
 
+  // Example usage in your toggleAnimation method:
+  toggleAnimation(value) {
+    console.log(value.checked);
+    this.showingAnimations = value.checked;
+
+    // Get the total number of pages/images
+    const totalPages = this.canvasData.length;
+
+    if (this.showingAnimations) {
+      // Check if we're on the last image
+      if (this.pageIndex === 0) {
+        // Add video overlay when animations are enabled and we're on the last image
+        this.addVideoOverlay(0.381, 0.581, 'assets/videos/boy.mp4', 0.158, 0.158);
+      } else if (this.pageIndex === 3) {
+        // Add video overlay when animations are enabled and we're on the last image
+        this.addVideoOverlay(0.5, 0.5, 'assets/videos/goose.mp4', 0.3, 0.2);
+      }
+    } else {
+      // Remove all overlays or specific video overlays
+      const overlays = this.viewer.currentOverlays;
+      overlays.forEach(overlay => {
+        if (overlay.element.tagName === 'VIDEO') {
+          this.viewer.removeOverlay(overlay.element);
+        }
+      });
     }
+  }
+
+  addVideoOverlay(x: number, y: number, videoUrl: string, width: number = 0.2, height: number = 0.2) {
+    // Create video element
+    const videoElement = document.createElement('video');
+    videoElement.src = videoUrl;
+    videoElement.controls = false; // Hide controls
+    videoElement.autoplay = true; // Enable autoplay
+    videoElement.muted = false; // Most browsers require muted for autoplay to work
+    videoElement.loop = true; // Optional: make the video loop
+    videoElement.style.backgroundColor = 'black';
+    videoElement.id = 'video-overlay-' + Date.now();
+    
+    // Add the video as an overlay
+    this.viewer.addOverlay({
+      element: videoElement,
+      location: new OpenSeadragon.Point(x, y),
+      placement: 'CENTER',
+      checkResize: false,
+      width: width,
+      height: height
+    });
+    
+    return videoElement;
   }
 
 }
