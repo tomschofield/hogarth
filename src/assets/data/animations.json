@@ -1,0 +1,38 @@
+[
+    {
+        "title": "A gin boy speaks",
+        "canvasIndex":0,
+        "storyIndex":0,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/boy.mp4",
+        "x": 0.381,
+        "y": 0.581,
+        "width":0.158,
+        "height":0.158,
+        "duration":20.0
+    },
+    {
+        "title": "Fiddle away love",
+        "canvasIndex":0,
+        "storyIndex":1,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/fiddling-nan.mp4",
+        "x": 0.457,
+        "y": 0.3,
+        "width":0.14,
+        "height":0.14,
+        "duration":9.0
+    },
+    {
+        "title": "Yikes a talking goose",
+        "canvasIndex":3,
+        "storyIndex":2,
+        "transcript": "honk honk honk",
+        "videoUrl": "assets/videos/goose.mp4",
+        "x": 0.51,
+        "y": 0.51,
+        "width":0.3,
+        "height":0.2,
+        "duration":5.0
+    }
+]

@@ -1,10 +1,19 @@
+
 #image-ruler{
     background-color: rgba(255,255,255,0.5);
     width: 50px;
     height: 50px;
     // border: 1px solid;
   }
-
+#icon_drawer{
+  position:absolute;
+  left:1%;
+  top:1%;
+  z-index: 5;
+  color: white;
+  background-color: grey;
+  padding: 1%;
+}
 #control-panel{
   // border: 2px solid;
   // border-color: grey;
@@ -27,6 +36,9 @@ p{
 }
 div {
   
+}
+mat-slide-toggle {
+  margin: 1%;
 }
 section{
   // display: inline;
