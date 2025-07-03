@@ -9,7 +9,8 @@
         "y": 0.581,
         "width":0.158,
         "height":0.158,
-        "duration":20.0
+        "duration":20.0,
+        "hideControls": false
     },
     {
         "title": "Fiddle away love",
@@ -17,11 +18,12 @@
         "storyIndex":1,
         "transcript": "blah blah blah blah",
         "videoUrl": "assets/videos/fiddling-nan.mp4",
-        "x": 0.457,
-        "y": 0.3,
+        "x": 0.465,
+        "y": 0.29,
         "width":0.14,
         "height":0.14,
-        "duration":9.0
+        "duration":9.0,
+        "hideControls": false
     },
     {
         "title": "Yikes a talking goose",
