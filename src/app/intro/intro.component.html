@@ -1,0 +1,30 @@
+<div class="intro-container">
+  <video class="background-video" 
+         autoplay 
+         muted 
+         playsinline 
+         preload="auto"
+         #backgroundVideo 
+         (ended)="onVideoEnded()"
+         (canplay)="onVideoCanPlay()"
+         (error)="onVideoError($event)">
+    <source src="assets/videos/Hogarth.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  
+  <h1 class="intro-title">Welcome to Hogarth's Election Series</h1>
+  
+  <!-- Play button overlay -->
+  <div class="play-button-overlay" *ngIf="showPlayButton">
+    <button mat-fab color="primary" (click)="onPlayButtonClick()" class="play-button">
+      <mat-icon>play_arrow</mat-icon>
+    </button>
+    <p>Click to start the experience</p>
+  </div>
+  
+  <div class="intro-content" [class.show]="showContent">
+    <button mat-raised-button color="primary" (click)="startViewer()" *ngIf="showStartButton">
+      Start Exploring
+    </button>
+  </div>
+</div>

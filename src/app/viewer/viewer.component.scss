@@ -1,0 +1,122 @@
+/* filepath: /Users/danielfostersmith/Documents/GIT/hogarth/src/app/viewer/viewer.component.scss */
+.controls-section {
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.toggle-controls {
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  margin-top: 10px;
+  
+  mat-slide-toggle {
+    margin: 0 15px;
+  }
+}
+
+.annotation-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  max-height: 60vh;
+  overflow-y: auto;
+  z-index: 1000;
+  
+  mat-card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+}
+
+.panel-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+}
+
+.animation-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 350px;
+  z-index: 1000;
+  
+  mat-card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+}
+
+.animation-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  
+  span {
+    font-weight: 500;
+  }
+}
+
+.video-tour-controls {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  
+  mat-card {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+}
+
+.page-info {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  
+  mat-chip {
+    background-color: #3f51b5;
+    color: white;
+    font-weight: 500;
+  }
+}
+
+#seadragon-viewer {
+  border: 2px solid #ccc;
+  border-radius: 4px;
+}
+
+
+.annotation-content {
+  a {
+    color: #1976d2;
+    text-decoration: underline;
+    cursor: pointer;
+    
+    &:hover {
+      color: #0d47a1;
+      text-decoration: underline;
+    }
+    
+    &:visited {
+      color: #7b1fa2;
+    }
+  }
+}
+
+.annotation-panel-right {
+  .annotation-content {
+    // Ensure links are clickable and don't interfere with panel interactions
+    a {
+      pointer-events: auto;
+    }
+  }
+}

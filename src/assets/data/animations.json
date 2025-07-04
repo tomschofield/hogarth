@@ -9,7 +9,8 @@
         "y": 0.581,
         "width":0.158,
         "height":0.158,
-        "duration":20.0
+        "duration":20.0,
+        "hideControls": false
     },
     {
         "title": "Fiddle away maam",
@@ -17,11 +18,12 @@
         "storyIndex":1,
         "transcript": "blah blah blah blah",
         "videoUrl": "assets/videos/fiddling-nan.mp4",
-        "x": 0.457,
-        "y": 0.3,
+        "x": 0.465,
+        "y": 0.29,
         "width":0.14,
         "height":0.14,
-        "duration":9.0
+        "duration":9.0,
+        "hideControls": false
     },
     {
         "title": "Yikes a talking goose",
@@ -29,10 +31,10 @@
         "storyIndex":2,
         "transcript": "honk honk honk",
         "videoUrl": "assets/videos/goose.mp4",
-        "x": 0.51,
-        "y": 0.51,
-        "width":0.3,
-        "height":0.2,
+        "x": 0.564,
+        "y": 0.149,
+        "width":0.101,
+        "height":0.101,
         "duration":5.0
     }
 ]

@@ -1,0 +1,127 @@
+<section style="width:100vw;height:100vh; background-color: #d3d4d7;vertical-align: middle; text-align: center;">
+  
+  <!-- Main Content Area with Flexbox Layout - Now full height -->
+  <div class="main-content" style="display: flex; height: 100%; position: relative;">
+    <!-- Main Viewer Container -->
+    <div id="seadragon-viewer" 
+         [style.width]="showingAnnotations && panelText ? '70%' : '100%'" 
+         style="height: 100%; background-color: #ddd; color: #333; transition: width 0.3s ease;">
+    </div>
+
+    <!-- Annotation Panel - Right Side -->
+    <div *ngIf="panelText && showingAnnotations" 
+         class="annotation-panel-right" 
+         style="position: absolute; top: 0; right: 0; width: 30%; height: 100%; overflow-y: auto; padding: 10px; background-color: white; z-index: 100; box-shadow: -2px 0 5px rgba(0,0,0,0.1);">
+      <mat-card style="height: 100%;">
+        <mat-card-header>
+          <mat-card-title>{{panelTitle}}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content style="height: calc(100% - 80px); overflow-y: auto; text-align: left;">
+          <div [innerHTML]="panelText" class="annotation-content"></div>
+          
+          <!-- Panel Navigation -->
+          <div *ngIf="numPanels > 1" class="panel-navigation" style="margin-top: 20px; text-align: center;">
+            <button mat-icon-button 
+                    [disabled]="panelTextIndex === 0" 
+                    (click)="previousPanel()">
+              <mat-icon>navigate_before</mat-icon>
+            </button>
+            
+            <span style="margin: 0 10px;">{{panelTextIndex + 1}} of {{numPanels}}</span>
+            
+            <button mat-icon-button 
+                    [disabled]="panelTextIndex === numPanels - 1" 
+                    (click)="nextPanel()">
+              <mat-icon>navigate_next</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Navigation Controls - Now positioned absolutely on top -->
+  <div class="controls-section" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
+    <button id="home" mat-icon-button matTooltip="Home View">
+      <mat-icon>home</mat-icon>
+    </button>
+    <button id="previous" mat-icon-button matTooltip="Previous">
+      <mat-icon>navigate_before</mat-icon>
+    </button>
+    <button id="next" mat-icon-button matTooltip="Next">
+      <mat-icon>navigate_next</mat-icon>
+    </button>
+    <button id="full-page" mat-icon-button matTooltip="Full Screen">
+      <mat-icon>fullscreen</mat-icon>
+    </button>
+  </div>
+
+  <!-- Toggle Controls -->
+  <div class="toggle-controls" style="position: absolute; bottom: 10px; left: 10px; z-index: 1000;">
+    <mat-slide-toggle 
+      [(ngModel)]="showingAnnotations" 
+      (change)="toggleAnnotations($event.checked)">
+      Show Annotations
+    </mat-slide-toggle>
+    
+    <mat-slide-toggle 
+      [(ngModel)]="showingAnimations" 
+      (change)="toggleAnimations($event.checked)">
+      Show Animations
+    </mat-slide-toggle>
+  </div>
+
+  <!-- Animation Controls -->
+  <div *ngIf="showingAnimations" class="animation-controls" style="position: absolute; bottom: 60px; left: 10px; z-index: 1000;">
+    <mat-card>
+      <mat-card-content>
+        <div class="animation-navigation">
+          <button mat-raised-button 
+                  [disabled]="animationIndex === 0" 
+                  (click)="previousAnimation()">
+            Previous Animation
+          </button>
+          
+          <span>Animation {{animationIndex + 1}} of {{numAnimations}}</span>
+          
+          <button mat-raised-button 
+                  [disabled]="animationIndex === numAnimations - 1" 
+                  (click)="nextAnimation()">
+            Next Animation
+          </button>
+        </div>
+        
+        <button mat-raised-button 
+                color="primary" 
+                (click)="playCurrentAnimation()">
+        {{ isPlaying ? 'Pause Animation' : 'Play Animation' }}
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Video Tour Controls -->
+  <div *ngIf="showingVideoTour" class="video-tour-controls" style="position: absolute; bottom: 60px; left: 10px; z-index: 1000;">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Video Tour</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <button mat-raised-button color="warn" (click)="stopVideoTour()">
+          Stop Tour
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Page Information -->
+  <div class="page-info" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">
+    <mat-chip-list>
+      <mat-chip *ngIf="pageIndex === 0">An Election Entertainment</mat-chip>
+      <mat-chip *ngIf="pageIndex === 1">Canvassing for Votes</mat-chip>
+      <mat-chip *ngIf="pageIndex === 2">The Polling</mat-chip>
+      <mat-chip *ngIf="pageIndex === 3">Chairing the Member</mat-chip>
+    </mat-chip-list>
+  </div>
+
+</section>
