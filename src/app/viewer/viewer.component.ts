@@ -3,6 +3,7 @@ import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
 import { CanvasDatum } from '../canvas-datum';
+import { CdkDragEnd } from '@angular/cdk/drag-drop';
 declare var OpenSeadragon: any;
 
 @Component({
@@ -33,6 +34,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   annotationImages: string[] = [];
   videoProgress: number = 0;
   videoDuration: number = 0;
+  dragPosition = { x: 0, y: 0 };
 
   constructor(
     private ngZone: NgZone, 
@@ -59,6 +61,11 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         }, 500);
       }
     }, 200);
+  }
+
+  onDragEnded(event: CdkDragEnd) {
+    // Store the final position to prevent snap-back
+    this.dragPosition = event.source.getFreeDragPosition();
   }
 
   private initializeViewer() {

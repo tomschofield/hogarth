@@ -18,6 +18,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatLegacyChipsModule } from '@angular/material/legacy-chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 
 @NgModule({
@@ -41,7 +42,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatLegacyChipsModule, // Add this for mat-chip-list
     MatTooltipModule, // Add this for tooltips
     FormsModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    DragDropModule
   ],
   providers: [],
   bootstrap: [AppComponent]

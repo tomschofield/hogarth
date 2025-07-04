@@ -97,52 +97,62 @@
   </div>
 
   <!-- Animation Controls -->
-<div *ngIf="showingAnimations" class="animation-controls">
-  <mat-card>
-    <mat-card-content>
-      <div class="animation-player">
-        <!-- Animation Title -->
-        <div class="animation-title">
-          <span>{{ animations[animationIndex]?.title || 'Animation' }}</span>
+    <div *ngIf="showingAnimations" 
+        class="animation-controls" 
+        cdkDrag 
+        cdkDragBoundary="section"
+        [cdkDragFreeDragPosition]="dragPosition"
+        (cdkDragEnded)="onDragEnded($event)">
+        <mat-card>
+        <mat-card-content>
+        <!-- Drag handle -->
+        <div class="drag-handle" cdkDragHandle>
+            <mat-icon>drag_indicator</mat-icon>
         </div>
         
-        <!-- Animation Counter -->
-        <div class="animation-counter">
-          <span>{{ animationIndex + 1 }} of {{ numAnimations }}</span>
+        <div class="animation-player">
+            <!-- Animation Title -->
+            <div class="animation-title">
+            <span>{{ animations[animationIndex]?.title || 'Animation' }}</span>
+            </div>
+            
+            <!-- Animation Counter -->
+            <div class="animation-counter">
+            <span>{{ animationIndex + 1 }} of {{ numAnimations }}</span>
+            </div>
+            
+            <!-- Player Controls -->
+            <div class="player-controls">
+            <button mat-icon-button 
+                    [disabled]="animationIndex === 0" 
+                    (click)="previousAnimation()"
+                    class="control-button">
+                <mat-icon>skip_previous</mat-icon>
+            </button>
+            
+            <button mat-fab 
+                    color="primary" 
+                    (click)="playCurrentAnimation()"
+                    class="play-button">
+                <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+            </button>
+            
+            <button mat-icon-button 
+                    [disabled]="animationIndex === numAnimations - 1" 
+                    (click)="nextAnimation()"
+                    class="control-button">
+                <mat-icon>skip_next</mat-icon>
+            </button>
+            </div>
+            
+            <!-- Progress Bar (optional) -->
+            <div class="progress-container" *ngIf="isPlaying">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            </div>
         </div>
-        
-        <!-- Player Controls -->
-        <div class="player-controls">
-          <button mat-icon-button 
-                  [disabled]="animationIndex === 0" 
-                  (click)="previousAnimation()"
-                  class="control-button">
-            <mat-icon>skip_previous</mat-icon>
-          </button>
-          
-          <button mat-fab 
-                  color="primary" 
-                  (click)="playCurrentAnimation()"
-                  class="play-button">
-            <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
-          </button>
-          
-          <button mat-icon-button 
-                  [disabled]="animationIndex === numAnimations - 1" 
-                  (click)="nextAnimation()"
-                  class="control-button">
-            <mat-icon>skip_next</mat-icon>
-          </button>
-        </div>
-        
-        <!-- Progress Bar (optional) -->
-        <div class="progress-container" *ngIf="isPlaying">
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-</div>
+        </mat-card-content>
+    </mat-card>
+    </div>
 
   <!-- Video Tour Controls -->
   <div *ngIf="showingVideoTour" class="video-tour-controls" style="position: absolute; bottom: 60px; left: 10px; z-index: 1000;">
