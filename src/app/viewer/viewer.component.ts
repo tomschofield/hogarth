@@ -253,6 +253,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     }
 
     elt.id = "annotation_" + index;
+    elt.style.cursor = "pointer";
     this.currentAnnotationIndex = index;
     this.viewer.addOverlay({
       element: elt,
