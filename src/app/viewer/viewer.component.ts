@@ -16,6 +16,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   canvasData: CanvasDatum[] = [];
   annotations: any[] = [];
   animations: any[] = [];
+  allAnimations: any[] = [];
   pageIndex: number = 0;
   panelTextIndex: number = 0;
   showingVideoTour: boolean = false;
@@ -26,6 +27,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   animationIndex: number = 0;
   numAnimations: number = 0;
   private videoOverlays: any[] = [];
+  private currentVideo: HTMLVideoElement | null = null;
+  isPlaying: boolean = false;
 
   constructor(
     private ngZone: NgZone, 
@@ -171,7 +174,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
     // Fetch animation data
     this.animationsService.getData().subscribe(res => {
-      this.animations = res;
+      this.allAnimations = res;  // Store all animations here
+      this.animations = res;     // Keep this for backward compatibility
       this.numAnimations = this.animations.length;
     });
 
@@ -181,6 +185,15 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       this.panelText = "";
       console.log("now on page ", this.pageIndex);
       this.addAnnotations(this.annotations);
+      
+      // Update animations for new page if showing animations
+      if (this.showingAnimations) {
+        this.removeAnimations();
+        this.animations = this.allAnimations.filter(anim => anim.canvasIndex === this.pageIndex);
+        this.numAnimations = this.animations.length;
+        this.animationIndex = 0;
+        this.showAllAnimations();
+      }
     });
 
     // Handle canvas clicks
@@ -295,6 +308,13 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       }
     });
 
+    // Auto-play the video when it's loaded
+    video.addEventListener('loadeddata', () => {
+      video.play().catch(error => {
+        console.warn('Auto-play failed:', error);
+      });
+    });
+
     this.viewer.addOverlay({
       element: video,
       location: new OpenSeadragon.Point(x, y),
@@ -317,14 +337,18 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     });
   }
 
-    removeAnimations() {
-      // Remove all tracked video overlays
-      this.videoOverlays.forEach(video => {
-        this.viewer.removeOverlay(video);
-      });
-      // Clear the tracking array
-      this.videoOverlays = [];
-    }
+  removeAnimations() {
+    // Clear current video reference
+    this.currentVideo = null;
+    this.isPlaying = false;
+    
+    // Remove all tracked video overlays
+    this.videoOverlays.forEach(video => {
+      this.viewer.removeOverlay(video);
+    });
+    // Clear the tracking array
+    this.videoOverlays = [];
+  }
 
   setAnnotation(index: number) {
     this.panelText = this.formatPanelText(this.annotations[index]["annotation text 0"]);
@@ -367,7 +391,16 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   toggleAnimations(show: boolean) {
     this.showingAnimations = show;
     if (show) {
-      this.addAnimations(this.animations);
+      // Filter animations for current page
+      this.animations = this.allAnimations.filter(anim => anim.canvasIndex === this.pageIndex);
+      this.numAnimations = this.animations.length;
+      this.animationIndex = 0;
+      
+      console.log('Animations for page', this.pageIndex, ':', this.animations);
+      console.log('Number of animations:', this.numAnimations);
+      
+      // Show all animations by default (not playing)
+      this.showAllAnimations();
     } else {
       this.removeAnimations();
     }
@@ -393,20 +426,111 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
   previousAnimation() {
     if (this.animationIndex > 0) {
+      const wasPlaying = this.isPlaying; // Store current play state
       this.animationIndex--;
+      
+      if (wasPlaying) {
+        // If was playing, show only current animation and play it
+        this.showCurrentAnimation();
+        setTimeout(() => {
+          this.playCurrentAnimation();
+        }, 100);
+      } else {
+        // If was not playing, show all animations
+        this.showAllAnimations();
+      }
     }
   }
 
   nextAnimation() {
     if (this.animationIndex < this.numAnimations - 1) {
+      const wasPlaying = this.isPlaying; // Store current play state
       this.animationIndex++;
+      
+      if (wasPlaying) {
+        // If was playing, show only current animation and play it
+        this.showCurrentAnimation();
+        setTimeout(() => {
+          this.playCurrentAnimation();
+        }, 100);
+      } else {
+        // If was not playing, show all animations
+        this.showAllAnimations();
+      }
     }
   }
 
   playCurrentAnimation() {
-    if (this.animations.length > 0) {
+    console.log('Play animation called');
+    console.log('Animations array:', this.animations);
+    console.log('Animation index:', this.animationIndex);
+    console.log('Num animations:', this.numAnimations);
+    
+    if (this.currentVideo) {
+      // If there's a current video, toggle its play/pause state
+      if (this.currentVideo.paused) {
+        // Remove all animations and show only the current one playing
+        this.removeAnimations();
+        this.showCurrentAnimation();
+        setTimeout(() => {
+          if (this.currentVideo) {
+            this.currentVideo.play().catch(error => {
+              console.warn('Play failed:', error);
+            });
+            this.isPlaying = true;
+          }
+        }, 100);
+      } else {
+        // Pause current video and show all animations
+        this.currentVideo.pause();
+        this.isPlaying = false;
+        this.showAllAnimations();
+      }
+    } else {
+      // No current video, so remove all and show current animation playing
+      this.removeAnimations();
+      this.showCurrentAnimation();
+      setTimeout(() => {
+        if (this.currentVideo) {
+          this.currentVideo.play().catch(error => {
+            console.warn('Play failed:', error);
+          });
+          this.isPlaying = true;
+        }
+      }, 100);
+    }
+  }
+
+  private showAllAnimations() {
+    // Remove existing overlays first
+    this.removeAnimations();
+    
+    // Add all animations for current page (not playing)
+    this.animations.forEach(animation => {
+      this.addVideoOverlayForDisplay(
+        animation.x,
+        animation.y,
+        animation.videoUrl,
+        animation.width,
+        animation.height,
+        animation.hideControls
+      );
+    });
+    
+    // Reset current video reference since we're showing all
+    this.currentVideo = null;
+    this.isPlaying = false;
+  }
+
+  private showCurrentAnimation() {
+    if (this.animations.length > 0 && this.animationIndex < this.animations.length) {
       const currentAnimation = this.animations[this.animationIndex];
-      this.addVideoOverlay(
+      console.log('Showing animation:', currentAnimation);
+
+      // Remove any existing video overlays first
+      this.removeAnimations();
+      
+      this.addVideoOverlayForPlayback(
         currentAnimation.x, 
         currentAnimation.y, 
         currentAnimation.videoUrl, 
@@ -414,6 +538,210 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         currentAnimation.height,
         currentAnimation.hideControls
       );
+    } else {
+      console.log('No animations available or invalid index');
+    }
+  }
+
+  addVideoOverlayForDisplay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+    var video = document.createElement("video");
+    video.src = videoUrl;
+    video.controls = false;
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.cursor = "pointer";
+
+    // Show/hide controls on hover
+    video.addEventListener('mouseenter', () => {
+      if (!hideControls) {
+        video.controls = true;
+      }
+    });
+
+    video.addEventListener('mouseleave', () => {
+      video.controls = false;
+    });
+
+    // Handle click to play/pause
+    video.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      if (video.paused) {
+        video.play();
+      } else {
+        video.pause();
+      }
+    });
+
+    // Don't auto-play when displaying all animations
+    video.addEventListener('loadeddata', () => {
+      console.log('Video loaded for display');
+    });
+
+    this.viewer.addOverlay({
+      element: video,
+      location: new OpenSeadragon.Point(x, y),
+      placement: 'CENTER',
+      checkResize: false,
+      width: width,
+      height: height
+    });
+
+    // Track this video overlay for reliable removal
+    this.videoOverlays.push(video);
+  }
+
+  addVideoOverlayForPlayback(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+    var video = document.createElement("video");
+    video.src = videoUrl;
+    video.controls = false;
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.cursor = "pointer";
+
+    // Store reference to current video
+    this.currentVideo = video;
+
+    // Show/hide controls on hover
+    video.addEventListener('mouseenter', () => {
+      if (!hideControls) {
+        video.controls = true;
+      }
+    });
+
+    video.addEventListener('mouseleave', () => {
+      video.controls = false;
+    });
+
+    // Handle click to play/pause
+    video.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      if (video.paused) {
+        video.play();
+        this.isPlaying = true;
+      } else {
+        video.pause();
+        this.isPlaying = false;
+      }
+    });
+
+    // Track play state
+    video.addEventListener('play', () => {
+      this.isPlaying = true;
+    });
+
+    video.addEventListener('pause', () => {
+      this.isPlaying = false;
+    });
+
+    video.addEventListener('ended', () => {
+      this.isPlaying = false;
+    });
+
+    // Don't auto-play when showing animation
+    video.addEventListener('loadeddata', () => {
+      console.log('Video loaded and ready to play');
+    });
+
+    this.viewer.addOverlay({
+      element: video,
+      location: new OpenSeadragon.Point(x, y),
+      placement: 'CENTER',
+      checkResize: false,
+      width: width,
+      height: height
+    });
+
+    // Track this video overlay for reliable removal
+    this.videoOverlays.push(video);
+  }
+
+  addVideoOverlayWithSequence(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+    var video = document.createElement("video");
+    video.src = videoUrl;
+    video.controls = false; // Always start with controls hidden
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.cursor = "pointer";
+
+    // Show/hide controls on hover
+    video.addEventListener('mouseenter', () => {
+      if (!hideControls) {
+        video.controls = true;
+      }
+    });
+
+    video.addEventListener('mouseleave', () => {
+      video.controls = false;
+    });
+
+    // Always prevent the click from bubbling to OpenSeadragon
+    video.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      // Handle play/pause for all videos
+      if (video.paused) {
+        video.play();
+      } else {
+        video.pause();
+      }
+    });
+
+    // Auto-play the video when it's loaded
+    video.addEventListener('loadeddata', () => {
+      video.play().catch(error => {
+        console.warn('Auto-play failed:', error);
+      });
+    });
+
+    // When video ends, play the next animation
+    video.addEventListener('ended', () => {
+      console.log('Video ended, playing next animation');
+      this.playNextAnimationInSequence();
+    });
+
+    this.viewer.addOverlay({
+      element: video,
+      location: new OpenSeadragon.Point(x, y),
+      placement: 'CENTER',
+      checkResize: false,
+      width: width,
+      height: height
+    });
+
+    // Track this video overlay for reliable removal
+    this.videoOverlays.push(video);
+  }
+
+  playNextAnimationInSequence() {
+    // Move to next animation
+    if (this.animationIndex < this.numAnimations - 1) {
+      this.animationIndex++;
+      
+      // Get the next animation
+      const nextAnimation = this.animations[this.animationIndex];
+      console.log('Playing next animation:', nextAnimation);
+      
+      // Remove current video overlay
+      this.removeAnimations();
+      
+      // Add next video overlay
+      this.addVideoOverlayWithSequence(
+        nextAnimation.x, 
+        nextAnimation.y, 
+        nextAnimation.videoUrl, 
+        nextAnimation.width, 
+        nextAnimation.height,
+        nextAnimation.hideControls
+      );
+    } else {
+      console.log('All animations played, sequence complete');
+      // Optionally reset to first animation or show completion message
+      this.animationIndex = 0;
     }
   }
 

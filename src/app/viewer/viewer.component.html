@@ -74,9 +74,6 @@
   <!-- Animation Controls -->
   <div *ngIf="showingAnimations" class="animation-controls" style="position: absolute; bottom: 60px; left: 10px; z-index: 1000;">
     <mat-card>
-      <mat-card-header>
-        <mat-card-title>Character Animations</mat-card-title>
-      </mat-card-header>
       <mat-card-content>
         <div class="animation-navigation">
           <button mat-raised-button 
@@ -97,11 +94,7 @@
         <button mat-raised-button 
                 color="primary" 
                 (click)="playCurrentAnimation()">
-          Play Animation
-        </button>
-        
-        <button mat-button (click)="goBack()">
-          Back to Annotations
+        {{ isPlaying ? 'Pause Animation' : 'Play Animation' }}
         </button>
       </mat-card-content>
     </mat-card>
