@@ -60,4 +60,24 @@ export class IntroComponent implements AfterViewInit {
   startViewer() {
     this.router.navigate(['/viewer']);
   }
+
+  skipVideo() {
+    // Pause the video and skip to the end
+    const video = this.videoElement.nativeElement;
+    video.pause();
+    video.currentTime = video.duration;
+    
+    // Trigger the same behavior as when video ends
+    this.onVideoEnded();
+  }
+
+  playAgain() {
+    // Reset the video to beginning and play again
+    const video = this.videoElement.nativeElement;
+    video.currentTime = 0;
+    this.showContent = false;
+    this.showStartButton = false;
+    this.playVideo();
+  }
+
 }

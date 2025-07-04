@@ -12,7 +12,7 @@
     Your browser does not support the video tag.
   </video>
   
-  <h1 class="intro-title">Welcome to Hogarth's Election Series</h1>
+  <h1 class="intro-title">Hogarth's Election Series</h1>
   
   <!-- Play button overlay -->
   <div class="play-button-overlay" *ngIf="showPlayButton">
@@ -25,6 +25,15 @@
   <div class="intro-content" [class.show]="showContent">
     <button mat-raised-button color="primary" (click)="startViewer()" *ngIf="showStartButton">
       Start Exploring
+    </button>
+  </div>
+
+  <div class="skip-button-container">
+    <button mat-button color="accent" (click)="skipVideo()" *ngIf="!showContent">
+      Skip
+    </button>
+    <button mat-button color="accent" (click)="playAgain()" *ngIf="showContent">
+      Play Again
     </button>
   </div>
 </div>
