@@ -25,6 +25,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   showingAnnotations: boolean = true;
   animationIndex: number = 0;
   numAnimations: number = 0;
+  private videoOverlays: any[] = [];
 
   constructor(
     private ngZone: NgZone, 
@@ -302,6 +303,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       width: width,
       height: height
     });
+
+    // Track this video overlay for reliable removal
+    this.videoOverlays.push(video);
   }
 
   removeAnnotations() {
@@ -313,14 +317,14 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     });
   }
 
-  removeAnimations() {
-    const overlays = this.viewer.currentOverlays;
-    overlays.forEach(overlay => {
-      if (overlay.element.tagName === 'VIDEO') {
-        this.viewer.removeOverlay(overlay.element);
-      }
-    });
-  }
+    removeAnimations() {
+      // Remove all tracked video overlays
+      this.videoOverlays.forEach(video => {
+        this.viewer.removeOverlay(video);
+      });
+      // Clear the tracking array
+      this.videoOverlays = [];
+    }
 
   setAnnotation(index: number) {
     this.panelText = this.formatPanelText(this.annotations[index]["annotation text 0"]);
