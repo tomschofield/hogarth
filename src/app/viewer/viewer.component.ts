@@ -31,6 +31,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   private currentVideo: HTMLVideoElement | null = null;
   isPlaying: boolean = false;
   annotationImages: string[] = [];
+  videoProgress: number = 0;
+  videoDuration: number = 0;
 
   constructor(
     private ngZone: NgZone, 
@@ -149,10 +151,19 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
           showFlipControl: false,
           showSequenceControl: true,
           navigatorBackground: "black",
+          backgroundColor: 'black',
           prefixUrl: "//openseadragon.github.io/openseadragon/images/",
           tileSources: tileSources
         });
 
+        // Also set the canvas element background color directly
+        this.viewer.addHandler('open', () => {
+          const canvas = this.viewer.canvas;
+          if (canvas) {
+            canvas.style.backgroundColor = 'black';
+          }
+        });
+        
         console.log('OpenSeadragon viewer initialized successfully');
 
         // Load annotations and animations after viewer is created
@@ -639,16 +650,15 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     // Store reference to current video
     this.currentVideo = video;
 
-    // Show/hide controls on hover
-    video.addEventListener('mouseenter', () => {
-      if (!hideControls) {
-        video.controls = true;
-      }
+    // Track video progress
+    video.addEventListener('loadedmetadata', () => {
+      this.videoDuration = video.duration;
     });
 
-    video.addEventListener('mouseleave', () => {
-      video.controls = false;
+    video.addEventListener('timeupdate', () => {
+      this.videoProgress = (video.currentTime / video.duration) * 100;
     });
+
 
     // Handle click to play/pause
     video.addEventListener('click', (event) => {
@@ -675,6 +685,17 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
     video.addEventListener('ended', () => {
       this.isPlaying = false;
+    });
+
+        // Show/hide controls on hover
+    video.addEventListener('mouseenter', () => {
+      if (!hideControls) {
+        video.controls = true;
+      }
+    });
+
+    video.addEventListener('mouseleave', () => {
+      video.controls = false;
     });
 
     // Don't auto-play when showing animation

@@ -1,5 +1,14 @@
 <section style="width:100vw;height:100vh; background-color: #d3d4d7;vertical-align: middle; text-align: center;">
   
+  <div class="page-title" style="position: absolute; z-index: 1000;">
+    <h1 class="painting-title">
+      <span *ngIf="pageIndex === 0">An Election Entertainment</span>
+      <span *ngIf="pageIndex === 1">Canvassing for Votes</span>
+      <span *ngIf="pageIndex === 2">The Polling</span>
+      <span *ngIf="pageIndex === 3">Chairing the Member</span>
+    </h1>
+  </div>    
+
   <!-- Main Content Area with Flexbox Layout - Now full height -->
   <div class="main-content" style="display: flex; height: 100%; position: relative;">
     <!-- Main Viewer Container -->
@@ -83,33 +92,52 @@
   </div>
 
   <!-- Animation Controls -->
-  <div *ngIf="showingAnimations" class="animation-controls" style="position: absolute; bottom: 60px; left: 10px; z-index: 1000;">
-    <mat-card>
-      <mat-card-content>
-        <div class="animation-navigation">
-          <button mat-raised-button 
+<div *ngIf="showingAnimations" class="animation-controls">
+  <mat-card>
+    <mat-card-content>
+      <div class="animation-player">
+        <!-- Animation Title -->
+        <div class="animation-title">
+          <span>{{ animations[animationIndex]?.title || 'Animation' }}</span>
+        </div>
+        
+        <!-- Animation Counter -->
+        <div class="animation-counter">
+          <span>{{ animationIndex + 1 }} of {{ numAnimations }}</span>
+        </div>
+        
+        <!-- Player Controls -->
+        <div class="player-controls">
+          <button mat-icon-button 
                   [disabled]="animationIndex === 0" 
-                  (click)="previousAnimation()">
-            Previous Animation
+                  (click)="previousAnimation()"
+                  class="control-button">
+            <mat-icon>skip_previous</mat-icon>
           </button>
           
-          <span>Animation {{animationIndex + 1}} of {{numAnimations}}</span>
+          <button mat-fab 
+                  color="primary" 
+                  (click)="playCurrentAnimation()"
+                  class="play-button">
+            <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+          </button>
           
-          <button mat-raised-button 
+          <button mat-icon-button 
                   [disabled]="animationIndex === numAnimations - 1" 
-                  (click)="nextAnimation()">
-            Next Animation
+                  (click)="nextAnimation()"
+                  class="control-button">
+            <mat-icon>skip_next</mat-icon>
           </button>
         </div>
         
-        <button mat-raised-button 
-                color="primary" 
-                (click)="playCurrentAnimation()">
-        {{ isPlaying ? 'Pause Animation' : 'Play Animation' }}
-        </button>
-      </mat-card-content>
-    </mat-card>
-  </div>
+        <!-- Progress Bar (optional) -->
+        <div class="progress-container" *ngIf="isPlaying">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
 
   <!-- Video Tour Controls -->
   <div *ngIf="showingVideoTour" class="video-tour-controls" style="position: absolute; bottom: 60px; left: 10px; z-index: 1000;">
@@ -123,16 +151,6 @@
         </button>
       </mat-card-content>
     </mat-card>
-  </div>
-
-  <!-- Page Information -->
-  <div class="page-info" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">
-    <mat-chip-list>
-      <mat-chip *ngIf="pageIndex === 0">An Election Entertainment</mat-chip>
-      <mat-chip *ngIf="pageIndex === 1">Canvassing for Votes</mat-chip>
-      <mat-chip *ngIf="pageIndex === 2">The Polling</mat-chip>
-      <mat-chip *ngIf="pageIndex === 3">Chairing the Member</mat-chip>
-    </mat-chip-list>
   </div>
 
 </section>

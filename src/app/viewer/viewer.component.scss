@@ -1,141 +1,309 @@
 /* filepath: /Users/danielfostersmith/Documents/GIT/hogarth/src/app/viewer/viewer.component.scss */
 .controls-section {
-  padding: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 4px;
-  margin-bottom: 10px;
-  display: inline-block;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: inline-block;
 }
 
 .toggle-controls {
-  padding: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 4px;
-  margin-top: 10px;
-  
-  mat-slide-toggle {
-    margin: 0 15px;
-  }
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    margin-top: 10px;
+
+    mat-slide-toggle {
+        margin: 0 15px;
+    }
 }
 
 .annotation-panel {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 300px;
-  max-height: 60vh;
-  overflow-y: auto;
-  z-index: 1000;
-  
-  mat-card {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  }
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 1000;
+
+    mat-card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
 }
 
 .panel-navigation {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
 }
 
 .animation-controls {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 350px;
-  z-index: 1000;
-  
-  mat-card {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  }
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 320px;
+    z-index: 1000;
+
+    mat-card {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border-radius: 16px;
+        background: linear-gradient(135deg, #862633 0%, #af5e20 100%);
+        color: white;
+
+        mat-card-content {
+            padding: 20px;
+        }
+    }
+}
+
+.animation-player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    .animation-title {
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        color: white;
+        margin-bottom: 4px;
+
+        span {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 280px;
+        }
+    }
+
+    .animation-counter {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+    }
+
+    .player-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin: 8px 0;
+
+        .control-button {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+
+            &:hover:not([disabled]) {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            &[disabled] {
+                background: rgba(255, 255, 255, 0.05);
+                color: rgba(255, 255, 255, 0.3);
+            }
+
+            mat-icon {
+                color: white;
+                font-size: 20px;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        .play-button {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.9) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+            &:hover {
+                background: white !important;
+                transform: scale(1.05);
+            }
+
+            mat-icon {
+                color: #667eea;
+                font-size: 28px;
+                width: 28px;
+                height: 28px;
+            }
+        }
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 2px;
+
+        mat-progress-bar {
+            height: 2px;
+
+            ::ng-deep .mat-progress-bar-buffer {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            ::ng-deep .mat-progress-bar-fill::after {
+                background: white;
+            }
+        }
+    }
+}
+
+// Add smooth transitions
+.animation-controls {
+    transition: all 0.3s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+.control-button,
+.play-button {
+    transition: all 0.2s ease;
 }
 
 .animation-navigation {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  
-  span {
-    font-weight: 500;
-  }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+
+    span {
+        font-weight: 500;
+    }
 }
 
 .video-tour-controls {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1001;
-  
-  mat-card {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  }
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+
+    mat-card {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
 }
 
+.page-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+
+    .painting-title {
+        font-family: "Baskervville", serif;
+        font-size: 2rem;
+        font-weight: 700;
+        font-style: italic;
+        letter-spacing: 1.2px;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        margin: 0;
+        padding: 1.5rem 2rem 1rem 1.5rem;
+        text-align: left;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0) 100%);
+
+        // Add thin white line under the title
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 100vw;
+            height: 1px;
+            background-color: white;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            font-size: 1.5rem;
+            padding: 1rem 1.5rem 0.75rem 1rem;
+        }
+    }
+
+
+}
+
+
 .page-info {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-  
-  mat-chip {
-    background-color: #3f51b5;
-    color: white;
-    font-weight: 500;
-  }
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+
+    mat-chip {
+        background-color: #3f51b5;
+        color: white;
+        font-weight: 500;
+    }
 }
 
 #seadragon-viewer {
-  border: 2px solid #ccc;
-  border-radius: 4px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
 }
 
 
 .annotation-content {
-  a {
-    color: #1976d2;
-    text-decoration: underline;
-    cursor: pointer;
-    
-    &:hover {
-      color: #0d47a1;
-      text-decoration: underline;
+    a {
+        color: #1976d2;
+        text-decoration: underline;
+        cursor: pointer;
+
+        &:hover {
+            color: #0d47a1;
+            text-decoration: underline;
+        }
+
+        &:visited {
+            color: #7b1fa2;
+        }
     }
-    
-    &:visited {
-      color: #7b1fa2;
-    }
-  }
 }
 
 .annotation-panel-right {
-  .annotation-content {
-    // Ensure links are clickable and don't interfere with panel interactions
-    a {
-      pointer-events: auto;
+    .annotation-content {
+
+        // Ensure links are clickable and don't interfere with panel interactions
+        a {
+            pointer-events: auto;
+        }
     }
-  }
 }
 
 .annotation-images {
-  border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 10px;
-  
-  img {
-    display: block;
-    max-width: 100%;
-    max-height: 350px;
-    height: auto;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    
-    &:last-child {
-      margin-bottom: 0;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+
+    img {
+        display: block;
+        max-width: 100%;
+        max-height: 350px;
+        height: auto;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
-  }
 }
