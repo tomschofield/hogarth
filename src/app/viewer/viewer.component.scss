@@ -93,3 +93,30 @@
   border: 2px solid #ccc;
   border-radius: 4px;
 }
+
+
+.annotation-content {
+  a {
+    color: #1976d2;
+    text-decoration: underline;
+    cursor: pointer;
+    
+    &:hover {
+      color: #0d47a1;
+      text-decoration: underline;
+    }
+    
+    &:visited {
+      color: #7b1fa2;
+    }
+  }
+}
+
+.annotation-panel-right {
+  .annotation-content {
+    // Ensure links are clickable and don't interfere with panel interactions
+    a {
+      pointer-events: auto;
+    }
+  }
+}

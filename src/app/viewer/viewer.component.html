@@ -14,10 +14,10 @@
          style="position: absolute; top: 0; right: 0; width: 30%; height: 100%; overflow-y: auto; padding: 10px; background-color: white; z-index: 100; box-shadow: -2px 0 5px rgba(0,0,0,0.1);">
       <mat-card style="height: 100%;">
         <mat-card-header>
-          <mat-card-title>Annotation Details</mat-card-title>
+          <mat-card-title>{{panelTitle}}</mat-card-title>
         </mat-card-header>
         <mat-card-content style="height: calc(100% - 80px); overflow-y: auto; text-align: left;">
-          <div [innerHTML]="panelText"></div>
+          <div [innerHTML]="panelText" class="annotation-content"></div>
           
           <!-- Panel Navigation -->
           <div *ngIf="numPanels > 1" class="panel-navigation" style="margin-top: 20px; text-align: center;">

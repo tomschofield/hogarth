@@ -19,6 +19,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   allAnimations: any[] = [];
   pageIndex: number = 0;
   panelTextIndex: number = 0;
+  panelTitle: string = 'Annotation Details';
   showingVideoTour: boolean = false;
   currentAnnotationIndex: number = 0;
   numPanels: number = 0;
@@ -354,6 +355,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   setAnnotation(index: number) {
     this.panelText = this.formatPanelText(this.annotations[index]["annotation text 0"]);
     this.currentAnnotationIndex = index;
+    this.panelTitle = this.annotations[index]["annotation title"] || 'Annotation Details';
 
     // Determine how many panels there are
     this.numPanels = 0;
@@ -365,9 +367,21 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     this.panelTextIndex = 0;
   }
 
-  formatPanelText(text: string): string {
-    // Add any text formatting logic here
-    return text;
+ formatPanelText(text: string): string {
+    // If the text already contains HTML links, return as-is
+    if (text.includes('<a ') || text.includes('href=')) {
+      return text;
+    }
+    
+    // Convert plain URLs to clickable links
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    let formattedText = text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    
+    // Convert email addresses to clickable links
+    const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
+    formattedText = formattedText.replace(emailRegex, '<a href="mailto:$1">$1</a>');
+    
+    return formattedText;
   }
 
   jumpToAnimation(index: number) {
