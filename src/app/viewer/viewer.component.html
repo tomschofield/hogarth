@@ -17,8 +17,19 @@
           <mat-card-title>{{panelTitle}}</mat-card-title>
         </mat-card-header>
         <mat-card-content style="height: calc(100% - 80px); overflow-y: auto; text-align: left;">
+          
+           <!-- Annotation Images at the top -->
+          <div *ngIf="annotationImages.length > 0" class="annotation-images" style="margin-bottom: 15px;">
+            <img *ngFor="let imageSrc of annotationImages" 
+                 [src]="imageSrc" 
+                 [alt]="'Annotation image'"
+                 style="max-width: 100%; height: auto; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                 (error)="onImageError($event)">
+          </div>
+          
           <div [innerHTML]="panelText" class="annotation-content"></div>
           
+
           <!-- Panel Navigation -->
           <div *ngIf="numPanels > 1" class="panel-navigation" style="margin-top: 20px; text-align: center;">
             <button mat-icon-button 

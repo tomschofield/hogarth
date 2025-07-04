@@ -30,6 +30,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   private videoOverlays: any[] = [];
   private currentVideo: HTMLVideoElement | null = null;
   isPlaying: boolean = false;
+  annotationImages: string[] = [];
 
   constructor(
     private ngZone: NgZone, 
@@ -364,6 +365,12 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     if (this.annotations[index]["annotation text 2"].length > 0) this.numPanels = 3;
     if (this.annotations[index]["annotation text 3"].length > 0) this.numPanels = 4;
     
+    // Collect annotation images
+    this.annotationImages = [];
+
+    // Get images for the current panel (initially panel 0)
+    this.updateImagesForCurrentPanel();
+
     this.panelTextIndex = 0;
   }
 
@@ -421,6 +428,16 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     }
   }
 
+  updateImagesForCurrentPanel() {
+    this.annotationImages = [];
+    
+    // Get images for the current panel
+    const imageFilename = this.annotations[this.currentAnnotationIndex][`image filename ${this.panelTextIndex}`];
+    if (imageFilename && imageFilename.trim() !== '') {
+      this.annotationImages.push(`assets/panelImages/${imageFilename}`);
+    }
+  }
+
   previousPanel() {
     if (this.panelTextIndex > 0) {
       this.panelTextIndex--;
@@ -428,6 +445,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         this.annotations[this.currentAnnotationIndex][`annotation text ${this.panelTextIndex}`]
       );
     }
+    // Update images for the new panel
+    this.updateImagesForCurrentPanel();
   }
 
   nextPanel() {
@@ -437,6 +456,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         this.annotations[this.currentAnnotationIndex][`annotation text ${this.panelTextIndex}`]
       );
     }
+    // Update images for the new panel
+    this.updateImagesForCurrentPanel();
   }
 
   previousAnimation() {
@@ -768,5 +789,11 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   stopVideoTour() {
     this.showingVideoTour = false;
     this.removeAnimations();
+  }
+
+  onImageError(event: any) {
+    console.warn('Failed to load annotation image:', event.target.src);
+    // Optionally hide the image or show a placeholder
+    event.target.style.display = 'none';
   }
 }
