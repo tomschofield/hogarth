@@ -31,10 +31,10 @@
         "storyIndex":2,
         "transcript": "honk honk honk",
         "videoUrl": "assets/videos/goose.mp4",
-        "x": 0.51,
-        "y": 0.51,
-        "width":0.3,
-        "height":0.2,
+        "x": 0.564,
+        "y": 0.149,
+        "width":0.101,
+        "height":0.101,
         "duration":5.0
     }
 ]
