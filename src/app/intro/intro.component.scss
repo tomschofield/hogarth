@@ -165,6 +165,44 @@
   opacity: 0;
   transition: opacity 0.5s ease;
   z-index: 1;
+
+  // Make the Start Exploring button more prominent
+  button[mat-raised-button] {
+    background: rgba(0, 0, 0, 0.7) !important;
+    color: white !important;
+    font-size: 45px !important;
+    font-family: "ballet", cursive !important;
+    font-weight: 600 !important;
+    padding: 26px 32px !important;
+    min-height: 96px !important;
+    border-radius: 73px !important;
+    box-shadow: 0 8px 24px rgba(134, 38, 51, 0.4) !important;
+    letter-spacing: 1px !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+
+    // Add right arrow after the text
+    &::after {
+      content: '→' !important;
+      margin-left: 8px !important;
+      font-size: 20px !important;
+      transition: transform 0.3s ease !important;
+    }
+
+    &:hover {
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+      background: rgba(0, 0, 0, 0.8) !important;
+
+      // Animate arrow on hover
+      &::after {
+        transform: translateX(4px) !important;
+      }
+    }
+
+    &:active {
+      transform: translateY(-1px) scale(1.02) !important;
+    }
+  }
 }
 
 .intro-content.show {
