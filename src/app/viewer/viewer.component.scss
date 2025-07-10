@@ -274,6 +274,23 @@
     }
 }
 
+.center-navigation {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-counter {
+    font-size: 14px;
+    font-weight: 500;
+    color: #dbdbdb;
+    min-width: 40px;
+    text-align: center;
+}
+
 .menu-toggles {
     display: flex;
     align-items: center;
