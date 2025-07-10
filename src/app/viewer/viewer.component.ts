@@ -152,6 +152,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
           sequenceMode: true,
           showHomeControl: true,
           blendTime: 0.5,
+          springStiffness: 6.5,       
+          animationTime: 1.2,         
+          immediateRender: false, 
           showZoomControl: false,
           showFullPageControl: true,
           showRotationControl: false,
@@ -334,6 +337,21 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       video.play().catch(error => {
         console.warn('Auto-play failed:', error);
       });
+      
+      // Move and zoom to this video when it starts playing
+      const bounds = new OpenSeadragon.Rect(
+        x - (width / 2) - 0.1,
+        y - (height / 2) - 0.1,
+        width + 0.2,
+        height + 0.2
+      );
+      this.viewer.viewport.fitBounds(bounds, true);
+    });
+
+    // When video ends, play the next animation
+    video.addEventListener('ended', () => {
+      console.log('Video ended, playing next animation');
+      this.playNextAnimationInSequence();
     });
 
     this.viewer.addOverlay({
@@ -361,7 +379,6 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   removeAnimations() {
     // Clear current video reference
     this.currentVideo = null;
-    this.isPlaying = false;
     
     // Remove all tracked video overlays
     this.videoOverlays.forEach(video => {
@@ -490,8 +507,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
           this.playCurrentAnimation();
         }, 100);
       } else {
-        // If was not playing, show all animations
+        // If was not playing, show all animations but still move to it
         this.showAllAnimations();
+        this.moveToAnimation(this.animationIndex);
       }
     }
   }
@@ -508,8 +526,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
           this.playCurrentAnimation();
         }, 100);
       } else {
-        // If was not playing, show all animations
+        // If was not playing, show all animations but still move to it
         this.showAllAnimations();
+        this.moveToAnimation(this.animationIndex);
       }
     }
   }
@@ -532,6 +551,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
               console.warn('Play failed:', error);
             });
             this.isPlaying = true;
+            
+            // Move and zoom to animation location
+            this.moveToAnimation(this.animationIndex);
           }
         }, 100);
       } else {
@@ -550,14 +572,36 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
             console.warn('Play failed:', error);
           });
           this.isPlaying = true;
+          
+          // Move and zoom to animation location
+          this.moveToAnimation(this.animationIndex);
         }
       }, 100);
+    }
+  }
+
+  moveToAnimation(index: number) {
+    if (this.animations.length > 0 && index < this.animations.length) {
+      const animation = this.animations[index];
+      
+      // Calculate the bounds for the animation with some padding
+      const padding = 0.1; // Add 10% padding around the animation
+      const bounds = new OpenSeadragon.Rect(
+        animation.x - (animation.width / 2) - padding,
+        animation.y - (animation.height / 2) - padding,
+        animation.width + (padding * 2),
+        animation.height + (padding * 2)
+      );
+      
+      // Smoothly pan and zoom to the animation
+      this.viewer.viewport.fitBounds(bounds, false);
     }
   }
 
   private showAllAnimations() {
     // Remove existing overlays first
     this.removeAnimations();
+    this.isPlaying = false;
     
     // Add all animations for current page (not playing)
     this.animations.forEach(animation => {
@@ -692,6 +736,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
     video.addEventListener('ended', () => {
       this.isPlaying = false;
+      this.playNextAnimationInSequence();
     });
 
         // Show/hide controls on hover
@@ -731,6 +776,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     video.style.height = "100%";
     video.style.cursor = "pointer";
 
+    // Store reference to current video - THIS WAS MISSING
+    this.currentVideo = video;
+
     // Show/hide controls on hover
     video.addEventListener('mouseenter', () => {
       if (!hideControls) {
@@ -755,11 +803,29 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       }
     });
 
+    video.addEventListener('play', () => {
+      this.isPlaying = true;
+    });
+
+    video.addEventListener('pause', () => {
+      this.isPlaying = false;
+    });
+    
     // Auto-play the video when it's loaded
     video.addEventListener('loadeddata', () => {
       video.play().catch(error => {
         console.warn('Auto-play failed:', error);
       });
+
+      // Move and zoom to this video when it starts playing with smooth transition
+      const bounds = new OpenSeadragon.Rect(
+        x - (width / 2) - 0.1,
+        y - (height / 2) - 0.1,
+        width + 0.2,
+        height + 0.2
+      );
+      
+      this.viewer.viewport.fitBounds(bounds, false);
     });
 
     // When video ends, play the next animation
@@ -802,10 +868,23 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         nextAnimation.height,
         nextAnimation.hideControls
       );
+      // Auto-play the next video after a short delay and maintain play state
+      setTimeout(() => {
+        if (this.currentVideo) {
+          this.currentVideo.play().catch(error => {
+            console.warn('Auto-play failed:', error);
+          });
+          this.isPlaying = true; // Maintain playing state
+          
+          // Move to the animation with smooth transition
+          this.moveToAnimation(this.animationIndex);
+        }
+      }, 100);
     } else {
       console.log('All animations played, sequence complete');
-      // Optionally reset to first animation or show completion message
-      this.animationIndex = 0;
+      // Optionally reset to first animation or show all animations
+      this.isPlaying = false;
+      this.showAllAnimations();
     }
   }
 
