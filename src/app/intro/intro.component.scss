@@ -25,9 +25,39 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   margin: 0;
   z-index: 2;
-  font-size: 2rem;
-  padding: 1.5rem 2rem 1rem 1.5rem;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0) 100%);
+  font-size: 3rem;
+  padding: 2rem 2rem 1.5rem 1.5rem;
+  text-align: left;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.3) 100%);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  .title-controls {
+    position: absolute;
+    top: 1.5rem; 
+    right: 2rem; 
+    display: flex;
+    align-items: center;
+
+    .pause-button {
+      background: rgba(0, 0, 0, 0.3) !important;
+      color: #dbdbdb !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      
+      &:hover {
+        background: rgb(108, 108, 108) !important;
+        transform: scale(1.05);
+      }
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
 
   // Add thin white line under the title
   &::after {
@@ -40,6 +70,48 @@
     height: 1px;
     background-color: white;
     opacity: 0.8;
+  }
+
+  // Progress bar styles (renamed from loading-bar-container)
+  .progress-bar-container {
+    position: absolute;
+    bottom: -1px; // Position just below the white line
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 2px; // Slightly thicker for better visibility
+    z-index: 3;
+
+    .video-progress-bar {
+      height: 3px;
+      
+      // Use the correct MDC classes for Material Angular components
+      ::ng-deep .mdc-linear-progress__bar-inner {
+        border-color: white !important;
+        background-color: white !important;
+      }
+
+      ::ng-deep .mdc-linear-progress__buffer {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      }
+
+      ::ng-deep .mdc-linear-progress__track {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+      }
+
+      // Fallback for older Angular Material versions
+      ::ng-deep .mat-progress-bar-buffer {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      ::ng-deep .mat-progress-bar-fill::after {
+        background: white;
+      }
+
+      ::ng-deep .mat-progress-bar-background {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
   }
 }
 

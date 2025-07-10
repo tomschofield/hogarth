@@ -12,7 +12,19 @@
     Your browser does not support the video tag.
   </video>
   
-  <h1 class="intro-title">Hogarth's Election Series</h1>
+  <h1 class="intro-title">Hogarth's Election Series
+    <div class="progress-bar-container" *ngIf="!isVideoLoading && !showContent">
+      <mat-progress-bar mode="determinate" [value]="videoProgress" class="video-progress-bar"></mat-progress-bar>
+    </div>
+    <div class="title-controls" *ngIf="!showContent && !showPlayButton">
+    <button mat-icon-button 
+            (click)="toggleVideoPause()" 
+            class="pause-button"
+            [matTooltip]="isVideoPaused ? 'Resume Video' : 'Pause Video'">
+      <mat-icon>{{ isVideoPaused ? 'play_arrow' : 'pause' }}</mat-icon>
+    </button>
+  </div>
+  </h1>
   
   <!-- Play button overlay -->
   <div class="play-button-overlay" *ngIf="showPlayButton">

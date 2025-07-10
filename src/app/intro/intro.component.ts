@@ -12,12 +12,42 @@ export class IntroComponent implements AfterViewInit {
   showContent = false;
   showStartButton = false;
   showPlayButton = false;
+  isVideoLoading = true; 
+  videoProgress = 0;
+  isVideoPaused = false;
 
   constructor(private router: Router) { }
 
   ngAfterViewInit() {
     // Ensure video plays after view init
     this.playVideo();
+    this.setupVideoProgressTracking();
+  }
+
+  setupVideoProgressTracking() {
+    const video = this.videoElement.nativeElement;
+    
+    video.addEventListener('timeupdate', () => {
+      if (video.duration > 0) {
+        this.videoProgress = (video.currentTime / video.duration) * 100;
+      }
+    });
+
+    video.addEventListener('loadedmetadata', () => {
+      console.log('Video metadata loaded, duration:', video.duration);
+    });
+  }
+
+  toggleVideoPause() {
+    const video = this.videoElement.nativeElement;
+    
+    if (this.isVideoPaused) {
+      video.play();
+      this.isVideoPaused = false;
+    } else {
+      video.pause();
+      this.isVideoPaused = true;
+    }
   }
 
   async playVideo() {
@@ -25,6 +55,7 @@ export class IntroComponent implements AfterViewInit {
       await this.videoElement.nativeElement.play();
       console.log('Video started playing');
       this.showPlayButton = false;
+      this.isVideoPaused = false;
     } catch (error) {
       console.warn('Autoplay failed:', error);
       // Show play button when autoplay fails
@@ -38,11 +69,13 @@ export class IntroComponent implements AfterViewInit {
 
   onVideoCanPlay() {
     console.log('Video can play');
+    this.isVideoLoading = false;
     // Don't auto-play here to avoid double play attempts
   }
 
   onVideoError(event: any) {
     console.error('Video error:', event);
+    this.isVideoLoading = false;
     // Show content immediately if video fails
     this.showContent = true;
     this.showStartButton = true;
