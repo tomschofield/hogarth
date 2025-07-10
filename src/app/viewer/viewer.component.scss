@@ -233,7 +233,7 @@
     align-items: center;
     justify-content: space-between;
     height: 80px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0) 100%);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.3) 100%);
     
     // Add thin white line under the menu bar
     &::after {
@@ -252,15 +252,14 @@
     flex: 1;
     
     .painting-title {
-        font-family: "Baskervville", serif;
-        font-size: 2rem;
+        font-family: "Ballet", cursive;
+        font-size: 3rem;
         font-weight: 700;
-        font-style: italic;
         letter-spacing: 1.2px;
         color: white;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         margin: 0;
-        padding: 1.5rem 2rem 1rem 1.5rem;
+        padding: 2rem 2rem 1.5rem 1.5rem;
         text-align: left;
 
         @media (max-width: 768px) {
