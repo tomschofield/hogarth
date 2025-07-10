@@ -281,6 +281,40 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     } else {
       elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%,  rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
     }
+
+        // Create tooltip element
+    var tooltip = document.createElement("div");
+    tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
+    tooltip.style.position = "absolute";
+    tooltip.style.bottom = "100%";
+    tooltip.style.left = "50%";
+    tooltip.style.transform = "translateX(-50%)";
+    tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
+    tooltip.style.color = "white";
+    tooltip.style.padding = "8px 12px";
+    tooltip.style.borderRadius = "4px";
+    tooltip.style.fontSize = "14px";
+    tooltip.style.whiteSpace = "nowrap";
+    tooltip.style.opacity = "0";
+    tooltip.style.pointerEvents = "none";
+    tooltip.style.transition = "opacity 0.3s ease";
+    tooltip.style.zIndex = "10000";
+    tooltip.style.marginBottom = "8px";
+    
+    // Add arrow to tooltip
+    var arrow = document.createElement("div");
+    arrow.style.position = "absolute";
+    arrow.style.top = "100%";
+    arrow.style.left = "50%";
+    arrow.style.marginLeft = "-5px";
+    arrow.style.width = "0";
+    arrow.style.height = "0";
+    arrow.style.borderLeft = "5px solid transparent";
+    arrow.style.borderRight = "5px solid transparent";
+    arrow.style.borderTop = "5px solid rgba(0, 0, 0, 0.9)";
+    
+    tooltip.appendChild(arrow);
+    elt.appendChild(tooltip);
     
     this.currentAnnotationIndex = index;
     
@@ -300,6 +334,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     // Add hover effects using JavaScript since CSS might not penetrate OpenSeadragon
     elt.addEventListener('mouseenter', () => {
       elt.style.transform = "scale(1.6)";
+      tooltip.style.opacity = "1";
       if (type === "multi-level") {
         elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
         elt.style.animation = "pulse-multi 1.5s infinite";
@@ -312,6 +347,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     elt.addEventListener('mouseleave', () => {
       elt.style.transform = "scale(1)";
       elt.style.animation = "none";
+      tooltip.style.opacity = "0";
       if (type === "multi-level") {
         elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
       } else {
@@ -751,7 +787,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         playButton.style.opacity = "1";
       }
     });
-    
+
     container.addEventListener('mouseleave', () => {
       playButton.style.opacity = "0";
     });
