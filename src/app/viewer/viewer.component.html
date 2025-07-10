@@ -11,6 +11,23 @@
       </h1>
     </div>
     
+     <!-- Toggle Controls in Menu Bar -->
+    <div class="menu-toggles">
+      <mat-slide-toggle 
+        [(ngModel)]="showingAnnotations" 
+        (change)="toggleAnnotations($event.checked)"
+        class="menu-toggle">
+        Show Annotations
+      </mat-slide-toggle>
+      
+      <mat-slide-toggle 
+        [(ngModel)]="showingAnimations" 
+        (change)="toggleAnimations($event.checked)"
+        class="menu-toggle">
+        Show Animations
+      </mat-slide-toggle>
+    </div>
+
     <!-- Navigation Controls - Now in top menu bar -->
     <div class="controls-section">
       <button id="home" mat-icon-button matTooltip="Home View">
@@ -77,23 +94,6 @@
         </mat-card-content>
       </mat-card>
     </div>
-  </div>
-
-  
-
-  <!-- Toggle Controls -->
-  <div class="toggle-controls" style="position: absolute; bottom: 10px; left: 10px; z-index: 1000;">
-    <mat-slide-toggle 
-      [(ngModel)]="showingAnnotations" 
-      (change)="toggleAnnotations($event.checked)">
-      Show Annotations
-    </mat-slide-toggle>
-    
-    <mat-slide-toggle 
-      [(ngModel)]="showingAnimations" 
-      (change)="toggleAnimations($event.checked)">
-      Show Animations
-    </mat-slide-toggle>
   </div>
 
   <!-- Animation Controls -->
