@@ -1,4 +1,9 @@
-
+.main-content{
+    display: flex; 
+    height: 100%;
+    position: relative;
+    background-color: black;
+}
 
 .annotation-panel {
     position: fixed;
@@ -302,11 +307,11 @@
         }
         
         ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-            background-color: rgba(255, 255, 255, 0.5);
+            background-color: #862633;
         }
         
         ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
-            background-color: #ffffff;
+            background-color: #862633;
         }
     }
     
@@ -359,8 +364,10 @@
 }
 
 #seadragon-viewer {
-    border: 2px solid #ccc;
-    border-radius: 4px;
+    height: 100%; 
+    background-color: #000000; 
+    color: #333; 
+    transition: width 0.3s ease;
 }
 
 
@@ -382,6 +389,17 @@
 }
 
 .annotation-panel-right {
+    position: absolute;
+    top: 80px; 
+    right: 0;
+    width: 30%;
+    height: calc(100% - 80px); 
+    overflow-y: auto;
+    padding: 10px;
+    background-color: white;
+    z-index: 100;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+
     .annotation-content {
 
         // Ensure links are clickable and don't interfere with panel interactions
