@@ -220,19 +220,6 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       }
     });
 
-    // Handle canvas clicks
-    this.viewer.addHandler('canvas-click', (event: any) => {
-      var size = 0.2;
-      if (event.quick) {
-        var point = event.position;
-        console.log("point", point);
-        var vp = this.viewer.viewport.viewerElementToViewportCoordinates(point);
-        console.log("Vp", vp);
-        var box = new OpenSeadragon.Rect(vp.x - size / 2, vp.y - size / 2, size, size);
-        console.log(box);
-      }
-    });
-
     this.viewer.addHandler('open', function () {
       console.log("Viewer opened successfully");
     });
@@ -345,70 +332,12 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   addVideoOverlay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-    var video = document.createElement("video");
-    video.src = videoUrl;
-    video.controls = false; // Always start with controls hidden
-    video.style.width = "100%";
-    video.style.height = "100%";
-    video.style.cursor = "pointer";
-
-    // Show/hide controls on hover
-    video.addEventListener('mouseenter', () => {
-      if (!hideControls) {
-        video.controls = true;
-      }
+    return this.createVideoOverlay(x, y, videoUrl, width, height, {
+      autoPlay: true,
+      moveToOnLoad: true,
+      playNextOnEnd: true,
+      storeAsCurrentVideo: false
     });
-
-    video.addEventListener('mouseleave', () => {
-      video.controls = false;
-    });
-
-    // Always prevent the click from bubbling to OpenSeadragon
-    video.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      
-      // Handle play/pause for all videos
-      if (video.paused) {
-        video.play();
-      } else {
-        video.pause();
-      }
-    });
-
-    // Auto-play the video when it's loaded
-    video.addEventListener('loadeddata', () => {
-      video.play().catch(error => {
-        console.warn('Auto-play failed:', error);
-      });
-      
-      // Move and zoom to this video when it starts playing
-      const bounds = new OpenSeadragon.Rect(
-        x - (width / 2) - 0.1,
-        y - (height / 2) - 0.1,
-        width + 0.2,
-        height + 0.2
-      );
-      this.viewer.viewport.fitBounds(bounds, true);
-    });
-
-    // When video ends, play the next animation
-    video.addEventListener('ended', () => {
-      console.log('Video ended, playing next animation');
-      this.playNextAnimationInSequence();
-    });
-
-    this.viewer.addOverlay({
-      element: video,
-      location: new OpenSeadragon.Point(x, y),
-      placement: 'CENTER',
-      checkResize: false,
-      width: width,
-      height: height
-    });
-
-    // Track this video overlay for reliable removal
-    this.videoOverlays.push(video);
   }
 
   removeAnnotations() {
@@ -686,209 +615,28 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   addVideoOverlayForDisplay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-    var video = document.createElement("video");
-    video.src = videoUrl;
-    video.controls = false;
-    video.style.width = "100%";
-    video.style.height = "100%";
-    video.style.cursor = "pointer";
-
-    // Show/hide controls on hover
-    video.addEventListener('mouseenter', () => {
-      if (!hideControls) {
-        video.controls = true;
-      }
+    return this.createVideoOverlay(x, y, videoUrl, width, height, {
+      autoPlay: false,
+      storeAsCurrentVideo: false
     });
-
-    video.addEventListener('mouseleave', () => {
-      video.controls = false;
-    });
-
-    // Handle click to play/pause
-    video.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      
-      if (video.paused) {
-        video.play();
-      } else {
-        video.pause();
-      }
-    });
-
-    // Don't auto-play when displaying all animations
-    video.addEventListener('loadeddata', () => {
-      console.log('Video loaded for display');
-    });
-
-    this.viewer.addOverlay({
-      element: video,
-      location: new OpenSeadragon.Point(x, y),
-      placement: 'CENTER',
-      checkResize: false,
-      width: width,
-      height: height
-    });
-
-    // Track this video overlay for reliable removal
-    this.videoOverlays.push(video);
   }
 
   addVideoOverlayForPlayback(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-    var video = document.createElement("video");
-    video.src = videoUrl;
-    video.controls = false;
-    video.style.width = "100%";
-    video.style.height = "100%";
-    video.style.cursor = "pointer";
-
-    // Store reference to current video
-    this.currentVideo = video;
-
-    // Track video progress
-    video.addEventListener('loadedmetadata', () => {
-      this.videoDuration = video.duration;
+    return this.createVideoOverlay(x, y, videoUrl, width, height, {
+      autoPlay: false,
+      storeAsCurrentVideo: true,
+      trackProgress: true,
+      playNextOnEnd: true
     });
-
-    video.addEventListener('timeupdate', () => {
-      this.videoProgress = (video.currentTime / video.duration) * 100;
-    });
-
-
-    // Handle click to play/pause
-    video.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      
-      if (video.paused) {
-        video.play();
-        this.isPlaying = true;
-      } else {
-        video.pause();
-        this.isPlaying = false;
-      }
-    });
-
-    // Track play state
-    video.addEventListener('play', () => {
-      this.isPlaying = true;
-    });
-
-    video.addEventListener('pause', () => {
-      this.isPlaying = false;
-    });
-
-    video.addEventListener('ended', () => {
-      this.isPlaying = false;
-      this.playNextAnimationInSequence();
-    });
-
-        // Show/hide controls on hover
-    video.addEventListener('mouseenter', () => {
-      if (!hideControls) {
-        video.controls = true;
-      }
-    });
-
-    video.addEventListener('mouseleave', () => {
-      video.controls = false;
-    });
-
-    // Don't auto-play when showing animation
-    video.addEventListener('loadeddata', () => {
-      console.log('Video loaded and ready to play');
-    });
-
-    this.viewer.addOverlay({
-      element: video,
-      location: new OpenSeadragon.Point(x, y),
-      placement: 'CENTER',
-      checkResize: false,
-      width: width,
-      height: height
-    });
-
-    // Track this video overlay for reliable removal
-    this.videoOverlays.push(video);
   }
 
   addVideoOverlayWithSequence(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-    var video = document.createElement("video");
-    video.src = videoUrl;
-    video.controls = false; // Always start with controls hidden
-    video.style.width = "100%";
-    video.style.height = "100%";
-    video.style.cursor = "pointer";
-
-    // Store reference to current video - THIS WAS MISSING
-    this.currentVideo = video;
-
-    // Show/hide controls on hover
-    video.addEventListener('mouseenter', () => {
-      if (!hideControls) {
-        video.controls = true;
-      }
+    return this.createVideoOverlay(x, y, videoUrl, width, height, {
+      autoPlay: true,
+      moveToOnLoad: true,
+      playNextOnEnd: true,
+      storeAsCurrentVideo: true
     });
-
-    video.addEventListener('mouseleave', () => {
-      video.controls = false;
-    });
-
-    // Always prevent the click from bubbling to OpenSeadragon
-    video.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      
-      // Handle play/pause for all videos
-      if (video.paused) {
-        video.play();
-      } else {
-        video.pause();
-      }
-    });
-
-    video.addEventListener('play', () => {
-      this.isPlaying = true;
-    });
-
-    video.addEventListener('pause', () => {
-      this.isPlaying = false;
-    });
-
-    // Auto-play the video when it's loaded
-    video.addEventListener('loadeddata', () => {
-      video.play().catch(error => {
-        console.warn('Auto-play failed:', error);
-      });
-
-      // Move and zoom to this video when it starts playing with smooth transition
-      const bounds = new OpenSeadragon.Rect(
-        x - (width / 2) - 0.1,
-        y - (height / 2) - 0.1,
-        width + 0.2,
-        height + 0.2
-      );
-      
-      this.viewer.viewport.fitBounds(bounds, false);
-    });
-
-    // When video ends, play the next animation
-    video.addEventListener('ended', () => {
-      console.log('Video ended, playing next animation');
-      this.playNextAnimationInSequence();
-    });
-
-    this.viewer.addOverlay({
-      element: video,
-      location: new OpenSeadragon.Point(x, y),
-      placement: 'CENTER',
-      checkResize: false,
-      width: width,
-      height: height
-    });
-
-    // Track this video overlay for reliable removal
-    this.videoOverlays.push(video);
   }
 
   playNextAnimationInSequence() {
@@ -946,5 +694,175 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     console.warn('Failed to load annotation image:', event.target.src);
     // Optionally hide the image or show a placeholder
     event.target.style.display = 'none';
+  }
+
+  private createVideoOverlay(x: number, y: number, videoUrl: string, width: number, height: number, options: {
+    autoPlay?: boolean;
+    hideControls?: boolean;
+    storeAsCurrentVideo?: boolean;
+    trackProgress?: boolean;
+    moveToOnLoad?: boolean;
+    playNextOnEnd?: boolean;
+  } = {}) {
+    var video = document.createElement("video");
+    video.src = videoUrl;
+    video.controls = false;
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.cursor = "pointer";
+
+    // Create play button overlay
+    var playButton = document.createElement("div");
+    playButton.innerHTML = "▶"; // Play icon
+    playButton.style.position = "absolute";
+    playButton.style.top = "50%";
+    playButton.style.left = "50%";
+    playButton.style.transform = "translate(-50%, -50%)";
+    playButton.style.fontSize = "24px";
+    playButton.style.color = "white";
+    playButton.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+    playButton.style.borderRadius = "50%";
+    playButton.style.width = "60px";
+    playButton.style.height = "60px";
+    playButton.style.display = "flex";
+    playButton.style.alignItems = "center";
+    playButton.style.justifyContent = "center";
+    playButton.style.opacity = "0";
+    playButton.style.transition = "opacity 0.3s ease";
+    playButton.style.cursor = "pointer";
+    playButton.style.zIndex = "1000";
+    playButton.style.paddingLeft = "2px";
+
+    // Create container for video and play button
+    var container = document.createElement("div");
+    container.style.position = "relative";
+    container.style.width = "100%";
+    container.style.height = "100%";
+    container.appendChild(video);
+    container.appendChild(playButton);
+
+    // Show/hide play button on hover
+    container.addEventListener('mouseenter', () => {
+      if (video.paused) {
+        playButton.innerHTML = "▶"; // Play icon
+        playButton.style.opacity = "1";
+      } else {
+        playButton.innerHTML = "⏸"; // Pause icon
+        playButton.style.opacity = "1";
+      }
+    });
+    
+    container.addEventListener('mouseleave', () => {
+      playButton.style.opacity = "0";
+    });
+
+    // Handle play button click using OpenSeadragon MouseTracker
+    new OpenSeadragon.MouseTracker({
+      element: playButton,
+      clickHandler: (event: any) => {
+        console.log('Play button clicked via MouseTracker!');
+        event.preventDefaultAction = true;
+        
+        if (video.paused) {
+          console.log('Playing video via MouseTracker');
+          video.play().catch(error => {
+            console.warn('Play failed:', error);
+          });
+          playButton.style.opacity = "0";
+          if (options.storeAsCurrentVideo) {
+            this.isPlaying = true;
+          }
+        } else {
+          console.log('Pausing video via MouseTracker');
+          video.pause();
+          playButton.style.opacity = "1";
+          if (options.storeAsCurrentVideo) {
+            this.isPlaying = false;
+          }
+        }
+        
+        return false; // Prevent further event propagation
+      }
+    });
+
+    // Store reference to current video if requested
+    if (options.storeAsCurrentVideo) {
+      this.currentVideo = video;
+    }
+
+    // Track video progress if requested
+    if (options.trackProgress) {
+      video.addEventListener('loadedmetadata', () => {
+        this.videoDuration = video.duration;
+      });
+
+      video.addEventListener('timeupdate', () => {
+        this.videoProgress = (video.currentTime / video.duration) * 100;
+      });
+    }
+
+    // Update play button and state when video state changes
+    video.addEventListener('play', () => {
+      playButton.innerHTML = "⏸"; // Pause icon
+      if (options.storeAsCurrentVideo) {
+        this.isPlaying = true;
+      }
+    });
+
+    video.addEventListener('pause', () => {
+      playButton.innerHTML = "▶"; // Play icon
+      if (options.storeAsCurrentVideo) {
+        this.isPlaying = false;
+      }
+    });
+
+    video.addEventListener('ended', () => {
+      if (options.storeAsCurrentVideo) {
+        this.isPlaying = false;
+      }
+      if (options.playNextOnEnd) {
+        console.log('Video ended, playing next animation');
+        this.playNextAnimationInSequence();
+      }
+    });
+
+    // Auto-play and move to video if requested
+    if (options.autoPlay) {
+      video.addEventListener('loadeddata', () => {
+        video.play().catch(error => {
+          console.warn('Auto-play failed:', error);
+        });
+        
+        if (options.moveToOnLoad) {
+          // Move and zoom to this video when it starts playing
+          const bounds = new OpenSeadragon.Rect(
+            x - (width / 2) - 0.1,
+            y - (height / 2) - 0.1,
+            width + 0.2,
+            height + 0.2
+          );
+          this.viewer.viewport.fitBounds(bounds, !options.playNextOnEnd); // Use immediate for sequence
+        }
+      });
+    } else {
+      video.addEventListener('loadeddata', () => {
+        console.log('Video loaded and ready to play');
+      });
+    }
+
+    // Add overlay to viewer
+    this.viewer.addOverlay({
+      element: container,
+      location: new OpenSeadragon.Point(x, y),
+      placement: 'CENTER',
+      checkResize: false,
+      width: width,
+      height: height
+    });
+
+    // Track this video overlay for reliable removal
+    this.videoOverlays.push(container);
+
+    return container;
   }
 }
