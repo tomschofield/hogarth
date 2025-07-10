@@ -11,20 +11,33 @@
       </h1>
     </div>
 
-    <!-- Navigation Controls - Now in center -->
-    <div class="controls-section center-navigation">
-      <button id="previous" mat-icon-button matTooltip="Previous Painting">
-        <mat-icon>navigate_before</mat-icon>
-      </button>
+    <!-- Combined Navigation Row for Mobile -->
+    <div class="navigation-row">
+      <!-- Navigation Controls -->
+      <div class="center-navigation">
+        <button id="previous" mat-icon-button matTooltip="Previous Painting">
+          <mat-icon>navigate_before</mat-icon>
+        </button>
 
-      <span class="page-counter">{{ pageIndex + 1 }} of 4</span>
+        <span class="page-counter">{{ pageIndex + 1 }} of 4</span>
+        
+        <button id="next" mat-icon-button matTooltip="Next Painting">
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+      </div>
       
-      <button id="next" mat-icon-button matTooltip="Next Painting">
-        <mat-icon>navigate_next</mat-icon>
-      </button>
+      <!-- Home/Fullscreen Controls -->
+      <div class="controls-section">
+        <button id="home" mat-icon-button matTooltip="Home View">
+          <mat-icon>home</mat-icon>
+        </button>
+        <button id="full-page" mat-icon-button matTooltip="Full Screen">
+          <mat-icon>fullscreen</mat-icon>
+        </button>
+      </div>
     </div>
     
-     <!-- Toggle Controls in Menu Bar -->
+    <!-- Toggle Controls in Menu Bar -->
     <div class="menu-toggles">
       <mat-slide-toggle 
         [(ngModel)]="showingAnnotations" 
@@ -39,16 +52,6 @@
         class="menu-toggle">
         Show Animations
       </mat-slide-toggle>
-    </div>
-
-    <!-- Navigation Controls - Now in top menu bar -->
-    <div class="controls-section">
-      <button id="home" mat-icon-button matTooltip="Home View">
-        <mat-icon>home</mat-icon>
-      </button>
-      <button id="full-page" mat-icon-button matTooltip="Full Screen">
-        <mat-icon>fullscreen</mat-icon>
-      </button>
     </div>
   </div>
 

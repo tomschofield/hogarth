@@ -22,5 +22,11 @@ $custom-theme: mat.define-light-theme((
 // Include theme styles for core and each component used in your app
 @include mat.all-component-themes($custom-theme);
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body { 
+  height: 100%; 
+  overflow: hidden;
+}
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+}
