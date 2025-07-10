@@ -16,14 +16,23 @@
     <div class="progress-bar-container" *ngIf="!isVideoLoading && !showContent">
       <mat-progress-bar mode="determinate" [value]="videoProgress" class="video-progress-bar"></mat-progress-bar>
     </div>
-    <div class="title-controls" *ngIf="!showContent && !showPlayButton">
-    <button mat-icon-button 
-            (click)="toggleVideoPause()" 
-            class="pause-button"
-            [matTooltip]="isVideoPaused ? 'Resume Video' : 'Pause Video'">
-      <mat-icon>{{ isVideoPaused ? 'play_arrow' : 'pause' }}</mat-icon>
-    </button>
-  </div>
+    <div class="title-controls" *ngIf="!showPlayButton">
+      <button mat-icon-button 
+              (click)="toggleVideoPause()" 
+              class="pause-button"
+              *ngIf="!showContent"
+              [matTooltip]="isVideoPaused ? 'Resume Video' : 'Pause Video'">
+        <mat-icon>{{ isVideoPaused ? 'play_arrow' : 'pause' }}</mat-icon>
+      </button>
+      <button mat-stroked-button (click)="skipVideo()" *ngIf="!showContent" class="skip-button" matTooltip="Skip Video">
+        <mat-icon>skip_next</mat-icon>
+        Skip
+      </button>
+      <button mat-stroked-button (click)="playAgain()" *ngIf="showContent" class="play-again-button" matTooltip="Play Video Again">
+        <mat-icon>replay</mat-icon>
+        Play Again
+      </button>
+    </div>
   </h1>
   
   <!-- Play button overlay -->
@@ -37,15 +46,6 @@
   <div class="intro-content" [class.show]="showContent">
     <button mat-raised-button color="primary" (click)="startViewer()" *ngIf="showStartButton">
       Start Exploring
-    </button>
-  </div>
-
-  <div class="skip-button-container">
-    <button mat-button color="accent" (click)="skipVideo()" *ngIf="!showContent">
-      Skip
-    </button>
-    <button mat-button color="accent" (click)="playAgain()" *ngIf="showContent">
-      Play Again
     </button>
   </div>
 </div>

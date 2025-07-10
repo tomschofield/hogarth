@@ -29,10 +29,63 @@
   padding: 2rem 2rem 1.5rem 1.5rem;
   text-align: left;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.3) 100%);
-
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+
+  .pause-button,
+  .skip-button,
+  .play-again-button {
+    background: rgba(0, 0, 0, 0.3) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 20px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    &:hover {
+      background: rgb(108, 108, 108) !important;
+      transform: scale(1.05);
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-right: 4px;
+    }
+  }
+
+  .pause-button {
+    mat-icon {
+      margin-right: 0;
+    }
+  }
+
+  .skip-button,
+  .play-again-button {
+    gap: 4px !important;
+    padding: 0 12px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+  }
+
+  .skip-button,
+  .play-again-button {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 0 12px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+  }
 
   .title-controls {
     position: absolute;
@@ -40,22 +93,10 @@
     right: 2rem; 
     display: flex;
     align-items: center;
+    gap: 8px;
 
-    .pause-button {
-      background: rgba(0, 0, 0, 0.3) !important;
-      color: #dbdbdb !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      
-      &:hover {
-        background: rgb(108, 108, 108) !important;
-        transform: scale(1.05);
-      }
-      
-      mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-      }
+    @media (max-width: 768px) {
+      top: 6.5rem;
     }
   }
 
