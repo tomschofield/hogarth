@@ -307,11 +307,11 @@
         }
         
         ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-            background-color: #862633;
+            background-color: rgba(255, 255, 255, 0.5);
         }
         
         ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
-            background-color: #862633;
+            background-color: #ffffff;
         }
     }
     
@@ -409,21 +409,59 @@
     }
 }
 
-.annotation-images {
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 10px;
-
-    img {
-        display: block;
-        max-width: 100%;
-        max-height: 350px;
-        height: auto;
-        margin-bottom: 10px;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-        &:last-child {
-            margin-bottom: 0;
-        }
+// Annotation pin styles
+.annotation-pin {
+    border-radius: 50% !important;
+    position: relative !important;
+    cursor: pointer !important;
+    
+    /* Base styles for single-level annotations */
+    &.single-level {
+        background: radial-gradient(circle, #1976d2 30%, rgba(25, 118, 210, 0.8) 60%, rgba(25, 118, 210, 0.4) 10%) !important;
+        box-shadow: 0 0 10px rgba(25, 118, 210, 0.5) !important;
     }
+    
+    /* Base styles for multi-level annotations */
+    &.multi-level {
+        background: radial-gradient(circle, #862633 30%, rgba(134, 38, 51, 0.8) 60%, rgba(134, 38, 51, 0.4) 10%) !important;
+        box-shadow: 0 0 10px rgba(134, 38, 51, 0.5) !important;
+    }
+    
+    /* Inner dot for more definition */
+    &::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 8px !important;
+        height: 8px !important;
+        border-radius: 50% !important;
+        background: white !important;
+        opacity: 0.9 !important;
+    }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(25, 118, 210, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(25, 118, 210, 0);
+  }
+}
+
+@keyframes pulse-multi {
+  0% {
+    box-shadow: 0 0 0 0 rgba(134, 38, 51, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(134, 38, 51, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(134, 38, 51, 0);
+  }
 }

@@ -29,6 +29,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   animationIndex: number = 0;
   numAnimations: number = 0;
   private videoOverlays: any[] = [];
+  private annotationOverlays: any[] = [];
   private currentVideo: HTMLVideoElement | null = null;
   isPlaying: boolean = false;
   annotationImages: string[] = [];
@@ -268,28 +269,71 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   addAnnotation(x: number, y: number, index: number, type: string) {
-    var elt = document.createElement("img");
+    var elt = document.createElement("div");
+    elt.className = "annotation-pin";
+    
     if (type === "multi-level") {
-      elt.src = "assets/icons/pin.png"
+      elt.classList.add("multi-level");
     } else {
-      elt.src = "assets/icons/pin_blue.png"
+      elt.classList.add("single-level");
     }
 
     elt.id = "annotation_" + index;
     elt.style.cursor = "pointer";
+    
+    // Apply inline styles for immediate effect
+    elt.style.width = "1px";
+    elt.style.height = "1px";
+    elt.style.borderRadius = "50%";
+    elt.style.position = "relative";
+    elt.style.transition = "all 0.1s ease";
+    
+    // Add the visual styling based on type
+    if (type === "multi-level") {
+      elt.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%,  rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
+    } else {
+      elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%,  rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
+    }
+    
     this.currentAnnotationIndex = index;
+    
     this.viewer.addOverlay({
       element: elt,
       location: new OpenSeadragon.Point(x, y),
-      placement: 'BOTTOM',
+      placement: 'CENTER',
       checkResize: false,
-      width: 0.05,
-      height: 0.05,
+      width: 0.02,
+      height: 0.02,
       index: index
     });
 
+    // Track this annotation overlay for reliable removal
+    this.annotationOverlays.push(elt);
+
+    // Add hover effects using JavaScript since CSS might not penetrate OpenSeadragon
+    elt.addEventListener('mouseenter', () => {
+      elt.style.transform = "scale(1.6)";
+      if (type === "multi-level") {
+        elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
+        elt.style.animation = "pulse-multi 1.5s infinite";
+      } else {
+        elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0.8)";
+        elt.style.animation = "pulse 1.5s infinite";
+      }
+    });
+    
+    elt.addEventListener('mouseleave', () => {
+      elt.style.transform = "scale(1)";
+      elt.style.animation = "none";
+      if (type === "multi-level") {
+        elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
+      } else {
+        elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0)";
+      }
+    });
+
     new OpenSeadragon.MouseTracker({
-      element: document.getElementById('annotation_' + index),
+      element: elt,
       clickHandler: e => this.setAnnotation(index),
     });
 
@@ -368,12 +412,12 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   removeAnnotations() {
-    const overlays = this.viewer.currentOverlays;
-    overlays.forEach(overlay => {
-      if (overlay.element.tagName === 'IMG') {
-        this.viewer.removeOverlay(overlay.element);
-      }
+    // Remove all tracked annotation overlays
+    this.annotationOverlays.forEach(annotationElement => {
+      this.viewer.removeOverlay(annotationElement);
     });
+    // Clear the tracking array
+    this.annotationOverlays = [];
   }
 
   removeAnimations() {
@@ -810,7 +854,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     video.addEventListener('pause', () => {
       this.isPlaying = false;
     });
-    
+
     // Auto-play the video when it's loaded
     video.addEventListener('loadeddata', () => {
       video.play().catch(error => {
