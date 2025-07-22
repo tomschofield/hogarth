@@ -15,13 +15,85 @@ export class IntroComponent implements AfterViewInit {
   isVideoLoading = true; 
   videoProgress = 0;
   isVideoPaused = false;
+  adaptiveVideoUrl = '';
+  private orientationChangeListener?: () => void;
+  private currentTime = 0;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) { 
+    this.adaptiveVideoUrl = this.getOptimalVideoUrl('assets/videos/Hogarth.mp4');
+  }
 
   ngAfterViewInit() {
+    // Set the adaptive video source
+    this.videoElement.nativeElement.src = this.adaptiveVideoUrl;
     // Ensure video plays after view init
     this.playVideo();
     this.setupVideoProgressTracking();
+    this.setupOrientationChangeListener();
+  }
+
+  ngOnDestroy() {
+    if (this.orientationChangeListener) {
+      window.removeEventListener('orientationchange', this.orientationChangeListener);
+      window.removeEventListener('resize', this.orientationChangeListener);
+    }
+  }
+
+  private setupOrientationChangeListener() {
+    this.orientationChangeListener = () => {
+      // Small delay to ensure the orientation change is complete
+      setTimeout(() => {
+        this.handleOrientationChange();
+      }, 100);
+    };
+
+    // Listen for both orientationchange and resize events
+    window.addEventListener('orientationchange', this.orientationChangeListener);
+    window.addEventListener('resize', this.orientationChangeListener);
+  }
+
+  private handleOrientationChange() {
+    const newVideoUrl = this.getOptimalVideoUrl('assets/videos/Hogarth.mp4');
+    
+    // Only swap if the URL actually changed
+    if (newVideoUrl !== this.adaptiveVideoUrl) {
+      const video = this.videoElement.nativeElement;
+      
+      // Store current playback time and state
+      this.currentTime = video.currentTime;
+      const wasPlaying = !video.paused;
+      
+      // Update the video source
+      this.adaptiveVideoUrl = newVideoUrl;
+      video.src = this.adaptiveVideoUrl;
+      
+      // When the new video loads, restore playback position and state
+      const loadedHandler = () => {
+        video.currentTime = this.currentTime;
+        
+        if (wasPlaying && !this.isVideoPaused) {
+          video.play().catch(console.error);
+        }
+        
+        video.removeEventListener('loadeddata', loadedHandler);
+      };
+      
+      video.addEventListener('loadeddata', loadedHandler);
+    }
+  }
+  
+  private getOptimalVideoUrl(baseVideoUrl: string): string {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const isPortrait = screenHeight > screenWidth;
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    
+    // Determine optimal video quality based on screen size and pixel density
+    if (isPortrait) {
+      return baseVideoUrl.replace('.mp4', '_Portrait.mp4');
+    } else {
+      return baseVideoUrl
+    }
   }
 
   setupVideoProgressTracking() {
