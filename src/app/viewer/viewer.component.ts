@@ -1003,4 +1003,13 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       this.viewer.removeOverlay(highlight);
     }, 2000);
   }
+
+  closeAnnotationPanel() {
+    this.panelText = "";
+    this.annotationImages = [];
+    this.panelTitle = 'Annotation Details';
+    this.currentAnnotationIndex = 0;
+    this.panelTextIndex = 0;
+    this.numPanels = 0;
+  }
 }
