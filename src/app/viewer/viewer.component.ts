@@ -658,20 +658,32 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   addVideoOverlayForPlayback(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+    // Find the animation data to get navigation cues
+    const animation = this.animations.find(anim => 
+      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
+    );
+    
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: false,
       storeAsCurrentVideo: true,
       trackProgress: true,
-      playNextOnEnd: true
+      playNextOnEnd: true,
+      navigationCues: animation?.navigationCues 
     });
   }
 
   addVideoOverlayWithSequence(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+    // Find the animation data to get navigation cues
+    const animation = this.animations.find(anim => 
+      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
+    );
+    
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: true,
       moveToOnLoad: true,
       playNextOnEnd: true,
-      storeAsCurrentVideo: true
+      storeAsCurrentVideo: true,
+      navigationCues: animation?.navigationCues 
     });
   }
 
@@ -739,6 +751,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     trackProgress?: boolean;
     moveToOnLoad?: boolean;
     playNextOnEnd?: boolean;
+    navigationCues?: any[];
   } = {}) {
     var video = document.createElement("video");
     video.src = videoUrl;
@@ -776,6 +789,50 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     container.style.height = "100%";
     container.appendChild(video);
     container.appendChild(playButton);
+
+    // Track navigation cues if provided
+    if (options.navigationCues && options.navigationCues.length > 0) {
+      console.log('Navigation cues provided:', options.navigationCues);
+      let currentCueIndex = 0;
+      const navigationCues = options.navigationCues;
+
+      video.addEventListener('timeupdate', () => {
+        const currentTime = video.currentTime;
+        
+        // Check if we've reached the next navigation cue
+        if (currentCueIndex < navigationCues.length) {
+          const nextCue = navigationCues[currentCueIndex];
+          
+          if (currentTime >= nextCue.time) {
+            console.log(`Navigation cue triggered at ${currentTime}s:`, nextCue.description);
+            
+            // Move the viewer to the specified location
+            this.moveToLocation(nextCue.x, nextCue.y, nextCue.width, nextCue.height);
+            
+            currentCueIndex++;
+          }
+        }
+
+        // Show preview of next navigation cue when we're 2 seconds away
+        // if (currentCueIndex < navigationCues.length) {
+        //   const nextCue = navigationCues[currentCueIndex];
+        //   if (currentTime >= (nextCue.time - 2) && currentTime < nextCue.time) {
+        //     // Only show the preview once per cue
+        //     if (!nextCue.previewShown) {
+        //       this.showNextNavigationCue(nextCue);
+        //       nextCue.previewShown = true; // Mark as shown to prevent repeated calls
+        //     }
+        //   }
+        // }
+
+      });
+
+      // Reset cue index when video starts over
+      video.addEventListener('seeked', () => {
+        currentCueIndex = navigationCues.findIndex(cue => cue.time > video.currentTime);
+        if (currentCueIndex === -1) currentCueIndex = navigationCues.length;
+      });
+    }
 
     // Show/hide play button on hover
     container.addEventListener('mouseenter', () => {
@@ -900,5 +957,50 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     this.videoOverlays.push(container);
 
     return container;
+  }
+
+  private moveToLocation(x: number, y: number, width: number, height: number, immediate: boolean = false, duration: number = 1.5) {
+    const padding = 0.05; // Add some padding around the target area
+    const bounds = new OpenSeadragon.Rect(
+      x - (width / 2) - padding,
+      y - (height / 2) - padding,
+      width + (padding * 2),
+      height + (padding * 2)
+    );
+    
+    // Use custom animation timing for smoother transitions
+    const currentAnimationTime = this.viewer.animationTime;
+    this.viewer.animationTime = duration;
+    
+    this.viewer.viewport.fitBounds(bounds, false);
+    
+    // Restore original animation time after transition
+    setTimeout(() => {
+      this.viewer.animationTime = currentAnimationTime;
+    }, duration * 1000);
+  }
+
+  private showNextNavigationCue(cue: any) {
+    // Create a temporary highlight overlay
+    const highlight = document.createElement("div");
+    highlight.style.border = "2px dashed rgba(255, 255, 255, 0.8)";
+    highlight.style.borderRadius = "8px";
+    highlight.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+    highlight.style.pointerEvents = "none";
+    
+    // Add overlay to show next target area
+    this.viewer.addOverlay({
+      element: highlight,
+      location: new OpenSeadragon.Point(cue.x, cue.y),
+      placement: 'CENTER',
+      checkResize: false,
+      width: cue.width,
+      height: cue.height
+    });
+    
+    // Remove highlight after 2 seconds
+    setTimeout(() => {
+      this.viewer.removeOverlay(highlight);
+    }, 2000);
   }
 }
