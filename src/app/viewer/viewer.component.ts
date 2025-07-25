@@ -154,7 +154,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
           showHomeControl: true,
           blendTime: 0.5,
           springStiffness: 6.5,       
-          animationTime: 1.2,         
+          animationTime: 1.5,         
           immediateRender: false, 
           showZoomControl: false,
           showFullPageControl: true,
@@ -959,7 +959,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     return container;
   }
 
-  private moveToLocation(x: number, y: number, width: number, height: number, immediate: boolean = false, duration: number = 1.5) {
+  private moveToLocation(x: number, y: number, width: number, height: number, immediate: boolean = false, duration: number = 2) {
     const padding = 0.05; // Add some padding around the target area
     const bounds = new OpenSeadragon.Rect(
       x - (width / 2) - padding,

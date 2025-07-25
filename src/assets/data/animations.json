@@ -13,28 +13,36 @@
         "hideControls": false,
         "navigationCues": [
             {
-                "time": 3.0,
-                "x": 0.2,
+                "time":48.0,
+                "x": 0.5,
                 "y": 0.3,
                 "width": 0.5,
                 "height": 0.5,
-                "description": "Focus on character interaction"
+                "description": "King William"
             },
             {
-                "time": 8.5,
-                "x": 0.7,
+                "time":58.0,
+                "x": 0.5,
                 "y": 0.5,
-                "width": 0.25,
-                "height": 0.25,
-                "description": "Highlight background detail"
+                "width": 0.7,
+                "height": 0.7,
+                "description": "Look around the table"
             },
             {
-                "time": 15.0,
-                "x": 0.358,
-                "y": 0.6236,
-                "width": 0.237,
-                "height": 0.237,
-                "description": "Return to main subject"
+                "time":91.0,
+                "x": 0.5,
+                "y": 0.6,
+                "width": 0.3,
+                "height": 0.3,
+                "description": "Carter"
+            },
+            {
+                "time":120.0,
+                "x": 0.154,
+                "y": 0.452,
+                "width": 0.2,
+                "height": 0.2,
+                "description": "Candidate"
             }
         ]
     },
@@ -49,7 +57,25 @@
         "width":0.142,
         "height":0.142,
         "duration":9.0,
-        "hideControls": false
+        "hideControls": false,
+         "navigationCues": [
+            {
+                "time":35.0,
+                "x": 0.154,
+                "y": 0.3,
+                "width": 0.3,
+                "height": 0.3,
+                "description": "Flag"
+            },
+             {
+                "time":63.0,
+                "x": 0.154,
+                "y": 0.5,
+                "width": 0.2,
+                "height": 0.2,
+                "description": "Flag"
+            }
+        ]
     },
     {
         "title": "Fiddle away maam",
