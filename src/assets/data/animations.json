@@ -21,7 +21,7 @@
                 "description": "King William"
             },
             {
-                "time":58.0,
+                "time":57.0,
                 "x": 0.5,
                 "y": 0.5,
                 "width": 0.7,
@@ -40,8 +40,8 @@
                 "time":120.0,
                 "x": 0.154,
                 "y": 0.452,
-                "width": 0.2,
-                "height": 0.2,
+                "width": 0.3,
+                "height": 0.3,
                 "description": "Candidate"
             }
         ]
@@ -60,7 +60,7 @@
         "hideControls": false,
          "navigationCues": [
             {
-                "time":35.0,
+                "time":34.0,
                 "x": 0.154,
                 "y": 0.3,
                 "width": 0.3,
@@ -83,10 +83,10 @@
         "storyIndex":2,
         "transcript": "blah blah blah blah",
         "videoUrl": "assets/videos/fiddling-nan.mp4",
-        "x": 0.464,
-        "y": 0.292,
-        "width":0.116,
-        "height":0.116,
+        "x": 0.463,
+        "y": 0.295,
+        "width":0.113,
+        "height":0.113,
         "duration":9.0,
         "hideControls": false
     },{
