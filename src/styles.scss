@@ -3,11 +3,37 @@
 @use '@angular/material' as mat;
 
 // Include the common styles for Angular Material
-@include mat.core();
+// @include mat.core();
+
+// Define a custom color palette
+$custom-accent: mat.define-palette((
+   50: #f3e5e7,
+  100: #e1bec3,
+  200: #cd939b,
+  300: #862633, // Your burgundy color moved to 300
+  400: #6d1f29,
+  500: #5a1a20,
+  600: #4d1619,
+  700: #3f1215,
+  800: #320e11,
+  900: #25090c,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+));
 
 // Define your custom primary color palette
 $custom-primary: mat.define-palette(mat.$grey-palette, 900);
-$custom-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+// $custom-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 $custom-warn: mat.define-palette(mat.$red-palette);
 
 // Create the theme object
