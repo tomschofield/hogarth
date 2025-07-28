@@ -454,7 +454,7 @@
                 }
                 
                 ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-                    background-color: rgba(255, 255, 255, 0.5);
+                    background-color: #862633 !important;
                 }
                 
                 ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
@@ -513,7 +513,7 @@
         }
         
         ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-            background-color: rgba(255, 255, 255, 0.5);
+            background-color: #862633 !important;
         }
         
         ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
@@ -529,11 +529,15 @@
 }
 
 .controls-section {
+  position: fixed;
+  top: 90px; // Position below the 80px top-menu-bar with some spacing
+  right: 20px;
   display: flex;
+  flex-direction: column; // Stack buttons vertically
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 10px;
+  z-index: 999; // Ensure it's below the menu but above content
 
   @media (max-width: 768px) , 
          (max-height: 768px) and (orientation: landscape) {
@@ -543,6 +547,8 @@
   button {
     color: white;
     background-color: rgba(255, 255, 255, 0.1);
+    width: 48px; // Make buttons consistent size
+    height: 48px;
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.2);

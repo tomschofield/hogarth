@@ -25,16 +25,6 @@
           <mat-icon>navigate_next</mat-icon>
         </button>
       </div>
-      
-      <!-- Home/Fullscreen Controls -->
-      <div class="controls-section">
-        <button id="home" mat-icon-button matTooltip="Home View">
-          <mat-icon>home</mat-icon>
-        </button>
-        <button id="full-page" mat-icon-button matTooltip="Full Screen">
-          <mat-icon>fullscreen</mat-icon>
-        </button>
-      </div>
     </div>
     
     <!-- Desktop Toggle Controls -->
@@ -63,6 +53,16 @@
         <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
       </button>
     </div>
+  </div>
+
+  <!-- Home/Fullscreen Controls - Now positioned on the right side -->
+  <div class="controls-section">
+    <button id="home" mat-icon-button matTooltip="Home View">
+      <mat-icon>home</mat-icon>
+    </button>
+    <button id="full-page" mat-icon-button matTooltip="Full Screen">
+      <mat-icon>fullscreen</mat-icon>
+    </button>
   </div>
 
   <!-- Mobile Menu Overlay -->
