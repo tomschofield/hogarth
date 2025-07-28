@@ -37,8 +37,8 @@
       </div>
     </div>
     
-    <!-- Toggle Controls in Menu Bar -->
-    <div class="menu-toggles">
+    <!-- Desktop Toggle Controls -->
+    <div class="menu-toggles desktop-only">
       <mat-slide-toggle 
         [(ngModel)]="showingAnnotations" 
         (change)="toggleAnnotations($event.checked)"
@@ -52,6 +52,47 @@
         class="menu-toggle">
         Show Animations
       </mat-slide-toggle>
+    </div>
+
+    <!-- Mobile Burger Menu Button -->
+    <div class="mobile-menu-button mobile-only">
+      <button mat-icon-button 
+              (click)="toggleMobileMenu()"
+              [class.menu-open]="isMobileMenuOpen"
+              matTooltip="Menu">
+        <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" 
+       *ngIf="isMobileMenuOpen" 
+       (click)="closeMobileMenu()"></div>
+
+  <!-- Mobile Menu Panel -->
+  <div class="mobile-menu-panel" 
+       [class.menu-open]="isMobileMenuOpen">
+    <div class="mobile-menu-content">
+      <h3>Display Options</h3>
+      
+      <div class="mobile-menu-item">
+        <mat-slide-toggle 
+          [(ngModel)]="showingAnnotations" 
+          (change)="toggleAnnotations($event.checked)"
+          class="menu-toggle">
+          Show Annotations
+        </mat-slide-toggle>
+      </div>
+      
+      <div class="mobile-menu-item">
+        <mat-slide-toggle 
+          [(ngModel)]="showingAnimations" 
+          (change)="toggleAnimations($event.checked)"
+          class="menu-toggle">
+          Show Animations
+        </mat-slide-toggle>
+      </div>
     </div>
   </div>
 

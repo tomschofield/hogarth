@@ -36,6 +36,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   videoProgress: number = 0;
   videoDuration: number = 0;
   dragPosition = { x: 0, y: 0 };
+  isMobileMenuOpen: boolean = false;
+  
 
   constructor(
     private ngZone: NgZone, 
@@ -1011,5 +1013,13 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     this.currentAnnotationIndex = 0;
     this.panelTextIndex = 0;
     this.numPanels = 0;
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
   }
 }

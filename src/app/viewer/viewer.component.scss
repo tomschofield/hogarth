@@ -32,7 +32,7 @@
     position: fixed;
     bottom: 20px;
     left: 20px;
-    width: 320px;
+    width: 280px;
     z-index: 1000;
     cursor: move;
     
@@ -53,7 +53,7 @@
         color: white;
 
         mat-card-content {
-            padding: 20px;
+            padding: 10px;
         }
     }
 }
@@ -88,7 +88,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 2px;
      margin-top: 8px;
 
     .animation-title {
@@ -337,6 +337,145 @@
     text-align: center;
 }
 
+// Mobile/Desktop visibility utilities
+.desktop-only {
+    @media (max-width: 768px) {
+        display: none !important;
+    }
+}
+
+.mobile-only {
+    display: none;
+    
+    @media (max-width: 768px) {
+        display: flex !important;
+    }
+}
+
+// Mobile burger menu button
+.mobile-menu-button {
+    position: absolute;
+    right: 10px;
+    top: 25%;
+    transform: translateY(-50%);
+    z-index: 1002;
+    
+    button {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        &.menu-open {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        mat-icon {
+            color: white;
+            transition: transform 0.3s ease;
+        }
+    }
+}
+
+// Mobile menu overlay
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+// Mobile menu panel
+.mobile-menu-panel {
+    position: fixed;
+    top: 80px;
+    right: -300px;
+    width: 280px;
+    background: linear-gradient(135deg, #862633 0%, #af5e20 100%);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+    z-index: 1002;
+    transition: right 0.3s ease;
+    border-radius: 8px 0 0 8px;
+    
+    &.menu-open {
+        right: 0;
+    }
+    
+    .mobile-menu-content {
+        padding: 20px;
+        color: white;
+        
+        h3 {
+            margin: 0 0 20px 0;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+        
+        .mobile-menu-item {
+            margin: 15px 0;
+            padding: 10px 0;
+            
+            .menu-toggle {
+                color: white;
+                width: 100%;
+                
+                ::ng-deep .mat-slide-toggle-label {
+                    color: white !important;
+                    font-size: 16px;
+                    font-weight: 500;
+                }
+
+                ::ng-deep .mdc-form-field > label {
+                    color: white !important;
+                }
+                
+                ::ng-deep .mat-mdc-slide-toggle .mdc-form-field {
+                    color: white !important;
+                }
+                
+                ::ng-deep .mat-slide-toggle-bar {
+                    background-color: rgba(255, 255, 255, 0.3);
+                }
+                
+                ::ng-deep .mat-slide-toggle-thumb {
+                    background-color: white;
+                }
+                
+                ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+                    background-color: rgba(255, 255, 255, 0.5);
+                }
+                
+                ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+                    background-color: #ffffff;
+                }
+            }
+        }
+    }
+}
+
+// Animation for fade in
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+// Update existing menu-toggles to hide on mobile
 .menu-toggles {
     display: flex;
     align-items: center;
@@ -344,10 +483,7 @@
     margin: 0 20px;
 
     @media (max-width: 768px) {
-        order: 4;
-        justify-content: center;
-        margin: 10px 0;
-        gap: 15px;
+        display: none; // Hide on mobile since we're using burger menu
     }
     
     .menu-toggle {
