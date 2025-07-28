@@ -4,6 +4,7 @@ import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
 import { CanvasDatum } from '../canvas-datum';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
+import { MatFormFieldModule } from '@angular/material/form-field';
 declare var OpenSeadragon: any;
 
 @Component({
@@ -37,6 +38,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   videoDuration: number = 0;
   dragPosition = { x: 0, y: 0 };
   isMobileMenuOpen: boolean = false;
+  showingChat: boolean = false;
+  chatMessages: {message: string, isUser: boolean, timestamp: Date}[] = [];
+  currentMessage: string = '';
   
 
   constructor(
@@ -450,6 +454,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   toggleAnnotations(show: boolean) {
     this.showingAnnotations = show;
     if (show) {
+      this.showingChat = false;
       this.addAnnotations(this.annotations);
     } else {
       this.removeAnnotations();
@@ -1021,5 +1026,74 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
   closeMobileMenu() {
     this.isMobileMenuOpen = false;
+  }
+
+  // Add the toggleChat method
+  toggleChat(show: boolean) {
+    this.showingChat = show;
+    if (show) {
+      // Turn off annotations when chat is opened
+      this.showingAnnotations = false;
+      this.removeAnnotations();
+      
+      // Hide annotation panel when chat is opened
+      this.closeAnnotationPanel();
+
+      // Add welcome message if chat is empty
+      if (this.chatMessages.length === 0) {
+        this.chatMessages.push({
+          message: "Greetings! I am William Hogarth, painter of moral tales and observer of human folly. What would you like to know about my Election Series?",
+          isUser: false,
+          timestamp: new Date()
+        });
+      }
+    }
+  }
+
+  // Add method to send chat message
+  sendChatMessage() {
+    if (this.currentMessage.trim()) {
+      // Add user message
+      this.chatMessages.push({
+        message: this.currentMessage,
+        isUser: true,
+        timestamp: new Date()
+      });
+
+      // Generate dummy Hogarth response
+      const responses = [
+        "Ah, a most perceptive question! In my paintings, I sought to expose the corruption and vice that plagued society.",
+        "Indeed! Each figure in my compositions tells a story of human nature - both its nobility and its failings.",
+        "You see clearly, my friend. The Election Series reveals how power corrupts and democracy can be bought.",
+        "Precisely! Notice how I've used symbolism throughout - every dog, every fallen hat, every gesture has meaning.",
+        "A keen observation! I painted not just what I saw, but what I felt about the moral state of our nation.",
+        "Quite right! My brush was my weapon against hypocrisy and social pretense.",
+        "Excellent question! Each painting in this series follows the progression of electoral corruption."
+      ];
+      
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      // Add Hogarth's response after a short delay
+      setTimeout(() => {
+        this.chatMessages.push({
+          message: randomResponse,
+          isUser: false,
+          timestamp: new Date()
+        });
+      }, 1000);
+
+      // Clear input
+      this.currentMessage = '';
+    }
+  }
+
+  // Add method to clear chat
+  clearChat() {
+    this.chatMessages = [];
+    this.chatMessages.push({
+      message: "Greetings! I am William Hogarth, painter of moral tales and observer of human folly. What would you like to know about my Election Series?",
+      isUser: false,
+      timestamp: new Date()
+    });
   }
 }

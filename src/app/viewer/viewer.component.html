@@ -42,6 +42,13 @@
         class="menu-toggle">
         Show Animations
       </mat-slide-toggle>
+
+      <mat-slide-toggle 
+        [(ngModel)]="showingChat" 
+        (change)="toggleChat($event.checked)"
+        class="menu-toggle">
+        Ask Hogarth
+      </mat-slide-toggle>
     </div>
 
     <!-- Mobile Burger Menu Button -->
@@ -93,6 +100,15 @@
           Show Animations
         </mat-slide-toggle>
       </div>
+
+      <div class="mobile-menu-item">
+        <mat-slide-toggle 
+          [(ngModel)]="showingChat" 
+          (change)="toggleChat($event.checked)"
+          class="menu-toggle">
+          Ask Hogarth
+        </mat-slide-toggle>
+      </div>
     </div>
   </div>
 
@@ -100,11 +116,11 @@
   <div class="main-content">
     <!-- Main Viewer Container -->
     <div id="seadragon-viewer" 
-         [style.width]="showingAnnotations && panelText ? '70%' : '100%'">
+         [style.width]="(showingAnnotations && panelText) || showingChat ? '70%' : '100%'">
     </div>
 
     <!-- Annotation Panel - Right Side -->
-    <div *ngIf="panelText && showingAnnotations" 
+    <div *ngIf="panelText && showingAnnotations && !showingChat" 
          class="annotation-panel-right">
       <mat-card style="height: 100%;">
         <mat-card-header>
@@ -144,6 +160,65 @@
                     [disabled]="panelTextIndex === numPanels - 1" 
                     (click)="nextPanel()">
               <mat-icon>navigate_next</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Chat Panel - Right Side -->
+    <div *ngIf="showingChat" class="chat-panel-right">
+      <mat-card style="height: 100%;">
+        <mat-card-header>
+          <mat-card-title style="display: flex; align-items: center; gap: 8px;">
+            <mat-icon>chat</mat-icon>
+            Ask Hogarth
+          </mat-card-title>
+          <button mat-icon-button 
+            class="close-button"
+            (click)="toggleChat(false)"
+            matTooltip="Close Chat">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-card-header>
+
+        <mat-card-content class="chat-content">
+          <!-- Chat Messages -->
+          <div class="chat-messages" #chatMessagesContainer>
+            <div *ngFor="let msg of chatMessages" 
+                 class="chat-message"
+                 [class.user-message]="msg.isUser"
+                 [class.hogarth-message]="!msg.isUser">
+              <div class="message-bubble">
+                <div class="message-text">{{ msg.message }}</div>
+                <div class="message-time">{{ msg.timestamp | date:'short' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="chat-input-container">
+            <mat-form-field appearance="outline" class="chat-input">
+              <mat-label>Ask William Hogarth...</mat-label>
+              <input matInput 
+                     [(ngModel)]="currentMessage" 
+                     (keyup.enter)="sendChatMessage()"
+                     placeholder="Type your question here...">
+            </mat-form-field>
+            <button mat-fab 
+                    color="primary" 
+                    (click)="sendChatMessage()"
+                    [disabled]="!currentMessage.trim()"
+                    class="send-button">
+              <mat-icon>send</mat-icon>
+            </button>
+          </div>
+
+          <!-- Chat Actions -->
+          <div class="chat-actions">
+            <button mat-stroked-button (click)="clearChat()" class="clear-chat-button">
+              <mat-icon>clear_all</mat-icon>
+              Clear Chat
             </button>
           </div>
         </mat-card-content>
