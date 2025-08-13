@@ -32,9 +32,12 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  min-height: 90px;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     font-size: 2rem;
+    min-height: 140px; 
   }
 
   .pause-button,
@@ -90,13 +93,67 @@
   .title-controls {
     position: absolute;
     top: 1.5rem; 
-    right: 2rem; 
+    right: 4.5rem; 
     display: flex;
     align-items: center;
     gap: 8px;
 
     @media (max-width: 768px) {
       top: 6.5rem;
+    }
+  }
+
+  // Menu button container - always visible, positioned independently
+  .menu-button-container {
+    position: absolute;
+    top: 1.5rem;
+    right: 1rem;
+    z-index: 10;
+
+    @media (max-width: 768px) {
+      top: 1rem;
+      right: 1rem;
+    }
+
+    // When title-controls are visible, adjust position to avoid overlap
+    .title-controls ~ & {
+      right: calc(1rem + 200px); // Move left when controls are present
+      
+      @media (max-width: 768px) {
+        right: 1rem;
+        top: 8rem; // Position below controls on mobile
+      }
+    }
+  }
+
+  // Menu button inline styles
+  .menu-button-inline {
+    background: rgba(0, 0, 0, 0.3) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 20px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    &:hover {
+      background: rgb(108, 108, 108) !important;
+      transform: scale(1.05);
+    }
+
+    &.menu-open {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: white;
+      transition: transform 0.3s ease;
+      margin-right: 0;
     }
   }
 
@@ -237,4 +294,122 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
+}
+
+// Menu button - visible on all screen sizes, positioned like viewer page
+.menu-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1002;
+  
+  @media (max-width: 768px) {
+    top: 25%;
+  }
+  
+  button {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    &.menu-open {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    mat-icon {
+      color: white;
+      transition: transform 0.3s ease;
+    }
+  }
+}
+
+// Menu overlay
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+// Menu panel
+.menu-panel {
+  position: fixed;
+  top: 80px;
+  right: -300px;
+  width: 280px;
+  background: #862633;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 1002;
+  transition: right 0.3s ease;
+  border-radius: 8px 0 0 8px;
+  
+  &.menu-open {
+    right: 0;
+  }
+  
+  .menu-content {
+    padding: 20px;
+    color: white;
+    font-family: "Figgins", serif;
+    
+    h3 {
+      margin: 0 0 20px 0;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      color: white;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 10px;
+    }
+    
+    .menu-item {
+      padding: 10px 0;
+      
+      .about-button {
+        width: 100%;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        font-family: "Figgins", serif;
+        font-size: 16px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        mat-icon {
+          color: white;
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+}
+
+// Animation for fade in
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

@@ -30,8 +30,19 @@
         Play Again
       </button>
     </div>
+    
+    <!-- Menu Button - always visible, positioned independently -->
+    <div class="menu-button-container">
+      <button mat-icon-button 
+              (click)="toggleMenu()"
+              [class.menu-open]="isMenuOpen"
+              class="menu-button-inline"
+              matTooltip="Menu">
+        <mat-icon>{{ isMenuOpen ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
   </h1>
-  
+
   <!-- Play button overlay -->
   <div class="play-button-overlay" *ngIf="showPlayButton">
     <button mat-fab color="primary" (click)="onPlayButtonClick()" class="play-button">
@@ -45,4 +56,31 @@
       Explore
     </button>
   </div>
+
+  <!-- Menu Overlay -->
+  <div class="menu-overlay" 
+       *ngIf="isMenuOpen" 
+       (click)="closeMenu()"></div>
+
+  <!-- Menu Panel -->
+  <div class="menu-panel" 
+       [class.menu-open]="isMenuOpen">
+    <div class="menu-content">
+      <h3>William Hogarth's Humors of an Election</h3>
+      
+      <div class="menu-item">
+        <button mat-stroked-button 
+                (click)="openAboutModal()"
+                class="about-button"> 
+          Acknowledgments
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acknowledgments Modal - Update to match viewer pattern -->
+  <app-acknowledgments-modal 
+       [isOpen]="isAboutModalOpen"
+       (closeModal)="onModalClose()">
+  </app-acknowledgments-modal>
 </div>

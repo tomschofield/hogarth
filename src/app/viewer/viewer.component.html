@@ -85,8 +85,27 @@
           Ask Hogarth
         </mat-slide-toggle>
       </div>
+
+      <div class="menu-item">
+        <button mat-stroked-button 
+                (click)="openAboutModal()"
+                class="about-button">
+          Acknowledgments
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- Acknowledgments Modal Overlay -->
+  <div class="about-modal-overlay" 
+       *ngIf="isAboutModalOpen" 
+       (click)="closeAboutModal()"></div>
+
+  <!-- Acknowledgments Modal -->
+  <app-acknowledgments-modal 
+    [isOpen]="isAboutModalOpen"
+    (closeModal)="closeAboutModal()">
+  </app-acknowledgments-modal>
 
   <!-- Main Content Area with Flexbox Layout - Now full height -->
   <div class="main-content">

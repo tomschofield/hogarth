@@ -18,6 +18,10 @@ export class IntroComponent implements AfterViewInit {
   adaptiveVideoUrl = '';
   private orientationChangeListener?: () => void;
   private currentTime = 0;
+  
+  // Menu properties
+  isMenuOpen: boolean = false;
+  isAboutModalOpen: boolean = false;
 
   constructor(private router: Router) { 
     this.adaptiveVideoUrl = this.getOptimalVideoUrl('assets/videos/Hogarth.mp4');
@@ -185,4 +189,26 @@ export class IntroComponent implements AfterViewInit {
     this.playVideo();
   }
 
+  // Menu functionality methods
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
+  }
+
+  openAboutModal() {
+    this.isAboutModalOpen = true;
+    this.closeMenu(); // Close the menu when opening about modal
+  }
+
+  closeAboutModal() {
+    this.isAboutModalOpen = false;
+  }
+
+  // Add handler for modal close event
+  onModalClose() {
+    this.isAboutModalOpen = false;
+  }
 }

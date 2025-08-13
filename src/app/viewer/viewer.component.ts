@@ -38,6 +38,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   videoDuration: number = 0;
   dragPosition = { x: 0, y: 0 };
   isMenuOpen: boolean = false;
+  isAboutModalOpen: boolean = false;
   showingChat: boolean = false;
   chatMessages: {message: string, isUser: boolean, timestamp: Date}[] = [];
   currentMessage: string = '';
@@ -1050,6 +1051,15 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     this.isMenuOpen = false;
   }
 
+  openAboutModal() {
+    this.isAboutModalOpen = true;
+    this.closeMenu(); // Close the menu when opening about modal
+  }
+
+  closeAboutModal() {
+    this.isAboutModalOpen = false;
+  }
+
   // Add the toggleChat method
   toggleChat(show: boolean) {
     this.showingChat = show;
@@ -1075,7 +1085,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   // Add method to send chat message
   sendChatMessage() {
     if (this.currentMessage.trim()) {
-      // Add user message
+      // Add user message (without image)
       this.chatMessages.push({
         message: this.currentMessage,
         isUser: true,

@@ -21,6 +21,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input'; 
+import { AcknowledgmentsModalComponent } from './acknowledgments-modal/acknowledgments-modal.component';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { MatInputModule } from '@angular/material/input';
     AppComponent,
     MiradorTestComponent,
     IntroComponent,
-    ViewerComponent
+    ViewerComponent,
+    AcknowledgmentsModalComponent
   ],
   imports: [
     BrowserModule,

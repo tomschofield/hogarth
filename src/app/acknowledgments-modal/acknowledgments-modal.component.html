@@ -1,0 +1,94 @@
+<!-- Acknowledgments Modal Overlay -->
+<div class="about-modal-overlay" 
+     *ngIf="isOpen" 
+     (click)="onOverlayClick($event)"></div>
+
+<!-- Acknowledgments Modal -->
+<div class="about-modal" 
+     *ngIf="isOpen">
+  <mat-card class="about-card">
+    <mat-card-header>
+      <mat-card-title>Acknowledgments</mat-card-title>
+      <button mat-icon-button 
+              class="close-button"
+              (click)="onCloseModal()"
+              matTooltip="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-card-header>
+    
+    <mat-card-content class="about-content">
+      <!-- Logos Section -->
+      <div class="logos-section" style="display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 30px; flex-wrap: wrap;">
+        <img src="assets/images/ahrc-logo.png" 
+             alt="Arts and Humanities Research Council" 
+             style="height: 50px; width: auto; padding-bottom: 5px;">
+        <img src="assets/images/newcastle-logo.png" 
+             alt="Newcastle University" 
+             style="height: 45px; width: auto;">
+        <img src="assets/images/soane-logo.png" 
+             alt="Sir John Soane's Museum London" 
+             style="height: 65px; width: auto; padding-bottom: 10px;">
+      </div>
+      
+      <div class="about-text" style="text-align: left;">
+        <p>
+          This project was made possible by a Follow-On grant from the Arts and Humanities Research Council (AHRC), 
+          running from March to July 2025 ('Humours of an Election: Annotation, Animation, Education', AH/Z507556/1). 
+          It developed from an earlier AHRC grant, 'Eighteenth-Century Political Participation and Electoral Culture' 
+          (ECPPEC) that ran from 2020 to 2023, the main output of which can be found at 
+          <a href="https://ecppec.ncl.ac.uk/" target="_blank">https://ecppec.ncl.ac.uk/</a>.
+        </p>
+        
+        <p>
+          Both projects were led by Professor Matthew Grenby (Newcastle University), with co-investigators 
+          Professor Elaine Chalus (University of Liverpool) and Dr. Tom Schofield (Newcastle). 
+          Dr Kendra Packham worked on the project as Senior Research and Innovation Associate, and 
+          Dan Foster-Smith as Research Software Developer (both Newcastle). Chalus, Grenby and Packham 
+          wrote the annotations for the paintings, Grenby and Packham wrote the scripts for the animations, 
+          and Foster-Smith and Schofield developed the online platform, AI-generated animations and interactive functions.
+        </p>
+        
+        <p>
+          The project was developed in partnership with the Sir John Soane Museum, with particular support from 
+          Jo Tinworth, Collections Curator (who has written extensive catalogue entries for the Soane's Hogarth paintings); 
+          Rhiannon Litterick, Public Programmes & Young People Manager; and Tallulah Smart, Museum Learning Officer.
+        </p>
+        
+        <p>
+          New, high-resolution digital images of William Hogarth's four 'Humours of an Election' paintings were 
+          produced as part of the project. We are grateful for help with this photography, and for permission to 
+          use the images, from the Sir John Soane Museum which has held the paintings since they were purchased 
+          by Soane in 1823.
+        </p>
+        
+        <p>
+          This resource was co-designed through a series of workshops with young people. We are grateful for the 
+          contributions made by Key Stage 3 students and their teachers at East Barnet School, London (in particular 
+          Mr Elliot Richman) and St Benet Biscop Catholic Academy, Bedlington (facilitated by the Education Outreach 
+          officers at Newcastle University Library), and by members of the Youth Panel at the Sir John Soane Museum.
+        </p>
+        
+        <p>
+          Music for the project was arranged and performed by Nancy Kerr (violin, viola, viola da gamba, voice) and 
+          Aisling Holmes (border pipes), Matt Quinn provided vocals; the music was recorded at Powered Flight Music. 
+          Kendra Packham selected, abridged and was historical adviser on the musical pieces. Voices for the animations 
+          were provided by Bertie Fenton, Kerry Gooderson, Katie Guicciardi, Nancy Kerr, Daniel Lille and Cameron Medford-Hawkins.
+        </p>
+        
+        <p>
+          For enquiries about the project please contact the Project Lead, <a href="mailto:matthew.grenby@ncl.ac.uk">Matthew Grenby</a>.
+        </p>
+      </div>
+      
+      <mat-divider style="margin: 20px 0;"></mat-divider>
+      
+      <div class="credits">
+        <p class="copyright">
+          © 2024 Digital Hogarth Project. Educational use permitted. 
+          Original artworks are in the public domain.
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
