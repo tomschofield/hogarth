@@ -26,7 +26,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   currentAnnotationIndex: number = 0;
   numPanels: number = 0;
   showingAnimations: boolean = false;
-  showingAnnotations: boolean = true;
+  showingAnnotations: boolean = false;
   animationIndex: number = 0;
   numAnimations: number = 0;
   private videoOverlays: any[] = [];
@@ -186,6 +186,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         // Load annotations and animations after viewer is created
         this.loadAnnotationsAndAnimations();
 
+        // Set default annotation content for the initial page
+        this.setDefaultAnnotationContent();
+
       } catch (error) {
         console.error('Error initializing OpenSeadragon viewer:', error);
       }
@@ -193,13 +196,23 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     error => {
       console.error("Error loading manifest data:", error);
     });
+
+    this.viewer.addHandler('open', () => {
+      const canvas = this.viewer.canvas;
+      if (canvas) {
+        canvas.style.backgroundColor = 'black';
+        
+        // Add selection event listeners when chat is active
+        this.setupSelectionHandlers();
+      }
+    });
   }
 
   private loadAnnotationsAndAnimations() {
     // Fetch annotation data
     this.annotationsService.getData().subscribe(res => {
       this.annotations = res;
-      this.addAnnotations(this.annotations);
+      // Remove automatic loading: this.addAnnotations(this.annotations);
     });
 
     // Fetch animation data
@@ -212,9 +225,18 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     // Handle page changes
     this.viewer.addHandler('page', (event: any) => {
       this.pageIndex = event.page;
-      this.panelText = "";
       console.log("now on page ", this.pageIndex);
-      this.addAnnotations(this.annotations);
+      
+      // Reset current annotation index to show default content
+      this.currentAnnotationIndex = -1;
+      
+      // Set default annotation panel content for each painting
+      this.setDefaultAnnotationContent();
+      
+      // Only add annotations if they are currently being shown
+      if (this.showingAnnotations) {
+        this.addAnnotations(this.annotations);
+      }
       
       // Update animations for new page if showing animations
       if (this.showingAnimations) {
@@ -322,7 +344,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     tooltip.appendChild(arrow);
     elt.appendChild(tooltip);
     
-    this.currentAnnotationIndex = index;
+    // this.currentAnnotationIndex = index;
     
     this.viewer.addOverlay({
       element: elt,
@@ -367,10 +389,10 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     });
 
     this.panelTextIndex = 0;
-    if (this.annotations[this.currentAnnotationIndex]["annotation text 0"].length > 0) this.numPanels = 1;
-    if (this.annotations[this.currentAnnotationIndex]["annotation text 1"].length > 0) this.numPanels = 2;
-    if (this.annotations[this.currentAnnotationIndex]["annotation text 2"].length > 0) this.numPanels = 3;
-    if (this.annotations[this.currentAnnotationIndex]["annotation text 3"].length > 0) this.numPanels = 4;
+    if (this.annotations[index]["annotation text 0"].length > 0) this.numPanels = 1;
+    if (this.annotations[index]["annotation text 1"].length > 0) this.numPanels = 2;
+    if (this.annotations[index]["annotation text 2"].length > 0) this.numPanels = 3;
+    if (this.annotations[index]["annotation text 3"].length > 0) this.numPanels = 4;
   }
 
   addVideoOverlay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
@@ -1094,4 +1116,48 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       timestamp: new Date()
     });
   }
+
+  private setDefaultAnnotationContent() {
+    const defaultContent = [
+      {
+        title: "An Election Entertainment",
+        text: `<p>Welcome to the first painting in Hogarth's Election Series: "An Election Entertainment" (1755).</p>
+               <p>This scene depicts the corrupt practices of electoral politics in 18th century England. The Tory party hosts a lavish feast to buy votes, while chaos and moral decay unfold around the dinner table.</p>
+               <p>Notice the symbolic details: the overturned chair, the dog stealing food, the window being bricked up (referencing the unpopular Window Tax), and the portrait of King William III being defaced.</p>
+               <p>Click on the blue and orange annotation pins to explore specific details and discover the hidden meanings in Hogarth's moral commentary.</p>`
+      },
+      {
+        title: "Canvassing for Votes", 
+        text: `<p>The second painting in the series: "Canvassing for Votes" (1757).</p>
+               <p>Here we see the corrupt practice of vote buying in full swing. Politicians and their agents desperately seek support through bribery, false promises, and manipulation of the electorate.</p>
+               <p>Hogarth masterfully depicts the hypocrisy of the electoral process - notice the inn signs showing competing political allegiances, the symbolic Royal Oak (representing the monarchy), and the various social classes being courted for their votes.</p>
+               <p>The painting reveals how democracy can be corrupted when money and power override genuine representation of the people's interests.</p>`
+      },
+      {
+        title: "The Polling",
+        text: `<p>The third painting: "The Polling" (1758) - Election Day arrives.</p>
+               <p>This scene shows the actual voting process, revealing the various ways corruption manifests even at the ballot box. Hogarth depicts voters of questionable capacity being brought to vote - including a dying man carried on a stretcher and a man taking an oath despite having a wooden leg (suggesting he may be an impostor).</p>
+               <p>The architecture itself tells a story: the classical building represents the ideal of democratic institutions, while the human drama unfolding reveals how far reality falls short of this ideal.</p>
+               <p>Notice Britannia's coach in the background - a symbol of the nation itself caught up in this corrupt spectacle.</p>`
+      },
+      {
+        title: "Chairing the Member",
+        text: `<p>The final painting: "Chairing the Member" (1758) - The aftermath of electoral victory.</p>
+               <p>The newly elected Member of Parliament is carried through the streets in traditional celebration, but Hogarth shows this moment of triumph descending into chaos and potential disaster.</p>
+               <p>The procession is on the verge of collapse - quite literally, as the chair and its occupant are about to tumble. This serves as Hogarth's final commentary on the electoral process: even victory achieved through corruption leads to instability and eventual downfall.</p>
+               <p>The painting completes the cycle, showing how the corruption depicted in the earlier scenes ultimately undermines the very system it was meant to celebrate.</p>`
+      }
+    ];
+
+    const currentContent = defaultContent[this.pageIndex];
+    if (currentContent) {
+      this.panelTitle = currentContent.title;
+      this.panelText = currentContent.text;
+      this.currentAnnotationIndex = -1; // Indicate this is default content, not a specific annotation
+      this.panelTextIndex = 0;
+      this.numPanels = 1;
+      this.annotationImages = [];
+    }
+  }
+
 }

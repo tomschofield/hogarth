@@ -92,11 +92,11 @@
   <div class="main-content">
     <!-- Main Viewer Container -->
     <div id="seadragon-viewer" 
-         [style.width]="(showingAnnotations && panelText) || showingChat ? '70%' : '100%'">
+         [style.width]="(panelText) || showingChat ? '70%' : '100%'">
     </div>
 
     <!-- Annotation Panel - Right Side -->
-    <div *ngIf="panelText && showingAnnotations && !showingChat" 
+    <div *ngIf="(panelText && showingAnnotations) || (panelText && currentAnnotationIndex === -1 && !showingChat)" 
          class="annotation-panel-right">
       <mat-card style="height: 100%;">
         <mat-card-header>
@@ -121,6 +121,29 @@
           
           <div [innerHTML]="panelText" class="annotation-content"></div>
           
+          <!-- Exploration Buttons - Only show for default content on first painting -->
+          <div *ngIf="currentAnnotationIndex === -1" class="exploration-buttons">
+            <h4>Explore Further:</h4>
+            <div class="button-group">
+              <div class="menu-item">
+                <mat-slide-toggle 
+                  [(ngModel)]="showingAnnotations" 
+                  (change)="toggleAnnotations($event.checked)"
+                  class="menu-toggle">
+                  Show Annotations
+                </mat-slide-toggle>
+              </div>
+              
+              <div class="menu-item">
+                <mat-slide-toggle 
+                  [(ngModel)]="showingAnimations" 
+                  (change)="toggleAnimations($event.checked)"
+                  class="menu-toggle">
+                  Show Animations
+                </mat-slide-toggle>
+              </div>
+            </div>
+          </div>
 
           <!-- Panel Navigation -->
           <div *ngIf="numPanels > 1" class="panel-navigation" style="margin-top: 20px; text-align: center;">
