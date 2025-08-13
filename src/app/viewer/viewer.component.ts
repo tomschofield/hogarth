@@ -37,7 +37,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   videoProgress: number = 0;
   videoDuration: number = 0;
   dragPosition = { x: 0, y: 0 };
-  isMobileMenuOpen: boolean = false;
+  isMenuOpen: boolean = false;
   showingChat: boolean = false;
   chatMessages: {message: string, isUser: boolean, timestamp: Date}[] = [];
   currentMessage: string = '';
@@ -1020,12 +1020,12 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     this.numPanels = 0;
   }
 
-  toggleMobileMenu() {
-    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
   }
 
-  closeMobileMenu() {
-    this.isMobileMenuOpen = false;
+  closeMenu() {
+    this.isMenuOpen = false;
   }
 
   // Add the toggleChat method
@@ -1073,7 +1073,6 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       
       const randomResponse = responses[Math.floor(Math.random() * responses.length)];
       
-      // Add Hogarth's response after a short delay
       setTimeout(() => {
         this.chatMessages.push({
           message: randomResponse,
@@ -1082,7 +1081,6 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         });
       }, 1000);
 
-      // Clear input
       this.currentMessage = '';
     }
   }
