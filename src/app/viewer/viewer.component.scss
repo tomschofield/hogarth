@@ -49,7 +49,7 @@
     mat-card {
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         border-radius: 16px;
-        background: linear-gradient(135deg, #862633 0%, #af5e20 100%);
+        background: #862633;
         color: white;
 
         mat-card-content {
@@ -89,7 +89,8 @@
     flex-direction: column;
     align-items: center;
     gap: 2px;
-     margin-top: 8px;
+    margin-top: 8px;
+    font-family: "Figgins", serif;
 
     .animation-title {
         font-size: 16px;
@@ -269,9 +270,8 @@
         order: 1;
     }
     .painting-title {
-        font-family: "Ballet", cursive;
-        font-size: 3rem;
-        font-weight: 700;
+        font-family: "Requiem Text", serif;
+        font-size: 2rem;
         letter-spacing: 1.2px;
         color: white;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
@@ -331,8 +331,11 @@
 
 .page-counter {
     font-size: 14px;
-    font-weight: 500;
-    color: #dbdbdb;
+    font-family: "Figgins", serif;
+    font-weight: 400;
+    color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     min-width: 40px;
     text-align: center;
 }
@@ -399,7 +402,7 @@
     top: 80px;
     right: -300px;
     width: 280px;
-    background: linear-gradient(135deg, #862633 0%, #af5e20 100%);
+    background: #862633;
     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
     z-index: 1002;
     transition: right 0.3s ease;
@@ -412,6 +415,7 @@
     .mobile-menu-content {
         padding: 20px;
         color: white;
+        font-family: "Figgins", serif;
         
         h3 {
             margin: 0 0 20px 0;
@@ -590,6 +594,7 @@
     a {
         color: #1976d2;
         text-decoration: underline;
+        font-family: "Figgins", serif;
         cursor: pointer;
 
         &:hover {
@@ -795,12 +800,14 @@
 .message-text {
     margin-bottom: 4px;
     line-height: 1.4;
+    font-family: "Figgins", serif;
 }
 
 .message-time {
     font-size: 10px;
     opacity: 0.7;
     text-align: right;
+    font-family: "Figgins", serif;
 }
 
 .chat-input-container {
@@ -818,10 +825,15 @@
     
     ::ng-deep .mat-mdc-form-field {
         margin-bottom: 0;
+        font-family: "Figgins", serif !important
     }
 
     ::ng-deep .mat-mdc-text-field-wrapper {
         background: white;
+    }
+
+    ::ng-deep input {
+        font-family: "Figgins", sans-serif !important; 
     }
 }
 
@@ -845,6 +857,7 @@
     font-size: 12px;
     height: 32px;
     line-height: 32px;
+    font-family: "Figgins", serif;
     
     mat-icon {
         font-size: 16px;
