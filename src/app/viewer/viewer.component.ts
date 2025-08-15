@@ -4,7 +4,6 @@ import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
 import { CanvasDatum } from '../canvas-datum';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
-import { MatFormFieldModule } from '@angular/material/form-field';
 declare var OpenSeadragon: any;
 
 @Component({
@@ -40,9 +39,18 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   isMenuOpen: boolean = false;
   isAboutModalOpen: boolean = false;
   showingChat: boolean = false;
-  chatMessages: {message: string, isUser: boolean, timestamp: Date}[] = [];
+  chatMessages: {
+    message: string, 
+    isUser: boolean, 
+    timestamp: Date,
+    imageData?: string,
+    imageBounds?: any
+  }[] = [];
   currentMessage: string = '';
-  
+  isSelecting: boolean = false;
+  selectionStart: { x: number, y: number } | null = null;
+  selectionEnd: { x: number, y: number } | null = null;
+  selectionOverlay: HTMLElement | null = null;
 
   constructor(
     private ngZone: NgZone, 
@@ -84,177 +92,199 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       return;
     }
 
-    this.manifestService.getData().subscribe(res => {
-      console.log('Canvas data received:', res); // Debug log
-      
-      // Check if res is an array, if not, extract the array
-      let canvasArray = Array.isArray(res) ? res : res.sequences?.[0]?.canvases || [];
-      this.canvasData = canvasArray;
-      
-      if (!Array.isArray(this.canvasData) || this.canvasData.length === 0) {
-        console.error('No valid canvas data found:', res);
-        return;
-      }
-      
-      // Create tile sources array
-      let tileSources: any[] = [];
-      this.canvasData.forEach((element: any) => { // Explicitly type as any
-        console.log('Processing canvas element:', element); // Debug log
+    // Check if OpenSeadragon is loaded
+    if (typeof OpenSeadragon === 'undefined') {
+      console.error('OpenSeadragon not loaded');
+      return;
+    }
+
+    this.manifestService.getData().subscribe({
+      next: (res) => {
+        console.log('Canvas data received:', res); // Debug log
         
-        // Try different possible paths for the image service
-        let imageServiceUrl = '';
+        // Check if res is an array, if not, extract the array
+        let canvasArray = Array.isArray(res) ? res : res.sequences?.[0]?.canvases || [];
+        this.canvasData = canvasArray;
         
-        // Try the standard IIIF structure
-        if (element.images && element.images[0] && element.images[0].resource && element.images[0].resource.service) {
-          const service = element.images[0].resource.service;
-          imageServiceUrl = service["@id"] || service.id;
-        }
-        // Try alternative structure with items
-        else if (element.items && element.items[0] && element.items[0].items && element.items[0].items[0]) {
-          const annotation = element.items[0].items[0];
-          if (annotation.body && annotation.body.service) {
-            const service = annotation.body.service;
-            imageServiceUrl = service["@id"] || service.id;
-          }
-        }
-        // Try direct imageServiceId property
-        else if (element.imageServiceId) {
-          imageServiceUrl = element.imageServiceId;
-        }
-        // Try imageApiId property (common in some manifests)
-        else if (element.imageApiId) {
-          imageServiceUrl = element.imageApiId;
-        }
-        // Try @id property directly
-        else if (element['@id']) {
-          imageServiceUrl = element['@id'];
-        }
-        else {
-          console.warn('Could not find image service URL for element:', element);
+        if (!Array.isArray(this.canvasData) || this.canvasData.length === 0) {
+          console.error('No valid canvas data found:', res);
           return;
         }
         
-        if (imageServiceUrl) {
-          // Ensure the URL doesn't already end with /info.json
-          const infoUrl = imageServiceUrl.endsWith('/info.json') ? imageServiceUrl : imageServiceUrl + "/info.json";
-          tileSources.push(infoUrl);
-          console.log('Added tile source:', infoUrl); // Debug log
-        }
-      });
-
-      if (tileSources.length === 0) {
-        console.error('No tile sources created');
-        return;
-      }
-
-      console.log('Final tile sources:', tileSources); // Debug log
-
-      // Initialize OpenSeadragon viewer
-      try {
-        this.viewer = new OpenSeadragon.Viewer({
-          id: "seadragon-viewer",
-          homeButton: "home",
-          fullPageButton: "full-page",
-          nextButton: "next",
-          previousButton: "previous",
-          sequenceMode: true,
-          showHomeControl: true,
-          blendTime: 0.5,
-          springStiffness: 6.5,       
-          animationTime: 1.5,         
-          immediateRender: false, 
-          showZoomControl: false,
-          showFullPageControl: true,
-          showRotationControl: false,
-          showFlipControl: false,
-          showSequenceControl: true,
-          navigatorBackground: "black",
-          backgroundColor: 'black',
-          prefixUrl: "//openseadragon.github.io/openseadragon/images/",
-          tileSources: tileSources
-        });
-
-        // Also set the canvas element background color directly
-        this.viewer.addHandler('open', () => {
-          const canvas = this.viewer.canvas;
-          if (canvas) {
-            canvas.style.backgroundColor = 'black';
+        // Create tile sources array
+        let tileSources: any[] = [];
+        this.canvasData.forEach((element: any) => { // Explicitly type as any
+          console.log('Processing canvas element:', element); // Debug log
+          
+          // Try different possible paths for the image service
+          let imageServiceUrl = '';
+          
+          // Try the standard IIIF structure
+          if (element.images && element.images[0] && element.images[0].resource && element.images[0].resource.service) {
+            const service = element.images[0].resource.service;
+            imageServiceUrl = service["@id"] || service.id;
+          }
+          // Try alternative structure with items
+          else if (element.items && element.items[0] && element.items[0].items && element.items[0].items[0]) {
+            const annotation = element.items[0].items[0];
+            if (annotation.body && annotation.body.service) {
+              const service = annotation.body.service;
+              imageServiceUrl = service["@id"] || service.id;
+            }
+          }
+          // Try direct imageServiceId property
+          else if (element.imageServiceId) {
+            imageServiceUrl = element.imageServiceId;
+          }
+          // Try imageApiId property (common in some manifests)
+          else if (element.imageApiId) {
+            imageServiceUrl = element.imageApiId;
+          }
+          // Try @id property directly
+          else if (element['@id']) {
+            imageServiceUrl = element['@id'];
+          }
+          else {
+            console.warn('Could not find image service URL for element:', element);
+            return;
+          }
+          
+          if (imageServiceUrl) {
+            // Ensure the URL doesn't already end with /info.json
+            const infoUrl = imageServiceUrl.endsWith('/info.json') ? imageServiceUrl : imageServiceUrl + "/info.json";
+            tileSources.push(infoUrl);
+            console.log('Added tile source:', infoUrl); // Debug log
           }
         });
-        
-        console.log('OpenSeadragon viewer initialized successfully');
 
-        // Load annotations and animations after viewer is created
-        this.loadAnnotationsAndAnimations();
+        if (tileSources.length === 0) {
+          console.error('No tile sources created');
+          return;
+        }
 
-        // Set default annotation content for the initial page
-        this.setDefaultAnnotationContent();
+        console.log('Final tile sources:', tileSources); // Debug log
 
-      } catch (error) {
-        console.error('Error initializing OpenSeadragon viewer:', error);
-      }
-    },
-    error => {
-      console.error("Error loading manifest data:", error);
-    });
+        // Initialize OpenSeadragon viewer
+        try {
+          this.viewer = new OpenSeadragon.Viewer({
+            id: "seadragon-viewer",
+            homeButton: "home",
+            fullPageButton: "full-page",
+            nextButton: "next",
+            previousButton: "previous",
+            sequenceMode: true,
+            showHomeControl: true,
+            blendTime: 0.5,
+            springStiffness: 6.5,       
+            animationTime: 1.5,         
+            immediateRender: false, 
+            showZoomControl: false,
+            showFullPageControl: true,
+            showRotationControl: false,
+            showFlipControl: false,
+            showSequenceControl: true,
+            navigatorBackground: "black",
+            backgroundColor: 'black',
+            prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+            tileSources: tileSources
+          });
 
-    this.viewer.addHandler('open', () => {
-      const canvas = this.viewer.canvas;
-      if (canvas) {
-        canvas.style.backgroundColor = 'black';
-        
-        // Add selection event listeners when chat is active
-        this.setupSelectionHandlers();
+          // Only proceed if viewer was successfully created
+          if (!this.viewer) {
+            console.error('Failed to create OpenSeadragon viewer');
+            return;
+          }
+
+          // Add event handlers only after successful viewer creation
+          this.viewer.addHandler('open', () => {
+            const canvas = this.viewer.canvas;
+            if (canvas) {
+              canvas.style.backgroundColor = 'black';
+              
+              // Add selection event listeners when chat is active
+              this.setupSelectionHandlers();
+            }
+          });
+
+          // Handle page changes
+          this.viewer.addHandler('page', (event: any) => {
+            this.pageIndex = event.page;
+            console.log("now on page ", this.pageIndex);
+            
+            // Reset current annotation index to show default content
+            this.currentAnnotationIndex = -1;
+            
+            // Set default annotation panel content for each painting
+            this.setDefaultAnnotationContent();
+            
+            // Only add annotations if they are currently being shown
+            if (this.showingAnnotations) {
+              this.addAnnotations(this.annotations);
+            }
+            
+            // Update animations for new page if showing animations
+            if (this.showingAnimations) {
+              this.removeAnimations();
+              this.animations = this.allAnimations.filter(anim => anim.canvasIndex === this.pageIndex);
+              this.numAnimations = this.animations.length;
+              this.animationIndex = 0;
+              this.showAllAnimations();
+            }
+          });
+
+          this.viewer.addHandler('open', function () {
+            console.log("Viewer opened successfully");
+          });
+          
+          console.log('OpenSeadragon viewer initialized successfully');
+
+          // Load annotations and animations after viewer is created
+          this.loadAnnotationsAndAnimations();
+
+          // Set default annotation content for the initial page
+          this.setDefaultAnnotationContent();
+
+        } catch (error) {
+          console.error('Error initializing OpenSeadragon viewer:', error);
+          this.viewer = null; // Ensure viewer is null on error
+        }
+      },
+      error: (error) => {
+        console.error("Error loading manifest data:", error);
       }
     });
   }
 
   private loadAnnotationsAndAnimations() {
     // Fetch annotation data
-    this.annotationsService.getData().subscribe(res => {
-      this.annotations = res;
-      // Remove automatic loading: this.addAnnotations(this.annotations);
+    this.annotationsService.getData().subscribe({
+      next: (res) => {
+        this.annotations = res;
+        // Remove automatic loading: this.addAnnotations(this.annotations);
+      },
+      error: (error) => {
+        console.error("Error loading annotations data:", error);
+      }
     });
 
     // Fetch animation data
-    this.animationsService.getData().subscribe(res => {
-      this.allAnimations = res;  // Store all animations here
-      this.animations = res;     // Keep this for backward compatibility
-      this.numAnimations = this.animations.length;
-    });
-
-    // Handle page changes
-    this.viewer.addHandler('page', (event: any) => {
-      this.pageIndex = event.page;
-      console.log("now on page ", this.pageIndex);
-      
-      // Reset current annotation index to show default content
-      this.currentAnnotationIndex = -1;
-      
-      // Set default annotation panel content for each painting
-      this.setDefaultAnnotationContent();
-      
-      // Only add annotations if they are currently being shown
-      if (this.showingAnnotations) {
-        this.addAnnotations(this.annotations);
-      }
-      
-      // Update animations for new page if showing animations
-      if (this.showingAnimations) {
-        this.removeAnimations();
-        this.animations = this.allAnimations.filter(anim => anim.canvasIndex === this.pageIndex);
+    this.animationsService.getData().subscribe({
+      next: (res) => {
+        this.allAnimations = res;  // Store all animations here
+        this.animations = res;     // Keep this for backward compatibility
         this.numAnimations = this.animations.length;
-        this.animationIndex = 0;
-        this.showAllAnimations();
+      },
+      error: (error) => {
+        console.error("Error loading animations data:", error);
       }
-    });
-
-    this.viewer.addHandler('open', function () {
-      console.log("Viewer opened successfully");
     });
   }
 
   move(x: number, y: number, width: number, height: number) {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized');
+      return;
+    }
     var box = new OpenSeadragon.Rect(x - (width / 2), y - (width / 2), width, height);
     this.viewer.viewport.fitBounds(box);
   }
@@ -285,6 +315,10 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   addAnnotation(x: number, y: number, index: number, type: string) {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized, cannot add annotation');
+      return;
+    }
     var elt = document.createElement("div");
     elt.className = "annotation-pin";
     
@@ -311,7 +345,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%,  rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
     }
 
-        // Create tooltip element
+    // Create tooltip element
     var tooltip = document.createElement("div");
     tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
     tooltip.style.position = "absolute";
@@ -344,8 +378,6 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     
     tooltip.appendChild(arrow);
     elt.appendChild(tooltip);
-    
-    // this.currentAnnotationIndex = index;
     
     this.viewer.addOverlay({
       element: elt,
@@ -388,12 +420,6 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       element: elt,
       clickHandler: e => this.setAnnotation(index),
     });
-
-    this.panelTextIndex = 0;
-    if (this.annotations[index]["annotation text 0"].length > 0) this.numPanels = 1;
-    if (this.annotations[index]["annotation text 1"].length > 0) this.numPanels = 2;
-    if (this.annotations[index]["annotation text 2"].length > 0) this.numPanels = 3;
-    if (this.annotations[index]["annotation text 3"].length > 0) this.numPanels = 4;
   }
 
   addVideoOverlay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
@@ -406,6 +432,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   removeAnnotations() {
+    if (!this.viewer) return;
+    
     // Remove all tracked annotation overlays
     this.annotationOverlays.forEach(annotationElement => {
       this.viewer.removeOverlay(annotationElement);
@@ -415,6 +443,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   removeAnimations() {
+    if (!this.viewer) return;
+    
     // Clear current video reference
     this.currentVideo = null;
     
@@ -620,21 +650,24 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   moveToAnimation(index: number) {
-    if (this.animations.length > 0 && index < this.animations.length) {
-      const animation = this.animations[index];
-      
-      // Calculate the bounds for the animation with some padding
-      const padding = 0.1; // Add 10% padding around the animation
-      const bounds = new OpenSeadragon.Rect(
-        animation.x - (animation.width / 2) - padding,
-        animation.y - (animation.height / 2) - padding,
-        animation.width + (padding * 2),
-        animation.height + (padding * 2)
-      );
-      
-      // Smoothly pan and zoom to the animation
-      this.viewer.viewport.fitBounds(bounds, false);
+    if (!this.viewer || this.animations.length === 0 || index >= this.animations.length) {
+      console.warn('Cannot move to animation: viewer not initialized or invalid index');
+      return;
     }
+    
+    const animation = this.animations[index];
+    
+    // Calculate the bounds for the animation with some padding
+    const padding = 0.1; // Add 10% padding around the animation
+    const bounds = new OpenSeadragon.Rect(
+      animation.x - (animation.width / 2) - padding,
+      animation.y - (animation.height / 2) - padding,
+      animation.width + (padding * 2),
+      animation.height + (padding * 2)
+    );
+    
+    // Smoothly pan and zoom to the animation
+    this.viewer.viewport.fitBounds(bounds, false);
   }
 
   private showAllAnimations() {
@@ -764,7 +797,6 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   stopVideoTour() {
-    this.showingVideoTour = false;
     this.removeAnimations();
   }
 
@@ -783,6 +815,11 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     playNextOnEnd?: boolean;
     navigationCues?: any[];
   } = {}) {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized, cannot create video overlay');
+      return null;
+    }
+
     var video = document.createElement("video");
     video.src = videoUrl;
     video.controls = false;
@@ -990,6 +1027,11 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   private moveToLocation(x: number, y: number, width: number, height: number, immediate: boolean = false, duration: number = 2) {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized');
+      return;
+    }
+    
     const padding = 0.05; // Add some padding around the target area
     const bounds = new OpenSeadragon.Rect(
       x - (width / 2) - padding,
@@ -1006,7 +1048,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     
     // Restore original animation time after transition
     setTimeout(() => {
-      this.viewer.animationTime = currentAnimationTime;
+      if (this.viewer) {
+        this.viewer.animationTime = currentAnimationTime;
+      }
     }, duration * 1000);
   }
 

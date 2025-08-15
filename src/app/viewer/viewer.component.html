@@ -208,6 +208,12 @@
                  [class.user-message]="msg.isUser"
                  [class.hogarth-message]="!msg.isUser">
               <div class="message-bubble">
+                <!-- Image attachment if present -->
+                <div *ngIf="msg.imageData" class="message-image">
+                  <img [src]="msg.imageData" 
+                       alt="Selected image section"
+                       style="max-width: 100%; border-radius: 8px; margin-bottom: 8px;">
+                </div>
                 <div class="message-text">{{ msg.message }}</div>
                 <div class="message-time">{{ msg.timestamp | date:'short' }}</div>
               </div>
