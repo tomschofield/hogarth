@@ -101,8 +101,55 @@
         "height":0.258,
         "duration":9.0,
         "hideControls": false
-    },
-    {
+    },{
+        "title": "The candidate",
+        "canvasIndex":1,
+        "storyIndex":1,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/1-Candidate.mp4",
+        "x": 0.39,
+        "y": 0.502,
+        "width":0.189,
+        "height":0.189,
+        "stopTime": 11.0,
+        "hideControls": false
+    },{
+        "title": "Women",
+        "canvasIndex":1,
+        "storyIndex":2,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/Women.mp4",
+        "x": 0.204,
+        "y": 0.164,
+        "width":0.21,
+        "height":0.21,
+        "stopTime": 9.4,
+        "hideControls": false
+    },{
+        "title": "The candidate",
+        "canvasIndex":1,
+        "storyIndex":3,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/1-Candidate.mp4",
+        "x": 0.39,
+        "y": 0.502,
+        "width":0.189,
+        "height":0.189,
+        "startTime": 11.0,
+        "hideControls": false
+    },{
+        "title": "Women",
+        "canvasIndex":1,
+        "storyIndex":4,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/Women.mp4",
+        "x": 0.204,
+        "y": 0.164,
+        "width":0.21,
+        "height":0.21,
+        "startTime": 9.4,
+        "hideControls": false
+    },{
         "title": "Yikes a talking goose",
         "canvasIndex":3,
         "storyIndex":2,

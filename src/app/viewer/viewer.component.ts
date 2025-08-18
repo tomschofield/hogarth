@@ -1,4 +1,4 @@
-import { Component, OnInit,AfterViewInit, NgZone, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, NgZone, ElementRef } from '@angular/core';
 import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
@@ -11,7 +11,7 @@ declare var OpenSeadragon: any;
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.scss']
 })
-export class ViewerComponent implements OnInit,  AfterViewInit {
+export class ViewerComponent implements OnInit, AfterViewInit {
   viewer: any;
   panelText: string = "";
   canvasData: CanvasDatum[] = [];
@@ -40,8 +40,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   isAboutModalOpen: boolean = false;
   showingChat: boolean = false;
   chatMessages: {
-    message: string, 
-    isUser: boolean, 
+    message: string,
+    isUser: boolean,
     timestamp: Date,
     imageData?: string,
     imageBounds?: any
@@ -53,9 +53,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   selectionOverlay: HTMLElement | null = null;
 
   constructor(
-    private ngZone: NgZone, 
-    private manifestService: ManifestService, 
-    private annotationsService: AnnotationsService, 
+    private ngZone: NgZone,
+    private manifestService: ManifestService,
+    private annotationsService: AnnotationsService,
     private animationsService: AnimationsService
   ) { }
 
@@ -101,24 +101,24 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     this.manifestService.getData().subscribe({
       next: (res) => {
         console.log('Canvas data received:', res); // Debug log
-        
+
         // Check if res is an array, if not, extract the array
         let canvasArray = Array.isArray(res) ? res : res.sequences?.[0]?.canvases || [];
         this.canvasData = canvasArray;
-        
+
         if (!Array.isArray(this.canvasData) || this.canvasData.length === 0) {
           console.error('No valid canvas data found:', res);
           return;
         }
-        
+
         // Create tile sources array
         let tileSources: any[] = [];
         this.canvasData.forEach((element: any) => { // Explicitly type as any
           console.log('Processing canvas element:', element); // Debug log
-          
+
           // Try different possible paths for the image service
           let imageServiceUrl = '';
-          
+
           // Try the standard IIIF structure
           if (element.images && element.images[0] && element.images[0].resource && element.images[0].resource.service) {
             const service = element.images[0].resource.service;
@@ -148,7 +148,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
             console.warn('Could not find image service URL for element:', element);
             return;
           }
-          
+
           if (imageServiceUrl) {
             // Ensure the URL doesn't already end with /info.json
             const infoUrl = imageServiceUrl.endsWith('/info.json') ? imageServiceUrl : imageServiceUrl + "/info.json";
@@ -175,9 +175,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
             sequenceMode: true,
             showHomeControl: true,
             blendTime: 0.5,
-            springStiffness: 6.5,       
-            animationTime: 1.5,         
-            immediateRender: false, 
+            springStiffness: 6.5,
+            animationTime: 1.5,
+            immediateRender: false,
             showZoomControl: false,
             showFullPageControl: true,
             showRotationControl: false,
@@ -200,7 +200,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
             const canvas = this.viewer.canvas;
             if (canvas) {
               canvas.style.backgroundColor = 'black';
-              
+
               // Add selection event listeners when chat is active
               this.setupSelectionHandlers();
             }
@@ -210,18 +210,18 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
           this.viewer.addHandler('page', (event: any) => {
             this.pageIndex = event.page;
             console.log("now on page ", this.pageIndex);
-            
+
             // Reset current annotation index to show default content
             this.currentAnnotationIndex = -1;
-            
+
             // Set default annotation panel content for each painting
             this.setDefaultAnnotationContent();
-            
+
             // Only add annotations if they are currently being shown
             if (this.showingAnnotations) {
               this.addAnnotations(this.annotations);
             }
-            
+
             // Update animations for new page if showing animations
             if (this.showingAnimations) {
               this.removeAnimations();
@@ -235,7 +235,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
           this.viewer.addHandler('open', function () {
             console.log("Viewer opened successfully");
           });
-          
+
           console.log('OpenSeadragon viewer initialized successfully');
 
           // Load annotations and animations after viewer is created
@@ -321,7 +321,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     }
     var elt = document.createElement("div");
     elt.className = "annotation-pin";
-    
+
     if (type === "multi-level") {
       elt.classList.add("multi-level");
     } else {
@@ -330,14 +330,14 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
     elt.id = "annotation_" + index;
     elt.style.cursor = "pointer";
-    
+
     // Apply inline styles for immediate effect
     elt.style.width = "1px";
     elt.style.height = "1px";
     elt.style.borderRadius = "50%";
     elt.style.position = "relative";
     elt.style.transition = "all 0.1s ease";
-    
+
     // Add the visual styling based on type
     if (type === "multi-level") {
       elt.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%,  rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
@@ -363,7 +363,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     tooltip.style.transition = "opacity 0.3s ease";
     tooltip.style.zIndex = "10000";
     tooltip.style.marginBottom = "8px";
-    
+
     // Add arrow to tooltip
     var arrow = document.createElement("div");
     arrow.style.position = "absolute";
@@ -375,10 +375,10 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     arrow.style.borderLeft = "5px solid transparent";
     arrow.style.borderRight = "5px solid transparent";
     arrow.style.borderTop = "5px solid rgba(0, 0, 0, 0.9)";
-    
+
     tooltip.appendChild(arrow);
     elt.appendChild(tooltip);
-    
+
     this.viewer.addOverlay({
       element: elt,
       location: new OpenSeadragon.Point(x, y),
@@ -404,7 +404,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         elt.style.animation = "pulse 1.5s infinite";
       }
     });
-    
+
     elt.addEventListener('mouseleave', () => {
       elt.style.transform = "scale(1)";
       elt.style.animation = "none";
@@ -433,7 +433,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
   removeAnnotations() {
     if (!this.viewer) return;
-    
+
     // Remove all tracked annotation overlays
     this.annotationOverlays.forEach(annotationElement => {
       this.viewer.removeOverlay(annotationElement);
@@ -444,10 +444,10 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
   removeAnimations() {
     if (!this.viewer) return;
-    
+
     // Clear current video reference
     this.currentVideo = null;
-    
+
     // Remove all tracked video overlays
     this.videoOverlays.forEach(video => {
       this.viewer.removeOverlay(video);
@@ -467,7 +467,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     if (this.annotations[index]["annotation text 1"].length > 0) this.numPanels = 2;
     if (this.annotations[index]["annotation text 2"].length > 0) this.numPanels = 3;
     if (this.annotations[index]["annotation text 3"].length > 0) this.numPanels = 4;
-    
+
     // Collect annotation images
     this.annotationImages = [];
 
@@ -477,20 +477,20 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     this.panelTextIndex = 0;
   }
 
- formatPanelText(text: string): string {
+  formatPanelText(text: string): string {
     // If the text already contains HTML links, return as-is
     if (text.includes('<a ') || text.includes('href=')) {
       return text;
     }
-    
+
     // Convert plain URLs to clickable links
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     let formattedText = text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-    
+
     // Convert email addresses to clickable links
     const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
     formattedText = formattedText.replace(emailRegex, '<a href="mailto:$1">$1</a>');
-    
+
     return formattedText;
   }
 
@@ -517,14 +517,17 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   toggleAnimations(show: boolean) {
     this.showingAnimations = show;
     if (show) {
-      // Filter animations for current page
-      this.animations = this.allAnimations.filter(anim => anim.canvasIndex === this.pageIndex);
+      // Filter animations for current page and sort by storyIndex
+      this.animations = this.allAnimations
+        .filter(anim => anim.canvasIndex === this.pageIndex)
+        .sort((a, b) => a.storyIndex - b.storyIndex);
+      
       this.numAnimations = this.animations.length;
       this.animationIndex = 0;
-      
+
       console.log('Animations for page', this.pageIndex, ':', this.animations);
       console.log('Number of animations:', this.numAnimations);
-      
+
       // Show all animations by default (not playing)
       this.showAllAnimations();
     } else {
@@ -534,7 +537,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
   updateImagesForCurrentPanel() {
     this.annotationImages = [];
-    
+
     // Get images for the current panel
     const imageFilename = this.annotations[this.currentAnnotationIndex][`image filename ${this.panelTextIndex}`];
     if (imageFilename && imageFilename.trim() !== '') {
@@ -568,7 +571,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     if (this.animationIndex > 0) {
       const wasPlaying = this.isPlaying; // Store current play state
       this.animationIndex--;
-      
+
       if (wasPlaying) {
         // If was playing, show only current animation and play it
         this.showCurrentAnimation();
@@ -587,7 +590,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     if (this.animationIndex < this.numAnimations - 1) {
       const wasPlaying = this.isPlaying; // Store current play state
       this.animationIndex++;
-      
+
       if (wasPlaying) {
         // If was playing, show only current animation and play it
         this.showCurrentAnimation();
@@ -607,7 +610,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     console.log('Animations array:', this.animations);
     console.log('Animation index:', this.animationIndex);
     console.log('Num animations:', this.numAnimations);
-    
+
     if (this.currentVideo) {
       // If there's a current video, toggle its play/pause state
       if (this.currentVideo.paused) {
@@ -620,7 +623,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
               console.warn('Play failed:', error);
             });
             this.isPlaying = true;
-            
+
             // Move and zoom to animation location
             this.moveToAnimation(this.animationIndex);
           }
@@ -641,7 +644,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
             console.warn('Play failed:', error);
           });
           this.isPlaying = true;
-          
+
           // Move and zoom to animation location
           this.moveToAnimation(this.animationIndex);
         }
@@ -654,9 +657,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       console.warn('Cannot move to animation: viewer not initialized or invalid index');
       return;
     }
-    
+
     const animation = this.animations[index];
-    
+
     // Calculate the bounds for the animation with some padding
     const padding = 0.1; // Add 10% padding around the animation
     const bounds = new OpenSeadragon.Rect(
@@ -665,7 +668,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       animation.width + (padding * 2),
       animation.height + (padding * 2)
     );
-    
+
     // Smoothly pan and zoom to the animation
     this.viewer.viewport.fitBounds(bounds, false);
   }
@@ -674,7 +677,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     // Remove existing overlays first
     this.removeAnimations();
     this.isPlaying = false;
-    
+
     // Add all animations for current page (not playing)
     this.animations.forEach(animation => {
       this.addVideoOverlayForDisplay(
@@ -686,7 +689,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         animation.hideControls
       );
     });
-    
+
     // Reset current video reference since we're showing all
     this.currentVideo = null;
     this.isPlaying = false;
@@ -699,12 +702,12 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
       // Remove any existing video overlays first
       this.removeAnimations();
-      
+
       this.addVideoOverlayForPlayback(
-        currentAnimation.x, 
-        currentAnimation.y, 
-        currentAnimation.videoUrl, 
-        currentAnimation.width, 
+        currentAnimation.x,
+        currentAnimation.y,
+        currentAnimation.videoUrl,
+        currentAnimation.width,
         currentAnimation.height,
         currentAnimation.hideControls
       );
@@ -714,14 +717,21 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
   }
 
   addVideoOverlayForDisplay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+    // Find the animation data to get timing information
+    const animation = this.animations.find(anim => 
+      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
+    );
+    
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: false,
-      storeAsCurrentVideo: false
+      storeAsCurrentVideo: false,
+      startTime: animation?.startTime,
+      stopTime: animation?.stopTime
     });
   }
 
   addVideoOverlayForPlayback(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-    // Find the animation data to get navigation cues
+    // Find the animation data to get navigation cues and timing
     const animation = this.animations.find(anim => 
       anim.x === x && anim.y === y && anim.videoUrl === videoUrl
     );
@@ -731,64 +741,138 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       storeAsCurrentVideo: true,
       trackProgress: true,
       playNextOnEnd: true,
-      navigationCues: animation?.navigationCues 
+      navigationCues: animation?.navigationCues,
+      startTime: animation?.startTime,
+      stopTime: animation?.stopTime
     });
   }
 
   addVideoOverlayWithSequence(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-    // Find the animation data to get navigation cues
-    const animation = this.animations.find(anim => 
-      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
-    );
-    
-    return this.createVideoOverlay(x, y, videoUrl, width, height, {
-      autoPlay: true,
-      moveToOnLoad: true,
-      playNextOnEnd: true,
-      storeAsCurrentVideo: true,
-      navigationCues: animation?.navigationCues 
-    });
-  }
+  // Find the animation data to get navigation cues and timing
+  const animation = this.animations[this.animationIndex];
+  
+  return this.createVideoOverlay(x, y, videoUrl, width, height, {
+    autoPlay: true,
+    moveToOnLoad: true,
+    playNextOnEnd: true,
+    storeAsCurrentVideo: true,
+    navigationCues: animation?.navigationCues,
+    startTime: animation?.startTime,
+    stopTime: animation?.stopTime
+  });
+}
 
-  playNextAnimationInSequence() {
-    // Move to next animation
-    if (this.animationIndex < this.numAnimations - 1) {
-      this.animationIndex++;
+playNextAnimationInSequence() {
+  // Move to next animation
+  if (this.animationIndex < this.numAnimations - 1) {
+    this.animationIndex++;
+
+    // Get the next animation
+    const nextAnimation = this.animations[this.animationIndex];
+    const currentAnimation = this.animations[this.animationIndex - 1];
+    console.log('Playing next animation:', nextAnimation);
+
+    // Check if it's the same video file
+    if (currentAnimation && nextAnimation.videoUrl === currentAnimation.videoUrl && this.currentVideo) {
+      // Same video file - pause first, then seek to start time
+      console.log('Same video file, seeking to start time:', nextAnimation.startTime);
       
-      // Get the next animation
-      const nextAnimation = this.animations[this.animationIndex];
-      console.log('Playing next animation:', nextAnimation);
+      this.currentVideo.pause();
       
-      // Remove current video overlay
+      // Wait for pause to complete, then set time and play
+      setTimeout(() => {
+        if (this.currentVideo) {
+          if (nextAnimation.startTime !== undefined) {
+            console.log('Setting currentTime to:', nextAnimation.startTime);
+            this.currentVideo.currentTime = nextAnimation.startTime;
+          } else {
+            this.currentVideo.currentTime = 0;
+          }
+          
+          // Wait for seek to complete before playing
+          const seekHandler = () => {
+            console.log('Seek completed, starting playback from:', this.currentVideo?.currentTime);
+            if (this.currentVideo) {
+              this.currentVideo.play().catch(error => {
+                console.warn('Auto-play failed:', error);
+              });
+              this.isPlaying = true;
+              this.currentVideo.removeEventListener('seeked', seekHandler);
+            }
+          };
+          
+          this.currentVideo.addEventListener('seeked', seekHandler);
+          
+          // Fallback in case seeked doesn't fire
+          setTimeout(() => {
+            if (this.currentVideo && this.currentVideo.paused) {
+              this.currentVideo.removeEventListener('seeked', seekHandler);
+              this.currentVideo.play().catch(error => {
+                console.warn('Fallback auto-play failed:', error);
+              });
+              this.isPlaying = true;
+            }
+          }, 200);
+        }
+      }, 100);
+      
+      // Move to the animation location
+      this.moveToAnimation(this.animationIndex);
+      
+    } else {
+      // Different video file - remove current and create new overlay
       this.removeAnimations();
-      
+
       // Add next video overlay
       this.addVideoOverlayWithSequence(
-        nextAnimation.x, 
-        nextAnimation.y, 
-        nextAnimation.videoUrl, 
-        nextAnimation.width, 
+        nextAnimation.x,
+        nextAnimation.y,
+        nextAnimation.videoUrl,
+        nextAnimation.width,
         nextAnimation.height,
         nextAnimation.hideControls
       );
+      
       // Auto-play the next video after a short delay and maintain play state
       setTimeout(() => {
         if (this.currentVideo) {
           this.currentVideo.play().catch(error => {
             console.warn('Auto-play failed:', error);
           });
-          this.isPlaying = true; // Maintain playing state
-          
+          this.isPlaying = true;
+
           // Move to the animation with smooth transition
           this.moveToAnimation(this.animationIndex);
         }
       }, 100);
-    } else {
-      console.log('All animations played, sequence complete');
-      // Optionally reset to first animation or show all animations
-      this.isPlaying = false;
-      this.showAllAnimations();
     }
+  } else {
+    console.log('All animations played, sequence complete');
+    // Optionally reset to first animation or show all animations
+    this.isPlaying = false;
+    this.showAllAnimations();
+  }
+}
+
+  private setupVideoForSequence(video: HTMLVideoElement, animation: any) {
+    // Set start time if specified
+    if (animation.startTime !== undefined) {
+      video.currentTime = animation.startTime;
+    }
+    
+    // Set up stop time listener
+    video.addEventListener('timeupdate', () => {
+      if (animation.stopTime !== undefined && video.currentTime >= animation.stopTime) {
+        if (!video.paused) {
+          video.pause();
+          this.isPlaying = false;
+          
+          setTimeout(() => {
+            this.playNextAnimationInSequence();
+          }, 50);
+        }
+      }
+    });
   }
 
   goBack() {
@@ -814,6 +898,8 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     moveToOnLoad?: boolean;
     playNextOnEnd?: boolean;
     navigationCues?: any[];
+    startTime?: number;
+    stopTime?: number;
   } = {}) {
     if (!this.viewer) {
       console.warn('Viewer not initialized, cannot create video overlay');
@@ -826,6 +912,11 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     video.style.width = "100%";
     video.style.height = "100%";
     video.style.cursor = "pointer";
+
+    // Set start time if specified
+    if (options.startTime !== undefined) {
+      video.currentTime = options.startTime;
+    }
 
     // Create play button overlay
     var playButton = document.createElement("div");
@@ -857,6 +948,29 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     container.appendChild(video);
     container.appendChild(playButton);
 
+    // Handle time updates - check for stop time
+    video.addEventListener('timeupdate', () => {
+      // Check if we've reached the stop time
+      if (options.stopTime !== undefined && video.currentTime >= options.stopTime) {
+        // Only trigger if video is still playing (prevent multiple triggers)
+        if (!video.paused) {
+          video.pause();
+          if (options.storeAsCurrentVideo) {
+            this.isPlaying = false;
+          }
+          
+          // If playNextOnEnd is true, trigger next animation
+          if (options.playNextOnEnd) {
+            console.log('Video reached stop time at:', video.currentTime, 'playing next animation');
+            // Add a small delay to ensure the video state is properly updated
+            setTimeout(() => {
+              this.playNextAnimationInSequence();
+            }, 50);
+          }
+        }
+      }
+    });
+
     // Track navigation cues if provided
     if (options.navigationCues && options.navigationCues.length > 0) {
       console.log('Navigation cues provided:', options.navigationCues);
@@ -865,36 +979,23 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
 
       video.addEventListener('timeupdate', () => {
         const currentTime = video.currentTime;
-        
+
         // Check if we've reached the next navigation cue
         if (currentCueIndex < navigationCues.length) {
           const nextCue = navigationCues[currentCueIndex];
-          
+
           if (currentTime >= nextCue.time) {
             console.log(`Navigation cue triggered at ${currentTime}s:`, nextCue.description);
-            
+
             // Move the viewer to the specified location
             this.moveToLocation(nextCue.x, nextCue.y, nextCue.width, nextCue.height);
-            
+
             currentCueIndex++;
           }
         }
-
-        // Show preview of next navigation cue when we're 2 seconds away
-        // if (currentCueIndex < navigationCues.length) {
-        //   const nextCue = navigationCues[currentCueIndex];
-        //   if (currentTime >= (nextCue.time - 2) && currentTime < nextCue.time) {
-        //     // Only show the preview once per cue
-        //     if (!nextCue.previewShown) {
-        //       this.showNextNavigationCue(nextCue);
-        //       nextCue.previewShown = true; // Mark as shown to prevent repeated calls
-        //     }
-        //   }
-        // }
-
       });
 
-      // Reset cue index when video starts over
+      // Reset cue index when video starts over or is seeked
       video.addEventListener('seeked', () => {
         currentCueIndex = navigationCues.findIndex(cue => cue.time > video.currentTime);
         if (currentCueIndex === -1) currentCueIndex = navigationCues.length;
@@ -922,9 +1023,15 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       clickHandler: (event: any) => {
         console.log('Play button clicked via MouseTracker!');
         event.preventDefaultAction = true;
-        
+
         if (video.paused) {
           console.log('Playing video via MouseTracker');
+
+          // Set start time when playing if specified
+          if (options.startTime !== undefined && video.currentTime < options.startTime) {
+            video.currentTime = options.startTime;
+          }
+
           video.play().catch(error => {
             console.warn('Play failed:', error);
           });
@@ -940,7 +1047,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
             this.isPlaying = false;
           }
         }
-        
+
         return false; // Prevent further event propagation
       }
     });
@@ -953,11 +1060,18 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     // Track video progress if requested
     if (options.trackProgress) {
       video.addEventListener('loadedmetadata', () => {
-        this.videoDuration = video.duration;
+        // Calculate effective duration (stopTime - startTime or full duration)
+        const startTime = options.startTime || 0;
+        const stopTime = options.stopTime || video.duration;
+        this.videoDuration = stopTime - startTime;
       });
 
       video.addEventListener('timeupdate', () => {
-        this.videoProgress = (video.currentTime / video.duration) * 100;
+        const startTime = options.startTime || 0;
+        const stopTime = options.stopTime || video.duration;
+        const effectiveDuration = stopTime - startTime;
+        const currentPosition = Math.max(0, video.currentTime - startTime);
+        this.videoProgress = (currentPosition / effectiveDuration) * 100;
       });
     }
 
@@ -986,13 +1100,18 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       }
     });
 
-    // Auto-play and move to video if requested
-    if (options.autoPlay) {
-      video.addEventListener('loadeddata', () => {
+    // Handle video loading and auto-play
+    video.addEventListener('loadeddata', () => {
+      // Set start time when video is loaded
+      if (options.startTime !== undefined) {
+        video.currentTime = options.startTime;
+      }
+
+      if (options.autoPlay) {
         video.play().catch(error => {
           console.warn('Auto-play failed:', error);
         });
-        
+
         if (options.moveToOnLoad) {
           // Move and zoom to this video when it starts playing
           const bounds = new OpenSeadragon.Rect(
@@ -1003,12 +1122,10 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
           );
           this.viewer.viewport.fitBounds(bounds, !options.playNextOnEnd); // Use immediate for sequence
         }
-      });
-    } else {
-      video.addEventListener('loadeddata', () => {
+      } else {
         console.log('Video loaded and ready to play');
-      });
-    }
+      }
+    });
 
     // Add overlay to viewer
     this.viewer.addOverlay({
@@ -1031,7 +1148,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       console.warn('Viewer not initialized');
       return;
     }
-    
+
     const padding = 0.05; // Add some padding around the target area
     const bounds = new OpenSeadragon.Rect(
       x - (width / 2) - padding,
@@ -1039,13 +1156,13 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       width + (padding * 2),
       height + (padding * 2)
     );
-    
+
     // Use custom animation timing for smoother transitions
     const currentAnimationTime = this.viewer.animationTime;
     this.viewer.animationTime = duration;
-    
+
     this.viewer.viewport.fitBounds(bounds, false);
-    
+
     // Restore original animation time after transition
     setTimeout(() => {
       if (this.viewer) {
@@ -1061,7 +1178,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
     highlight.style.borderRadius = "8px";
     highlight.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
     highlight.style.pointerEvents = "none";
-    
+
     // Add overlay to show next target area
     this.viewer.addOverlay({
       element: highlight,
@@ -1071,7 +1188,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       width: cue.width,
       height: cue.height
     });
-    
+
     // Remove highlight after 2 seconds
     setTimeout(() => {
       this.viewer.removeOverlay(highlight);
@@ -1111,7 +1228,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
       // Turn off annotations when chat is opened
       this.showingAnnotations = false;
       this.removeAnnotations();
-      
+
       // Hide annotation panel when chat is opened
       this.closeAnnotationPanel();
 
@@ -1146,9 +1263,9 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
         "Quite right! My brush was my weapon against hypocrisy and social pretense.",
         "Excellent question! Each painting in this series follows the progression of electoral corruption."
       ];
-      
+
       const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
+
       setTimeout(() => {
         this.chatMessages.push({
           message: randomResponse,
@@ -1181,7 +1298,7 @@ export class ViewerComponent implements OnInit,  AfterViewInit {
                <p>Click on the blue and orange annotation pins to explore specific details and discover the hidden meanings in Hogarth's moral commentary.</p>`
       },
       {
-        title: "Canvassing for Votes", 
+        title: "Canvassing for Votes",
         text: `<p>The second painting in the series: "Canvassing for Votes" (1757).</p>
                <p>Here we see the corrupt practice of vote buying in full swing. Politicians and their agents desperately seek support through bribery, false promises, and manipulation of the electorate.</p>
                <p>Hogarth masterfully depicts the hypocrisy of the electoral process - notice the inn signs showing competing political allegiances, the symbolic Royal Oak (representing the monarchy), and the various social classes being courted for their votes.</p>
