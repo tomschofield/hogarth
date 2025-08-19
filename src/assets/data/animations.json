@@ -101,7 +101,9 @@
         "height":0.258,
         "duration":9.0,
         "hideControls": false
-    },{
+    },
+    
+    {
         "title": "The candidate",
         "canvasIndex":1,
         "storyIndex":1,
@@ -126,7 +128,7 @@
         "stopTime": 9.4,
         "hideControls": false
     },{
-        "title": "The candidate",
+        "title": "The candidate 2",
         "canvasIndex":1,
         "storyIndex":3,
         "transcript": "blah blah blah blah",
@@ -136,6 +138,7 @@
         "width":0.189,
         "height":0.189,
         "startTime": 11.0,
+        "stopTime": 39.0,
         "hideControls": false
     },{
         "title": "Women",
@@ -148,8 +151,48 @@
         "width":0.21,
         "height":0.21,
         "startTime": 9.4,
+        "stopTime": 16.0,
         "hideControls": false
     },{
+        "title": "The candidate 3",
+        "canvasIndex":1,
+        "storyIndex":5,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/1-Candidate.mp4",
+        "x": 0.39,
+        "y": 0.502,
+        "width":0.189,
+        "height":0.189,
+        "startTime": 39.0,
+        "hideControls": false
+    },{
+        "title": "Women",
+        "canvasIndex":1,
+        "storyIndex":6,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/Women.mp4",
+        "x": 0.204,
+        "y": 0.164,
+        "width":0.21,
+        "height":0.21,
+        "startTime": 16.3,
+        "hideControls": false
+    },
+
+    {
+        "title": "Sign",
+        "canvasIndex":1,
+        "storyIndex":7,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/Sign.mp4",
+        "x": 0.505,
+        "y": 0.274,
+        "width":0.236,
+        "height":0.236,
+        "hideControls": false
+    },
+    
+    {
         "title": "Yikes a talking goose",
         "canvasIndex":3,
         "storyIndex":2,

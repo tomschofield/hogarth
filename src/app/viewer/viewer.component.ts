@@ -1018,6 +1018,7 @@ playNextAnimationInSequence() {
     });
 
     // Handle play button click using OpenSeadragon MouseTracker
+    // Handle play button click using OpenSeadragon MouseTracker
     new OpenSeadragon.MouseTracker({
       element: playButton,
       clickHandler: (event: any) => {
@@ -1027,10 +1028,9 @@ playNextAnimationInSequence() {
         if (video.paused) {
           console.log('Playing video via MouseTracker');
 
-          // Set start time when playing if specified
-          if (options.startTime !== undefined && video.currentTime < options.startTime) {
-            video.currentTime = options.startTime;
-          }
+          // Always start from the beginning when clicking play button directly
+          video.currentTime = 0;
+          console.log('Set video time to beginning: 0');
 
           video.play().catch(error => {
             console.warn('Play failed:', error);
