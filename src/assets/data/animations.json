@@ -191,6 +191,19 @@
         "height":0.236,
         "hideControls": false
     },
+
+     {
+        "title": "Canvassing",
+        "canvasIndex":1,
+        "storyIndex":7,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/7-Canvassing.mp4",
+        "x": 0.568,
+        "y": 0.605,
+        "width":0.278,
+        "height":0.278,
+        "hideControls": false
+    },
     
     {
         "title": "Yikes a talking goose",
