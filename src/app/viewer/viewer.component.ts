@@ -740,9 +740,9 @@ export class ViewerComponent implements OnInit, AfterViewInit {
 
   addVideoOverlayForPlayback(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
     // Find the animation data to get navigation cues and timing
-    const animation = this.animations.find(anim =>
-      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
-    );
+    // Use the current animation directly instead of searching by coordinates
+    const animation = this.animations[this.animationIndex];
+
 
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: false,
@@ -1036,9 +1036,17 @@ export class ViewerComponent implements OnInit, AfterViewInit {
         if (video.paused) {
           console.log('Playing video via MouseTracker');
 
-          // Always start from the beginning when clicking play button directly
-          video.currentTime = 0;
-          console.log('Set video time to beginning: 0');
+          // Only reset to beginning if no startTime is specified
+          // If startTime exists, use it; otherwise start from current position or 0
+          if (options.startTime !== undefined) {
+            video.currentTime = options.startTime;
+            console.log('Set video time to startTime:', options.startTime);
+          } else if (video.currentTime === 0 || video.ended) {
+            // Only reset to 0 if video is at the beginning or has ended
+            video.currentTime = 0;
+            console.log('Set video time to beginning: 0');
+          }
+          // Otherwise, continue from current position
 
           video.play().catch(error => {
             console.warn('Play failed:', error);

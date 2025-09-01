@@ -204,6 +204,19 @@
         "height":0.278,
         "hideControls": false
     },
+
+    {
+        "title": "Tory Candidate",
+        "canvasIndex":2,
+        "storyIndex":1,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/Tory Candidate.mp4",
+        "x": 0.74,
+        "y": 0.365,
+        "width":0.093,
+        "height":0.093,
+        "hideControls": false
+    },
     
     {
         "title": "Yikes a talking goose",
