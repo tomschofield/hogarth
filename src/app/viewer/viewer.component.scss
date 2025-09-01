@@ -847,6 +847,7 @@
     border-radius: 50% !important;
     position: relative !important;
     cursor: pointer !important;
+    z-index: 9999 !important;
     
     /* Base styles for single-level annotations */
     &.single-level {
@@ -856,22 +857,28 @@
     
     /* Base styles for multi-level annotations */
     &.multi-level {
-        background: radial-gradient(circle, #862633 30%, rgba(134, 38, 51, 0.8) 60%, rgba(134, 38, 51, 0.4) 10%) !important;
-        box-shadow: 0 0 10px rgba(134, 38, 51, 0.5) !important;
+        background: radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%, rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%) !important;
+        box-shadow: 0 0 10px rgba(255, 169, 24, 0.5) !important;
+    }
+
+    div {
+        z-index: 10000 !important;
+        position: absolute !important;
+    }
+}
+
+// Ensure video overlays have lower z-index
+#seadragon-viewer {
+    video {
+        z-index: 1 !important;
+        position: relative !important;
     }
     
-    /* Inner dot for more definition */
-    &::before {
-        content: '' !important;
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        width: 8px !important;
-        height: 8px !important;
-        border-radius: 50% !important;
-        background: white !important;
-        opacity: 0.9 !important;
+    // Target video containers/overlays specifically
+    .openseadragon-overlay {
+        &:has(video) {
+            z-index: 1 !important;
+        }
     }
 }
 
