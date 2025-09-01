@@ -70,6 +70,14 @@
       
       <div class="menu-item">
         <button mat-stroked-button 
+                (click)="startViewer()"
+                class="about-button"> 
+          View Paintings →
+        </button>
+      </div>
+      
+      <div class="menu-item">
+        <button mat-stroked-button 
                 (click)="openAboutModal()"
                 class="about-button"> 
           Acknowledgments
