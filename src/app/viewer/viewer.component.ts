@@ -202,10 +202,12 @@ export class ViewerComponent implements OnInit, AfterViewInit {
               canvas.style.backgroundColor = 'black';
 
               // Add selection event listeners when chat is active
-              this.setupSelectionHandlers();
+              //this.setupSelectionHandlers();
             }
           });
-
+          this.viewer.addHandler('scrollHandler', (event: any) => {
+            console.log(event)
+          });
           // Handle page changes
           this.viewer.addHandler('page', (event: any) => {
             this.pageIndex = event.page;
@@ -230,6 +232,12 @@ export class ViewerComponent implements OnInit, AfterViewInit {
               this.animationIndex = 0;
               this.showAllAnimations();
             }
+          });
+
+          this.viewer.addHandler('canvas-click',  (event) => {
+            var viewportPoint = this.viewer.viewport.pointFromPixel(event.position);
+          //  var imagePoint = this.viewer.viewport.viewportToImageCoordinates(viewportPoint.x, viewportPoint.y);
+            console.log(viewportPoint);
           });
 
           this.viewer.addHandler('open', function () {
@@ -521,7 +529,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       this.animations = this.allAnimations
         .filter(anim => anim.canvasIndex === this.pageIndex)
         .sort((a, b) => a.storyIndex - b.storyIndex);
-      
+
       this.numAnimations = this.animations.length;
       this.animationIndex = 0;
 
@@ -718,10 +726,10 @@ export class ViewerComponent implements OnInit, AfterViewInit {
 
   addVideoOverlayForDisplay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
     // Find the animation data to get timing information
-    const animation = this.animations.find(anim => 
+    const animation = this.animations.find(anim =>
       anim.x === x && anim.y === y && anim.videoUrl === videoUrl
     );
-    
+
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: false,
       storeAsCurrentVideo: false,
@@ -732,10 +740,10 @@ export class ViewerComponent implements OnInit, AfterViewInit {
 
   addVideoOverlayForPlayback(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
     // Find the animation data to get navigation cues and timing
-    const animation = this.animations.find(anim => 
+    const animation = this.animations.find(anim =>
       anim.x === x && anim.y === y && anim.videoUrl === videoUrl
     );
-    
+
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: false,
       storeAsCurrentVideo: true,
@@ -748,125 +756,125 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   }
 
   addVideoOverlayWithSequence(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-  // Find the animation data to get navigation cues and timing
-  const animation = this.animations[this.animationIndex];
-  
-  return this.createVideoOverlay(x, y, videoUrl, width, height, {
-    autoPlay: true,
-    moveToOnLoad: true,
-    playNextOnEnd: true,
-    storeAsCurrentVideo: true,
-    navigationCues: animation?.navigationCues,
-    startTime: animation?.startTime,
-    stopTime: animation?.stopTime
-  });
-}
+    // Find the animation data to get navigation cues and timing
+    const animation = this.animations[this.animationIndex];
 
-playNextAnimationInSequence() {
-  // Move to next animation
-  if (this.animationIndex < this.numAnimations - 1) {
-    this.animationIndex++;
-
-    // Get the next animation
-    const nextAnimation = this.animations[this.animationIndex];
-    const currentAnimation = this.animations[this.animationIndex - 1];
-    console.log('Playing next animation:', nextAnimation);
-
-    // Check if it's the same video file
-    if (currentAnimation && nextAnimation.videoUrl === currentAnimation.videoUrl && this.currentVideo) {
-      // Same video file - pause first, then seek to start time
-      console.log('Same video file, seeking to start time:', nextAnimation.startTime);
-      
-      this.currentVideo.pause();
-      
-      // Wait for pause to complete, then set time and play
-      setTimeout(() => {
-        if (this.currentVideo) {
-          if (nextAnimation.startTime !== undefined) {
-            console.log('Setting currentTime to:', nextAnimation.startTime);
-            this.currentVideo.currentTime = nextAnimation.startTime;
-          } else {
-            this.currentVideo.currentTime = 0;
-          }
-          
-          // Wait for seek to complete before playing
-          const seekHandler = () => {
-            console.log('Seek completed, starting playback from:', this.currentVideo?.currentTime);
-            if (this.currentVideo) {
-              this.currentVideo.play().catch(error => {
-                console.warn('Auto-play failed:', error);
-              });
-              this.isPlaying = true;
-              this.currentVideo.removeEventListener('seeked', seekHandler);
-            }
-          };
-          
-          this.currentVideo.addEventListener('seeked', seekHandler);
-          
-          // Fallback in case seeked doesn't fire
-          setTimeout(() => {
-            if (this.currentVideo && this.currentVideo.paused) {
-              this.currentVideo.removeEventListener('seeked', seekHandler);
-              this.currentVideo.play().catch(error => {
-                console.warn('Fallback auto-play failed:', error);
-              });
-              this.isPlaying = true;
-            }
-          }, 200);
-        }
-      }, 100);
-      
-      // Move to the animation location
-      this.moveToAnimation(this.animationIndex);
-      
-    } else {
-      // Different video file - remove current and create new overlay
-      this.removeAnimations();
-
-      // Add next video overlay
-      this.addVideoOverlayWithSequence(
-        nextAnimation.x,
-        nextAnimation.y,
-        nextAnimation.videoUrl,
-        nextAnimation.width,
-        nextAnimation.height,
-        nextAnimation.hideControls
-      );
-      
-      // Auto-play the next video after a short delay and maintain play state
-      setTimeout(() => {
-        if (this.currentVideo) {
-          this.currentVideo.play().catch(error => {
-            console.warn('Auto-play failed:', error);
-          });
-          this.isPlaying = true;
-
-          // Move to the animation with smooth transition
-          this.moveToAnimation(this.animationIndex);
-        }
-      }, 100);
-    }
-  } else {
-    console.log('All animations played, sequence complete');
-    // Optionally reset to first animation or show all animations
-    this.isPlaying = false;
-    this.showAllAnimations();
+    return this.createVideoOverlay(x, y, videoUrl, width, height, {
+      autoPlay: true,
+      moveToOnLoad: true,
+      playNextOnEnd: true,
+      storeAsCurrentVideo: true,
+      navigationCues: animation?.navigationCues,
+      startTime: animation?.startTime,
+      stopTime: animation?.stopTime
+    });
   }
-}
+
+  playNextAnimationInSequence() {
+    // Move to next animation
+    if (this.animationIndex < this.numAnimations - 1) {
+      this.animationIndex++;
+
+      // Get the next animation
+      const nextAnimation = this.animations[this.animationIndex];
+      const currentAnimation = this.animations[this.animationIndex - 1];
+      console.log('Playing next animation:', nextAnimation);
+
+      // Check if it's the same video file
+      if (currentAnimation && nextAnimation.videoUrl === currentAnimation.videoUrl && this.currentVideo) {
+        // Same video file - pause first, then seek to start time
+        console.log('Same video file, seeking to start time:', nextAnimation.startTime);
+
+        this.currentVideo.pause();
+
+        // Wait for pause to complete, then set time and play
+        setTimeout(() => {
+          if (this.currentVideo) {
+            if (nextAnimation.startTime !== undefined) {
+              console.log('Setting currentTime to:', nextAnimation.startTime);
+              this.currentVideo.currentTime = nextAnimation.startTime;
+            } else {
+              this.currentVideo.currentTime = 0;
+            }
+
+            // Wait for seek to complete before playing
+            const seekHandler = () => {
+              console.log('Seek completed, starting playback from:', this.currentVideo?.currentTime);
+              if (this.currentVideo) {
+                this.currentVideo.play().catch(error => {
+                  console.warn('Auto-play failed:', error);
+                });
+                this.isPlaying = true;
+                this.currentVideo.removeEventListener('seeked', seekHandler);
+              }
+            };
+
+            this.currentVideo.addEventListener('seeked', seekHandler);
+
+            // Fallback in case seeked doesn't fire
+            setTimeout(() => {
+              if (this.currentVideo && this.currentVideo.paused) {
+                this.currentVideo.removeEventListener('seeked', seekHandler);
+                this.currentVideo.play().catch(error => {
+                  console.warn('Fallback auto-play failed:', error);
+                });
+                this.isPlaying = true;
+              }
+            }, 200);
+          }
+        }, 100);
+
+        // Move to the animation location
+        this.moveToAnimation(this.animationIndex);
+
+      } else {
+        // Different video file - remove current and create new overlay
+        this.removeAnimations();
+
+        // Add next video overlay
+        this.addVideoOverlayWithSequence(
+          nextAnimation.x,
+          nextAnimation.y,
+          nextAnimation.videoUrl,
+          nextAnimation.width,
+          nextAnimation.height,
+          nextAnimation.hideControls
+        );
+
+        // Auto-play the next video after a short delay and maintain play state
+        setTimeout(() => {
+          if (this.currentVideo) {
+            this.currentVideo.play().catch(error => {
+              console.warn('Auto-play failed:', error);
+            });
+            this.isPlaying = true;
+
+            // Move to the animation with smooth transition
+            this.moveToAnimation(this.animationIndex);
+          }
+        }, 100);
+      }
+    } else {
+      console.log('All animations played, sequence complete');
+      // Optionally reset to first animation or show all animations
+      this.isPlaying = false;
+      this.showAllAnimations();
+    }
+  }
 
   private setupVideoForSequence(video: HTMLVideoElement, animation: any) {
     // Set start time if specified
     if (animation.startTime !== undefined) {
       video.currentTime = animation.startTime;
     }
-    
+
     // Set up stop time listener
     video.addEventListener('timeupdate', () => {
       if (animation.stopTime !== undefined && video.currentTime >= animation.stopTime) {
         if (!video.paused) {
           video.pause();
           this.isPlaying = false;
-          
+
           setTimeout(() => {
             this.playNextAnimationInSequence();
           }, 50);
@@ -958,7 +966,7 @@ playNextAnimationInSequence() {
           if (options.storeAsCurrentVideo) {
             this.isPlaying = false;
           }
-          
+
           // If playNextOnEnd is true, trigger next animation
           if (options.playNextOnEnd) {
             console.log('Video reached stop time at:', video.currentTime, 'playing next animation');
