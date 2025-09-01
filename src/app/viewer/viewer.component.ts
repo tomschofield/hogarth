@@ -1308,31 +1308,29 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     const defaultContent = [
       {
         title: "An Election Entertainment",
-        text: `<p>Welcome to the first painting in Hogarth's Election Series: "An Election Entertainment" (1755).</p>
-               <p>This scene depicts the corrupt practices of electoral politics in 18th century England. The Tory party hosts a lavish feast to buy votes, while chaos and moral decay unfold around the dinner table.</p>
-               <p>Notice the symbolic details: the overturned chair, the dog stealing food, the window being bricked up (referencing the unpopular Window Tax), and the portrait of King William III being defaced.</p>
-               <p>Click on the blue and orange annotation pins to explore specific details and discover the hidden meanings in Hogarth's moral commentary.</p>`
+        text: `<p>Welcome to the first painting in Hogarth's ‘Humours of an Election’ series: ‘An Election Entertainment’.</p>
+               <p>This scene, painted in 1754-55, depicts the first stage of an election for parliament in 18th-century England. The ‘New Interest’ (or Whig) party hosts a lavish feast to buy votes. It’s chaos around the dinner table, as well as outside the inn.</p>
+               <p>Notice the symbolic details indicating corruption and moral decay, but note also that a wide range of people could be involved in the election, even if they didn’t have the right to vote.</p>
+               <p>Take a look round the painting to explore its fine detail. Animate the characters, and listen to what they have to say. Or click on the annotation pins to discover the learn more about the history, and the hidden meanings of Hogarth's satire.</p>`
       },
       {
         title: "Canvassing for Votes",
-        text: `<p>The second painting in the series: "Canvassing for Votes" (1757).</p>
-               <p>Here we see the corrupt practice of vote buying in full swing. Politicians and their agents desperately seek support through bribery, false promises, and manipulation of the electorate.</p>
-               <p>Hogarth masterfully depicts the hypocrisy of the electoral process - notice the inn signs showing competing political allegiances, the symbolic Royal Oak (representing the monarchy), and the various social classes being courted for their votes.</p>
-               <p>The painting reveals how democracy can be corrupted when money and power override genuine representation of the people's interests.</p>`
+        text: `<p>The second painting in the series is called ‘Canvassing for Votes’ (1754-55).</p>
+               <p>Here we see attempts to buy votes in full swing. Politicians and their agents desperately seek support through bribery, false promises, and manipulation of the electorate.</p>
+               <p>Hogarth is depicting the corruption and hypocrisy of the electoral process. He was showing how democracy can be corrupted when money and influence override the genuine representation of the people's interests.</p>`
       },
       {
         title: "The Polling",
-        text: `<p>The third painting: "The Polling" (1758) - Election Day arrives.</p>
-               <p>This scene shows the actual voting process, revealing the various ways corruption manifests even at the ballot box. Hogarth depicts voters of questionable capacity being brought to vote - including a dying man carried on a stretcher and a man taking an oath despite having a wooden leg (suggesting he may be an impostor).</p>
+        text: `<p>The third painting in the series is called ’The Polling’ (1754-55).</p>
+               <p>The election has arrived, and the scene shows the actual voting process, revealing the various ways corruption is manifested even at the ballot box.</p>
                <p>The architecture itself tells a story: the classical building represents the ideal of democratic institutions, while the human drama unfolding reveals how far reality falls short of this ideal.</p>
-               <p>Notice Britannia's coach in the background - a symbol of the nation itself caught up in this corrupt spectacle.</p>`
+               <p>Notice Britannia's coach in the background. It has broken down, and she calls in vain for help - Hogarth’s symbol of the sad state of the nation.</p>`
       },
       {
         title: "Chairing the Member",
-        text: `<p>The final painting: "Chairing the Member" (1758) - The aftermath of electoral victory.</p>
-               <p>The newly elected Member of Parliament is carried through the streets in traditional celebration, but Hogarth shows this moment of triumph descending into chaos and potential disaster.</p>
-               <p>The procession is on the verge of collapse - quite literally, as the chair and its occupant are about to tumble. This serves as Hogarth's final commentary on the electoral process: even victory achieved through corruption leads to instability and eventual downfall.</p>
-               <p>The painting completes the cycle, showing how the corruption depicted in the earlier scenes ultimately undermines the very system it was meant to celebrate.</p>`
+        text: `<p>The final painting is ’Chairing the Member’ (1754-55), showing the aftermath of the election.</p>
+               <p>The newly elected Members of Parliament are carried through the streets in a traditional celebration, but Hogarth shows this moment of triumph descending into chaos, violence and disaster.</p>
+               <p>The painting completes the cycle, showing how the corruption depicted throughout the series has fatally undermined the political system. But it’s also a vibrant scene, where the whole community wants to play a part in the election. Whether they can vote or not, these are all people for whom elections matter.</p>`
       }
     ];
 
