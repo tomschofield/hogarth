@@ -364,9 +364,6 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     var tooltip = document.createElement("div");
     tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
     tooltip.style.position = "absolute";
-    tooltip.style.bottom = "100%";
-    tooltip.style.left = "50%";
-    tooltip.style.transform = "translateX(-50%)";
     tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
     tooltip.style.color = "white";
     tooltip.style.padding = "8px 12px";
@@ -382,14 +379,108 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     // Add arrow to tooltip
     var arrow = document.createElement("div");
     arrow.style.position = "absolute";
-    arrow.style.top = "100%";
-    arrow.style.left = "50%";
-    arrow.style.marginLeft = "-5px";
     arrow.style.width = "0";
     arrow.style.height = "0";
     arrow.style.borderLeft = "5px solid transparent";
     arrow.style.borderRight = "5px solid transparent";
-    arrow.style.borderTop = "5px solid rgba(0, 0, 0, 0.9)";
+
+    // Function to position tooltip dynamically
+    // Function to position tooltip dynamically
+    const positionTooltip = () => {
+      if (!tooltip.offsetParent) return;
+      
+      const rect = elt.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      
+      // Get the OpenSeadragon viewer container bounds instead of viewport
+      const viewerContainer = document.getElementById('seadragon-viewer');
+      if (!viewerContainer) return;
+      
+      const containerRect = viewerContainer.getBoundingClientRect();
+      const containerWidth = containerRect.width;
+      const containerHeight = containerRect.height;
+      const containerLeft = containerRect.left;
+      const containerTop = containerRect.top;
+      const containerRight = containerRect.right;
+      const containerBottom = containerRect.bottom;
+      
+      // Reset positioning
+      tooltip.style.top = "";
+      tooltip.style.bottom = "";
+      tooltip.style.left = "";
+      tooltip.style.right = "";
+      tooltip.style.transform = "";
+      arrow.style.top = "";
+      arrow.style.bottom = "";
+      arrow.style.left = "";
+      arrow.style.right = "";
+      arrow.style.marginLeft = "";
+      arrow.style.marginTop = "";
+      arrow.style.borderTop = "";
+      arrow.style.borderBottom = "";
+      arrow.style.borderLeft = "5px solid transparent";
+      arrow.style.borderRight = "5px solid transparent";
+      
+      // Calculate tooltip position relative to marker and container bounds
+      const tooltipLeft = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+      const tooltipRight = tooltipLeft + tooltipRect.width;
+      const tooltipTop = rect.top - tooltipRect.height - 10;
+      const tooltipBottom = rect.bottom + tooltipRect.height + 10;
+      
+      // Check if tooltip fits above and within container bounds
+      if (tooltipTop >= containerTop && tooltipLeft >= containerLeft && tooltipRight <= containerRight) {
+        // Position above (default)
+        tooltip.style.bottom = "100%";
+        tooltip.style.left = "50%";
+        tooltip.style.transform = "translateX(-50%)";
+        tooltip.style.marginBottom = "8px";
+        arrow.style.top = "100%";
+        arrow.style.left = "50%";
+        arrow.style.marginLeft = "-5px";
+        arrow.style.borderTop = "5px solid rgba(0, 0, 0, 0.9)";
+      }
+      // Check if tooltip fits below and within container bounds
+      else if (tooltipBottom <= containerBottom && tooltipLeft >= containerLeft && tooltipRight <= containerRight) {
+        // Position below
+        tooltip.style.top = "100%";
+        tooltip.style.left = "50%";
+        tooltip.style.transform = "translateX(-50%)";
+        tooltip.style.marginTop = "8px";
+        arrow.style.bottom = "100%";
+        arrow.style.left = "50%";
+        arrow.style.marginLeft = "-5px";
+        arrow.style.borderBottom = "5px solid rgba(0, 0, 0, 0.9)";
+      }
+      // Check if tooltip fits to the right and within container bounds
+      else if (rect.right + tooltipRect.width + 10 <= containerRight) {
+        // Position to the right
+        tooltip.style.left = "100%";
+        tooltip.style.top = "50%";
+        tooltip.style.transform = "translateY(-50%)";
+        tooltip.style.marginLeft = "8px";
+        arrow.style.right = "100%";
+        arrow.style.top = "50%";
+        arrow.style.marginTop = "-5px";
+        arrow.style.borderLeft = "5px solid transparent";
+        arrow.style.borderRight = "5px solid rgba(0, 0, 0, 0.9)";
+        arrow.style.borderTop = "5px solid transparent";
+        arrow.style.borderBottom = "5px solid transparent";
+      }
+      // Position to the left
+      else {
+        tooltip.style.right = "100%";
+        tooltip.style.top = "50%";
+        tooltip.style.transform = "translateY(-50%)";
+        tooltip.style.marginRight = "8px";
+        arrow.style.left = "100%";
+        arrow.style.top = "50%";
+        arrow.style.marginTop = "-5px";
+        arrow.style.borderLeft = "5px solid rgba(0, 0, 0, 0.9)";
+        arrow.style.borderRight = "5px solid transparent";
+        arrow.style.borderTop = "5px solid transparent";
+        arrow.style.borderBottom = "5px solid transparent";
+      }
+    };
 
     tooltip.appendChild(arrow);
     elt.appendChild(tooltip);
@@ -427,6 +518,9 @@ export class ViewerComponent implements OnInit, AfterViewInit {
         }
         
         tooltip.style.opacity = "1";
+
+        setTimeout(() => positionTooltip(), 10);
+
         if (type === "multi-level") {
           elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
           elt.style.animation = "pulse-multi 1.5s infinite";
@@ -437,6 +531,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       } else {
         // Show tooltip for selected annotation
         tooltip.style.opacity = "1";
+        setTimeout(() => positionTooltip(), 10);
       }
     });
 
