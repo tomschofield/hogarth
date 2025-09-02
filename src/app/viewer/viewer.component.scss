@@ -829,7 +829,6 @@
             pointer-events: auto;
         }
         
-        
         button {
             font-family: "Figgins", serif;
             font-weight: 500;
@@ -862,6 +861,11 @@
             width: 20px;
             height: 20px;
         }
+    }
+
+    .exploration-buttons {
+        text-align: center;
+        padding: 20px;
     }
 }
 
