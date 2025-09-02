@@ -250,9 +250,6 @@ export class ViewerComponent implements OnInit, AfterViewInit {
           // Load annotations and animations after viewer is created
           this.loadAnnotationsAndAnimations();
 
-          // Set default annotation content for the initial page
-          this.setDefaultAnnotationContent();
-
         } catch (error) {
           console.error('Error initializing OpenSeadragon viewer:', error);
           this.viewer = null; // Ensure viewer is null on error
@@ -269,7 +266,8 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     this.annotationsService.getData().subscribe({
       next: (res) => {
         this.annotations = res;
-        // Remove automatic loading: this.addAnnotations(this.annotations);
+        // Set default annotation content after annotations are loaded
+        this.setDefaultAnnotationContent();
       },
       error: (error) => {
         console.error("Error loading annotations data:", error);
@@ -329,6 +327,12 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       console.warn('Viewer not initialized, cannot add annotation');
       return;
     }
+
+    // Don't show markers for Introduction annotations
+    if (type === "Introduction") {
+      return;
+    }
+    
     var elt = document.createElement("div");
     elt.className = "annotation-pin";
 
@@ -415,7 +419,6 @@ export class ViewerComponent implements OnInit, AfterViewInit {
      elt.addEventListener('mouseenter', () => {
       // Only apply hover effects if not selected
       if (this.selectedAnnotationElement !== elt) {
-        elt.style.transform = "scale(1.6)";
         
         // Update wrapper z-index on hover
         const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
@@ -440,7 +443,6 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     elt.addEventListener('mouseleave', () => {
       // Only reset hover styles if not selected
       if (this.selectedAnnotationElement !== elt) {
-        elt.style.transform = "scale(1)";
         
         // Reset wrapper z-index
         const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
@@ -540,7 +542,6 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   private setSelectedAnnotationStyle(element: HTMLElement) {
     // Apply selected style with orange color #E35205
     element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, #E35205 40%, #E35205 50%, rgba(0, 0, 0, 0) 54%)";
-    element.style.transform = "scale(1.8)";
     element.style.boxShadow = "0 0 15px rgba(227, 82, 5, 0.9)";
     element.style.animation = "pulse-selected 1.5s infinite";
 
@@ -563,7 +564,6 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       element.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(71, 151, 168) 40%, rgb(71, 151, 168) 50%, rgba(0, 0, 0, 0) 54%)";
     }
     
-    element.style.transform = "scale(1)";
     element.style.boxShadow = "none";
     element.style.animation = "none";
 
@@ -646,23 +646,71 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   previousPanel() {
     if (this.panelTextIndex > 0) {
       this.panelTextIndex--;
-      this.panelText = this.formatPanelText(
-        this.annotations[this.currentAnnotationIndex][`annotation text ${this.panelTextIndex}`]
-      );
+      
+      if (this.currentAnnotationIndex === -1) {
+        // For introduction content, find the intro annotation
+        const paintingTitles = ["An Election Entertainment", "Canvassing for Votes", "The Polling", "Chairing the Member"];
+        const currentPaintingTitle = paintingTitles[this.pageIndex];
+        const introAnnotation = this.annotations.find(annotation => 
+          annotation["painting title"] === currentPaintingTitle && 
+          annotation["annotation title"] === "Introduction"
+        );
+        
+        if (introAnnotation) {
+          this.panelText = this.formatPanelText(
+            introAnnotation[`annotation text ${this.panelTextIndex}`]
+          );
+          // Update images for introduction
+          const imageFilename = introAnnotation[`image filename ${this.panelTextIndex}`];
+          this.annotationImages = [];
+          if (imageFilename && imageFilename.trim() !== '') {
+            this.annotationImages.push(`assets/panelImages/${imageFilename}`);
+          }
+        }
+      } else {
+        // For regular annotations
+        this.panelText = this.formatPanelText(
+          this.annotations[this.currentAnnotationIndex][`annotation text ${this.panelTextIndex}`]
+        );
+        // Update images for the new panel
+        this.updateImagesForCurrentPanel();
+      }
     }
-    // Update images for the new panel
-    this.updateImagesForCurrentPanel();
   }
 
   nextPanel() {
     if (this.panelTextIndex < this.numPanels - 1) {
       this.panelTextIndex++;
-      this.panelText = this.formatPanelText(
-        this.annotations[this.currentAnnotationIndex][`annotation text ${this.panelTextIndex}`]
-      );
+
+      if (this.currentAnnotationIndex === -1) {
+        // For introduction content, find the intro annotation
+        const paintingTitles = ["An Election Entertainment", "Canvassing for Votes", "The Polling", "Chairing the Member"];
+        const currentPaintingTitle = paintingTitles[this.pageIndex];
+        const introAnnotation = this.annotations.find(annotation => 
+          annotation["painting title"] === currentPaintingTitle && 
+          annotation["annotation title"] === "Introduction"
+        );
+        
+        if (introAnnotation) {
+          this.panelText = this.formatPanelText(
+            introAnnotation[`annotation text ${this.panelTextIndex}`]
+          );
+          // Update images for introduction
+          const imageFilename = introAnnotation[`image filename ${this.panelTextIndex}`];
+          this.annotationImages = [];
+          if (imageFilename && imageFilename.trim() !== '') {
+            this.annotationImages.push(`assets/panelImages/${imageFilename}`);
+          }
+        }
+      } else {
+        // For regular annotations
+        this.panelText = this.formatPanelText(
+          this.annotations[this.currentAnnotationIndex][`annotation text ${this.panelTextIndex}`]
+        );
+        // Update images for the new panel
+        this.updateImagesForCurrentPanel();
+      }
     }
-    // Update images for the new panel
-    this.updateImagesForCurrentPanel();
   }
 
   previousAnimation() {
@@ -1401,44 +1449,36 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   }
 
   private setDefaultAnnotationContent() {
-    const defaultContent = [
-      {
-        title: "An Election Entertainment",
-        text: `<p>Welcome to the first painting in Hogarth's ‘Humours of an Election’ series: ‘An Election Entertainment’.</p>
-               <p>This scene, painted in 1754-55, depicts the first stage of an election for parliament in 18th-century England. The ‘New Interest’ (or Whig) party hosts a lavish feast to buy votes. It’s chaos around the dinner table, as well as outside the inn.</p>
-               <p>Notice the symbolic details indicating corruption and moral decay, but note also that a wide range of people could be involved in the election, even if they didn’t have the right to vote.</p>
-               <p>Take a look round the painting to explore its fine detail. Animate the characters, and listen to what they have to say. Or click on the annotation pins to discover the learn more about the history, and the hidden meanings of Hogarth's satire.</p>`
-      },
-      {
-        title: "Canvassing for Votes",
-        text: `<p>The second painting in the series is called ‘Canvassing for Votes’ (1754-55).</p>
-               <p>Here we see attempts to buy votes in full swing. Politicians and their agents desperately seek support through bribery, false promises, and manipulation of the electorate.</p>
-               <p>Hogarth is depicting the corruption and hypocrisy of the electoral process. He was showing how democracy can be corrupted when money and influence override the genuine representation of the people's interests.</p>`
-      },
-      {
-        title: "The Polling",
-        text: `<p>The third painting in the series is called ’The Polling’ (1754-55).</p>
-               <p>The election has arrived, and the scene shows the actual voting process, revealing the various ways corruption is manifested even at the ballot box.</p>
-               <p>The architecture itself tells a story: the classical building represents the ideal of democratic institutions, while the human drama unfolding reveals how far reality falls short of this ideal.</p>
-               <p>Notice Britannia's coach in the background. It has broken down, and she calls in vain for help - Hogarth’s symbol of the sad state of the nation.</p>`
-      },
-      {
-        title: "Chairing the Member",
-        text: `<p>The final painting is ’Chairing the Member’ (1754-55), showing the aftermath of the election.</p>
-               <p>The newly elected Members of Parliament are carried through the streets in a traditional celebration, but Hogarth shows this moment of triumph descending into chaos, violence and disaster.</p>
-               <p>The painting completes the cycle, showing how the corruption depicted throughout the series has fatally undermined the political system. But it’s also a vibrant scene, where the whole community wants to play a part in the election. Whether they can vote or not, these are all people for whom elections matter.</p>`
-      }
-    ];
+     // Find the Introduction annotation for the current page
+    const paintingTitles = ["An Election Entertainment", "Canvassing for Votes", "The Polling", "Chairing the Member"];
+    const currentPaintingTitle = paintingTitles[this.pageIndex];
+    
+    const introAnnotation = this.annotations.find(annotation => 
+      annotation["painting title"] === currentPaintingTitle && 
+      annotation["annotation title"] === "Introduction"
+    );
 
-    const currentContent = defaultContent[this.pageIndex];
-    if (currentContent) {
-      this.panelTitle = currentContent.title;
-      this.panelText = currentContent.text;
+    if (introAnnotation) {
+      this.panelTitle = introAnnotation["annotation title"];
+      this.panelText = this.formatPanelText(introAnnotation["annotation text 0"]);
       this.currentAnnotationIndex = -1; // Indicate this is default content, not a specific annotation
       this.panelTextIndex = 0;
-      this.numPanels = 1;
+      
+      // Count how many text panels this introduction has
+      this.numPanels = 0;
+      if (introAnnotation["annotation text 0"] && introAnnotation["annotation text 0"].length > 0) this.numPanels = 1;
+      if (introAnnotation["annotation text 1"] && introAnnotation["annotation text 1"].length > 0) this.numPanels = 2;
+      if (introAnnotation["annotation text 2"] && introAnnotation["annotation text 2"].length > 0) this.numPanels = 3;
+      if (introAnnotation["annotation text 3"] && introAnnotation["annotation text 3"].length > 0) this.numPanels = 4;
+      
       this.annotationImages = [];
-    }
+      
+      // Get images for the introduction if any
+      const imageFilename = introAnnotation[`image filename 0`];
+      if (imageFilename && imageFilename.trim() !== '') {
+        this.annotationImages.push(`assets/panelImages/${imageFilename}`);
+      }
+    } 
   }
 
 }
