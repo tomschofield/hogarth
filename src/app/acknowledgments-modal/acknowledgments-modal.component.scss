@@ -8,7 +8,7 @@
   background-color: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  z-index: 2000;
+  z-index: 102000;
   opacity: 0;
   animation: fadeIn 0.3s ease forwards;
 }
@@ -18,7 +18,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2001;
+  z-index: 102001;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
