@@ -316,7 +316,8 @@ export class ViewerComponent implements OnInit, AfterViewInit {
 
     data.forEach(element => {
       if (titles.indexOf(element["painting title"]) == this.pageIndex) {
-        this.addAnnotation(element.x, element.y, index, element["annotation type"]);
+        ///updated from "annotation type so that we can highlight the introductions"
+        this.addAnnotation(element.x, element.y, index, element["annotation title"]);
       }
       index++;
     });
@@ -347,7 +348,8 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     elt.style.transition = "all 0.1s ease";
 
     // Add the visual styling based on type
-    if (type === "multi-level") {
+    if (type === "Introduction" || type === "The political context") {
+   
       elt.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%,  rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
     } else {
       elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%,  rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
