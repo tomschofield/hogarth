@@ -110,8 +110,8 @@
   <!-- Main Content Area with Flexbox Layout - Now full height -->
   <div class="main-content">
     <!-- Main Viewer Container -->
-    <div id="seadragon-viewer">
-         <!-- [style.width]="(panelText) || showingChat ? '70%' : '100%'"> -->
+    <div id="seadragon-viewer"
+         [style.width]="(panelText) || showingChat ? '70%' : '100%'">
     </div>
 
     <!-- Annotation Panel - Right Side -->
@@ -153,7 +153,7 @@
                 </mat-slide-toggle>
               </div>
               
-              <div class="menu-item">
+              <div class="menu-item" style="margin-top: 15px;">
                 <mat-slide-toggle 
                   [(ngModel)]="showingAnimations" 
                   (change)="toggleAnimations($event.checked)"

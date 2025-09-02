@@ -353,7 +353,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
    
       elt.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%,  rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
     } else {
-      elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%,  rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
+      elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(71, 151, 168) 40%,  rgb(71, 151, 168) 50%, rgba(0, 0, 0, 0) 54%)";
     }
 
     // Create tooltip element
@@ -428,7 +428,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
           elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
           elt.style.animation = "pulse-multi 1.5s infinite";
         } else {
-          elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0.8)";
+          elt.style.boxShadow = "0 0 10px rgba(71, 151, 168, 0.8)";
           elt.style.animation = "pulse 1.5s infinite";
         }
       } else {
@@ -453,7 +453,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
         if (type === "multi-level") {
           elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
         } else {
-          elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0)";
+          elt.style.boxShadow = "0 0 10px rgba(71, 151, 168, 0)";
         }
       } else {
         // Hide tooltip for selected annotation when not hovering
@@ -560,7 +560,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     if (isMultiLevel) {
       element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%, rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
     } else {
-      element.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%, rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
+      element.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(71, 151, 168) 40%, rgb(71, 151, 168) 50%, rgba(0, 0, 0, 0) 54%)";
     }
     
     element.style.transform = "scale(1)";
