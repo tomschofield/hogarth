@@ -52,6 +52,8 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   selectionEnd: { x: number, y: number } | null = null;
   selectionOverlay: HTMLElement | null = null;
   private selectedAnnotationElement: HTMLElement | null = null;
+  private originalBounds: any = null;
+  private isViewportAdjusted: boolean = false;
 
   constructor(
     private ngZone: NgZone,
@@ -632,6 +634,9 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     this.updateImagesForCurrentPanel();
 
     this.panelTextIndex = 0;
+
+    // Adjust viewport when annotation is selected
+    this.adjustViewportForPanel(true);
   }
 
   private setSelectedAnnotationStyle(element: HTMLElement) {
@@ -704,6 +709,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       this.addAnnotations(this.annotations);
     } else {
       this.removeAnnotations();
+      this.adjustViewportForPanel(false);
     }
   }
 
@@ -1457,6 +1463,47 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     this.currentAnnotationIndex = 0;
     this.panelTextIndex = 0;
     this.numPanels = 0;
+
+    // Adjust viewport when panel is closed
+    this.adjustViewportForPanel(false);
+  }
+
+  private adjustViewportForPanel(showPanel: boolean) {
+    if (!this.viewer) return;
+
+    const viewport = this.viewer.viewport;
+    
+    if (showPanel && !this.isViewportAdjusted) {
+      // Store the current bounds before adjusting
+      this.originalBounds = viewport.getBounds();
+      this.isViewportAdjusted = true;
+
+      const currentBounds = this.originalBounds;
+      
+      const zoomFactor = 1 / 0.75; 
+      const newWidth = currentBounds.width * zoomFactor;
+      const newHeight = currentBounds.height * zoomFactor;
+      
+      const shiftPercentage = -0.035; 
+      const shiftAmount = newWidth * shiftPercentage;
+      
+      // Shift viewport to the LEFT (subtract from x) to move image LEFT
+      const newX = currentBounds.x - shiftAmount;
+      const newY = currentBounds.y - (newHeight - currentBounds.height) / 2; // Center vertically
+
+      const newBounds = new OpenSeadragon.Rect(newX, newY, newWidth, newHeight);
+      
+      // Animate to new bounds
+      viewport.fitBounds(newBounds, false);
+      
+    } else if (!showPanel && this.isViewportAdjusted) {
+      // Restore original bounds
+      if (this.originalBounds) {
+        viewport.fitBounds(this.originalBounds, false);
+      }
+      this.isViewportAdjusted = false;
+      this.originalBounds = null;
+    }
   }
 
   toggleMenu() {
@@ -1487,6 +1534,9 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       // Hide annotation panel when chat is opened
       this.closeAnnotationPanel();
 
+      // Adjust viewport for chat panel
+      this.adjustViewportForPanel(true);
+
       // Add welcome message if chat is empty
       if (this.chatMessages.length === 0) {
         this.chatMessages.push({
@@ -1495,6 +1545,8 @@ export class ViewerComponent implements OnInit, AfterViewInit {
           timestamp: new Date()
         });
       }
+    } else {
+      this.adjustViewportForPanel(false);
     }
   }
 
