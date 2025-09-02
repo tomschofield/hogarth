@@ -216,6 +216,17 @@
         "width":0.093,
         "height":0.093,
         "hideControls": false
+    },{
+        "title": "Ballad Singer",
+        "canvasIndex":2,
+        "storyIndex":2,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/Ballad Singer.mp4",
+        "x": 0.394,
+        "y": 0.4657,
+        "width":0.1065,
+        "height":0.1065,
+        "hideControls": false
     },
     
     {

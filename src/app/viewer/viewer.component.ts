@@ -51,6 +51,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   selectionStart: { x: number, y: number } | null = null;
   selectionEnd: { x: number, y: number } | null = null;
   selectionOverlay: HTMLElement | null = null;
+  private selectedAnnotationElement: HTMLElement | null = null;
 
   constructor(
     private ngZone: NgZone,
@@ -399,30 +400,64 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       index: index
     });
 
+    // Apply z-index to the OpenSeadragon wrapper element after overlay is added
+    setTimeout(() => {
+      const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+      if (wrapperElement) {
+        wrapperElement.style.zIndex = "9999";
+      }
+    }, 50);
+
     // Track this annotation overlay for reliable removal
     this.annotationOverlays.push(elt);
 
     // Add hover effects using JavaScript since CSS might not penetrate OpenSeadragon
-    elt.addEventListener('mouseenter', () => {
-      elt.style.transform = "scale(1.6)";
-      tooltip.style.opacity = "1";
-      if (type === "multi-level") {
-        elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
-        elt.style.animation = "pulse-multi 1.5s infinite";
+     elt.addEventListener('mouseenter', () => {
+      // Only apply hover effects if not selected
+      if (this.selectedAnnotationElement !== elt) {
+        elt.style.transform = "scale(1.6)";
+        
+        // Update wrapper z-index on hover
+        const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+        if (wrapperElement) {
+          wrapperElement.style.zIndex = "10004";
+        }
+        
+        tooltip.style.opacity = "1";
+        if (type === "multi-level") {
+          elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
+          elt.style.animation = "pulse-multi 1.5s infinite";
+        } else {
+          elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0.8)";
+          elt.style.animation = "pulse 1.5s infinite";
+        }
       } else {
-        elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0.8)";
-        elt.style.animation = "pulse 1.5s infinite";
+        // Show tooltip for selected annotation
+        tooltip.style.opacity = "1";
       }
     });
 
     elt.addEventListener('mouseleave', () => {
-      elt.style.transform = "scale(1)";
-      elt.style.animation = "none";
-      tooltip.style.opacity = "0";
-      if (type === "multi-level") {
-        elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
+      // Only reset hover styles if not selected
+      if (this.selectedAnnotationElement !== elt) {
+        elt.style.transform = "scale(1)";
+        
+        // Reset wrapper z-index
+        const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+        if (wrapperElement) {
+          wrapperElement.style.zIndex = "9999";
+        }
+        
+        elt.style.animation = "none";
+        tooltip.style.opacity = "0";
+        if (type === "multi-level") {
+          elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
+        } else {
+          elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0)";
+        }
       } else {
-        elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0)";
+        // Hide tooltip for selected annotation when not hovering
+        tooltip.style.opacity = "0";
       }
     });
 
@@ -443,6 +478,9 @@ export class ViewerComponent implements OnInit, AfterViewInit {
 
   removeAnnotations() {
     if (!this.viewer) return;
+
+    // Reset selected annotation reference
+    this.selectedAnnotationElement = null;
 
     // Remove all tracked annotation overlays
     this.annotationOverlays.forEach(annotationElement => {
@@ -467,6 +505,18 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   }
 
   setAnnotation(index: number) {
+    // Reset previously selected annotation
+    if (this.selectedAnnotationElement) {
+      this.resetAnnotationStyle(this.selectedAnnotationElement);
+    }
+
+    // Find and style the new selected annotation
+    const selectedElement = document.getElementById("annotation_" + index);
+    if (selectedElement) {
+      this.selectedAnnotationElement = selectedElement;
+      this.setSelectedAnnotationStyle(selectedElement);
+    }
+
     this.panelText = this.formatPanelText(this.annotations[index]["annotation text 0"]);
     this.currentAnnotationIndex = index;
     this.panelTitle = this.annotations[index]["annotation title"] || 'Annotation Details';
@@ -485,6 +535,44 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     this.updateImagesForCurrentPanel();
 
     this.panelTextIndex = 0;
+  }
+
+  private setSelectedAnnotationStyle(element: HTMLElement) {
+    // Apply selected style with orange color #E35205
+    element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, #E35205 40%, #E35205 50%, rgba(0, 0, 0, 0) 54%)";
+    element.style.transform = "scale(1.8)";
+    element.style.boxShadow = "0 0 15px rgba(227, 82, 5, 0.9)";
+    element.style.animation = "pulse-selected 1.5s infinite";
+
+    // Update wrapper z-index for selected annotation
+    const index = element.id.replace('annotation_', '');
+    const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+    if (wrapperElement) {
+      wrapperElement.style.zIndex = "10003";
+    }
+  }
+
+  private resetAnnotationStyle(element: HTMLElement) {
+    // Determine original type from classes
+    const isMultiLevel = element.classList.contains("multi-level");
+    
+    // Reset to original style
+    if (isMultiLevel) {
+      element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%, rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
+    } else {
+      element.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%, rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
+    }
+    
+    element.style.transform = "scale(1)";
+    element.style.boxShadow = "none";
+    element.style.animation = "none";
+
+    // Reset wrapper z-index
+    const index = element.id.replace('annotation_', '');
+    const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+    if (wrapperElement) {
+      wrapperElement.style.zIndex = "9999";
+    }
   }
 
   formatPanelText(text: string): string {
@@ -1214,6 +1302,12 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   }
 
   closeAnnotationPanel() {
+    // Reset selected annotation when panel is closed
+    if (this.selectedAnnotationElement) {
+      this.resetAnnotationStyle(this.selectedAnnotationElement);
+      this.selectedAnnotationElement = null;
+    }
+
     this.panelText = "";
     this.annotationImages = [];
     this.panelTitle = 'Annotation Details';
