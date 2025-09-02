@@ -61,15 +61,6 @@
       
       <div class="menu-item">
         <mat-slide-toggle 
-          [(ngModel)]="showingAnnotations" 
-          (change)="toggleAnnotations($event.checked)"
-          class="menu-toggle">
-          Annotations
-        </mat-slide-toggle>
-      </div>
-      
-      <div class="menu-item">
-        <mat-slide-toggle 
           [(ngModel)]="showingAnimations" 
           (change)="toggleAnimations($event.checked)"
           class="menu-toggle">
@@ -77,6 +68,14 @@
         </mat-slide-toggle>
       </div>
 
+      <div class="menu-item">
+        <mat-slide-toggle 
+          [(ngModel)]="showingAnnotations" 
+          (change)="toggleAnnotations($event.checked)"
+          class="menu-toggle">
+          Annotations
+        </mat-slide-toggle>
+      </div>
       <!-- <div class="menu-item">
         <mat-slide-toggle 
           [(ngModel)]="showingChat" 
@@ -146,19 +145,20 @@
             <div class="button-group">
               <div class="menu-item">
                 <mat-slide-toggle 
-                  [(ngModel)]="showingAnnotations" 
-                  (change)="toggleAnnotations($event.checked)"
-                  class="menu-toggle">
-                  Annotations
-                </mat-slide-toggle>
-              </div>
-              
-              <div class="menu-item" style="margin-top: 15px;">
-                <mat-slide-toggle 
                   [(ngModel)]="showingAnimations" 
                   (change)="toggleAnimations($event.checked)"
                   class="menu-toggle">
                   Animations
+                </mat-slide-toggle>
+              </div>
+
+
+              <div class="menu-item" style="margin-top: 15px;">
+                <mat-slide-toggle 
+                  [(ngModel)]="showingAnnotations" 
+                  (change)="toggleAnnotations($event.checked)"
+                  class="menu-toggle">
+                  Annotations
                 </mat-slide-toggle>
               </div>
             </div>

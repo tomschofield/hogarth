@@ -264,12 +264,32 @@ export class ViewerComponent implements OnInit, AfterViewInit {
   }
 
   private loadAnnotationsAndAnimations() {
+    let annotationsLoaded = false;
+    let animationsLoaded = false;
+    
+    const checkAndAutoToggle = () => {
+      if (annotationsLoaded && animationsLoaded) {
+        // Both data sets are loaded, now we can safely auto-toggle
+        setTimeout(() => {
+          // Toggle animations on after 1 second
+          this.toggleAnimations(true);
+          
+          setTimeout(() => {
+            // Toggle annotations on after 2 more seconds
+            this.toggleAnnotations(true);
+          }, 2000);
+        }, 1000);
+      }
+    };
+    
     // Fetch annotation data
     this.annotationsService.getData().subscribe({
       next: (res) => {
         this.annotations = res;
         // Set default annotation content after annotations are loaded
         this.setDefaultAnnotationContent();
+        annotationsLoaded = true;
+        checkAndAutoToggle();
       },
       error: (error) => {
         console.error("Error loading annotations data:", error);
