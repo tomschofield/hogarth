@@ -398,6 +398,14 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       index: index
     });
 
+    // Apply z-index to the OpenSeadragon wrapper element after overlay is added
+    setTimeout(() => {
+      const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+      if (wrapperElement) {
+        wrapperElement.style.zIndex = "9999";
+      }
+    }, 50);
+
     // Track this annotation overlay for reliable removal
     this.annotationOverlays.push(elt);
 
@@ -406,7 +414,13 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       // Only apply hover effects if not selected
       if (this.selectedAnnotationElement !== elt) {
         elt.style.transform = "scale(1.6)";
-        elt.style.zIndex = "10002"; // Boost z-index on hover
+        
+        // Update wrapper z-index on hover
+        const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+        if (wrapperElement) {
+          wrapperElement.style.zIndex = "10004";
+        }
+        
         tooltip.style.opacity = "1";
         if (type === "multi-level") {
           elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
@@ -425,7 +439,13 @@ export class ViewerComponent implements OnInit, AfterViewInit {
       // Only reset hover styles if not selected
       if (this.selectedAnnotationElement !== elt) {
         elt.style.transform = "scale(1)";
-        elt.style.zIndex = "9999"; // Reset to normal high z-index
+        
+        // Reset wrapper z-index
+        const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+        if (wrapperElement) {
+          wrapperElement.style.zIndex = "9999";
+        }
+        
         elt.style.animation = "none";
         tooltip.style.opacity = "0";
         if (type === "multi-level") {
@@ -459,7 +479,7 @@ export class ViewerComponent implements OnInit, AfterViewInit {
 
     // Reset selected annotation reference
     this.selectedAnnotationElement = null;
-    
+
     // Remove all tracked annotation overlays
     this.annotationOverlays.forEach(annotationElement => {
       this.viewer.removeOverlay(annotationElement);
@@ -519,9 +539,15 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     // Apply selected style with orange color #E35205
     element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, #E35205 40%, #E35205 50%, rgba(0, 0, 0, 0) 54%)";
     element.style.transform = "scale(1.8)";
-    element.style.zIndex = "10003"; // Highest z-index for selected
     element.style.boxShadow = "0 0 15px rgba(227, 82, 5, 0.9)";
     element.style.animation = "pulse-selected 1.5s infinite";
+
+    // Update wrapper z-index for selected annotation
+    const index = element.id.replace('annotation_', '');
+    const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+    if (wrapperElement) {
+      wrapperElement.style.zIndex = "10003";
+    }
   }
 
   private resetAnnotationStyle(element: HTMLElement) {
@@ -536,9 +562,15 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     }
     
     element.style.transform = "scale(1)";
-    element.style.zIndex = "9999";
     element.style.boxShadow = "none";
     element.style.animation = "none";
+
+    // Reset wrapper z-index
+    const index = element.id.replace('annotation_', '');
+    const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
+    if (wrapperElement) {
+      wrapperElement.style.zIndex = "9999";
+    }
   }
 
   formatPanelText(text: string): string {

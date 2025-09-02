@@ -12,7 +12,7 @@
     width: 300px;
     max-height: 60vh;
     overflow-y: auto;
-    z-index: 1000;
+    z-index: 10100;
 
     mat-card {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -33,7 +33,7 @@
     bottom: 20px;
     left: 20px;
     width: 280px;
-    z-index: 1000;
+    z-index: 10100;
     cursor: move;
     
     // Remove the hover transform since it interferes with dragging
@@ -234,7 +234,7 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 101003;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -361,7 +361,7 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1002;
+    z-index: 101002;
     
     @media (max-width: 768px) {
         top: 25%;
@@ -395,7 +395,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1001;
+    z-index: 101001;
     opacity: 0;
     animation: fadeIn 0.3s ease forwards;
 }
@@ -408,7 +408,7 @@
     width: 280px;
     background: #862633;
     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
-    z-index: 1002;
+    z-index: 101002;
     transition: right 0.3s ease;
     border-radius: 8px 0 0 8px;
     
@@ -783,7 +783,7 @@
     overflow-y: auto;
     padding: 10px;
     // background-color: white;
-    z-index: 100;
+    z-index: 10100;
     // box-shadow: -2px 0 5px rgba(0,0,0,0.1);
 
     @media (max-width: 768px) and (orientation: portrait) {
