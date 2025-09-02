@@ -227,6 +227,17 @@
         "width":0.1065,
         "height":0.1065,
         "hideControls": false
+    },{
+        "title": "Former Soldier",
+        "canvasIndex":2,
+        "storyIndex":2,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/Former Soldier.mp4",
+        "x": 0.82,
+        "y": 0.562,
+        "width":0.418,
+        "height":0.418,
+        "hideControls": false
     },
     
     {
