@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, NgZone, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef } from '@angular/core';
 import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
@@ -11,7 +11,7 @@ declare var OpenSeadragon: any;
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.scss']
 })
-export class ViewerComponent implements OnInit, AfterViewInit {
+export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   viewer: any;
   panelText: string = "";
   canvasData: CanvasDatum[] = [];
@@ -64,6 +64,12 @@ export class ViewerComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     // Keep this empty or only put non-DOM related initialization here
+  }
+
+  ngOnDestroy() {
+    // Clean up event listeners
+    document.removeEventListener('toggleAnimations', this.handleAnimationsToggle);
+    document.removeEventListener('toggleAnnotations', this.handleAnnotationsToggle);
   }
 
   ngAfterViewInit() {
@@ -1446,29 +1452,29 @@ export class ViewerComponent implements OnInit, AfterViewInit {
     }, duration * 1000);
   }
 
-  private showNextNavigationCue(cue: any) {
-    // Create a temporary highlight overlay
-    const highlight = document.createElement("div");
-    highlight.style.border = "2px dashed rgba(255, 255, 255, 0.8)";
-    highlight.style.borderRadius = "8px";
-    highlight.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
-    highlight.style.pointerEvents = "none";
+  // private showNextNavigationCue(cue: any) {
+  //   // Create a temporary highlight overlay
+  //   const highlight = document.createElement("div");
+  //   highlight.style.border = "2px dashed rgba(255, 255, 255, 0.8)";
+  //   highlight.style.borderRadius = "8px";
+  //   highlight.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+  //   highlight.style.pointerEvents = "none";
 
-    // Add overlay to show next target area
-    this.viewer.addOverlay({
-      element: highlight,
-      location: new OpenSeadragon.Point(cue.x, cue.y),
-      placement: 'CENTER',
-      checkResize: false,
-      width: cue.width,
-      height: cue.height
-    });
+  //   // Add overlay to show next target area
+  //   this.viewer.addOverlay({
+  //     element: highlight,
+  //     location: new OpenSeadragon.Point(cue.x, cue.y),
+  //     placement: 'CENTER',
+  //     checkResize: false,
+  //     width: cue.width,
+  //     height: cue.height
+  //   });
 
-    // Remove highlight after 2 seconds
-    setTimeout(() => {
-      this.viewer.removeOverlay(highlight);
-    }, 2000);
-  }
+  //   // Remove highlight after 2 seconds
+  //   setTimeout(() => {
+  //     this.viewer.removeOverlay(highlight);
+  //   }, 2000);
+  // }
 
   closeAnnotationPanel() {
     // Reset selected annotation when panel is closed
@@ -1646,6 +1652,74 @@ export class ViewerComponent implements OnInit, AfterViewInit {
         this.annotationImages.push(`assets/panelImages/${imageFilename}`);
       }
     } 
+  }
+
+  showIntroduction() {
+    // Enable annotations if not already enabled
+    if (!this.showingAnnotations) {
+      this.showingAnnotations = true;
+      this.addAnnotations(this.annotations);
+    }
+
+    // Close chat if open
+    if (this.showingChat) {
+      this.showingChat = false;
+      this.adjustViewportForPanel(false);
+    }
+
+    // Set the default annotation content (Introduction)
+    this.setDefaultAnnotationContent();
+
+    // Adjust viewport for annotation panel
+    this.adjustViewportForPanel(true);
+  }
+
+    showHelp() {
+    // Enable annotations if not already enabled
+    if (!this.showingAnnotations) {
+      this.showingAnnotations = true;
+      this.addAnnotations(this.annotations);
+    }
+
+    // Close chat if open
+    if (this.showingChat) {
+      this.showingChat = false;
+      this.adjustViewportForPanel(false);
+    }
+
+    // Set help content without toggles (they'll be shown via Angular template)
+    this.panelTitle = "Help - Explore Further";
+    // ...existing code...
+    this.panelText = `
+          <p>Use the toggles below to enable different features and explore the rest of the painting by zooming in, clicking on other annotations, or listen to what the characters themselves have to say...</p>
+          <p>Navigate between paintings using the arrows at the top, or zoom in and explore the details of each scene.</p>
+        `;
+    // ...existing code...
+    this.currentAnnotationIndex = -2; // Special index for help content
+    this.panelTextIndex = 0;
+    this.numPanels = 1;
+    this.annotationImages = [];
+
+    // Adjust viewport for annotation panel
+    this.adjustViewportForPanel(true);
+  }
+
+  private setupHelpToggleListeners() {
+    // Remove existing listeners first
+    document.removeEventListener('toggleAnimations', this.handleAnimationsToggle);
+    document.removeEventListener('toggleAnnotations', this.handleAnnotationsToggle);
+
+    // Add new listeners
+    document.addEventListener('toggleAnimations', this.handleAnimationsToggle);
+    document.addEventListener('toggleAnnotations', this.handleAnnotationsToggle);
+  }
+
+  private handleAnimationsToggle = (event: any) => {
+    this.toggleAnimations(event.detail);
+  }
+
+  private handleAnnotationsToggle = (event: any) => {
+    this.toggleAnnotations(event.detail);
   }
 
 }

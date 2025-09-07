@@ -38,8 +38,24 @@
     </div>
   </div>
 
-  <!-- Home/Fullscreen Controls - Now positioned on the right side -->
+  <div class="left-controls-section">
+    <button id="info" mat-icon-button matTooltip="About this painting" (click)="showIntroduction()">
+      <span style="font-size: 18px; font-weight: bold; font-style: italic; transform: translateY(-2px); display: inline-block;">i</span>
+    </button>
+  </div>
+  <!-- Home/Fullscreen Controls -->
   <div class="controls-section">
+    <button id="animations-toggle" mat-icon-button matTooltip="Animations" [class.active]="showingAnimations"
+      (click)="toggleAnimations(!showingAnimations)">
+      <mat-icon>movie_filter</mat-icon>
+    </button>
+    <button id="annotations-toggle" mat-icon-button matTooltip="Annotations" [class.active]="showingAnnotations"
+      (click)="toggleAnnotations(!showingAnnotations)">
+      <mat-icon>info_outline</mat-icon>
+    </button>
+    <button id="help" mat-icon-button matTooltip="Help" (click)="showHelp()">
+      <span style="font-size: 18px; font-weight: bold; transform: translateY(-2px); display: inline-block;">?</span>
+    </button>
     <button id="home" mat-icon-button matTooltip="Home View">
       <mat-icon>home</mat-icon>
     </button>
@@ -140,7 +156,7 @@
           <div [innerHTML]="panelText" class="annotation-content"></div>
           
           <!-- Exploration Buttons - Only show for default content on first painting -->
-          <div *ngIf="currentAnnotationIndex === -1" class="exploration-buttons">
+          <div *ngIf="currentAnnotationIndex === -2" class="exploration-buttons">
             <h4>Explore Further:</h4>
             <div class="button-group">
               <div class="menu-item">
