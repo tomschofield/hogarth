@@ -263,5 +263,16 @@
         "width":0.1345,
         "height":0.1345,
         "duration":5.0
+    },{
+        "title": "Laughing New Interest supporters in the window ",
+        "canvasIndex":3,
+        "storyIndex":2,
+        "transcript": "",
+        "videoUrl": "assets/videos/window.mp4",
+        "x": 0.1225,
+        "y": 0.2877,
+        "width":0.105,
+        "height":0.1015,
+        "duration":5.0
     }
 ]
