@@ -101,6 +101,18 @@
         "height":0.258,
         "duration":9.0,
         "hideControls": false
+    },{
+        "title": "The Election Agent",
+        "canvasIndex":0,
+        "storyIndex":4,
+        "transcript": "blah blah blah blah",
+        "videoUrl": "assets/videos/The Election Agent.mp4",
+        "x": 0.763,
+        "y": 0.5765,
+        "width":0.293,
+        "height":0.293,
+        "duration":9.0,
+        "hideControls": false
     },
     
     {
