@@ -255,7 +255,7 @@
     {
         "title": "Yikes a talking goose",
         "canvasIndex":3,
-        "storyIndex":2,
+        "storyIndex":1,
         "transcript": "honk honk honk",
         "videoUrl": "assets/videos/Goose2.mp4",
         "x": 0.559,
@@ -264,9 +264,20 @@
         "height":0.1345,
         "duration":5.0
     },{
-        "title": "Laughing New Interest supporters in the window ",
+        "title": "Thresher Sailor",
         "canvasIndex":3,
         "storyIndex":2,
+        "transcript": "",
+        "videoUrl": "assets/videos/ThresherSailor.mp4",
+        "x": 0.551,
+        "y": 0.5705,
+        "width":0.404,
+        "height":0.404,
+        "duration":5.0
+    },{
+        "title": "Laughing New Interest supporters in the window ",
+        "canvasIndex":3,
+        "storyIndex":3,
         "transcript": "",
         "videoUrl": "assets/videos/window.mp4",
         "x": 0.1225,
