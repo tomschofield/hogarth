@@ -275,9 +275,31 @@
         "height":0.404,
         "duration":5.0
     },{
-        "title": "Laughing New Interest supporters in the window ",
+        "title": "Candidate Chairing",
         "canvasIndex":3,
         "storyIndex":3,
+        "transcript": "",
+        "videoUrl": "assets/videos/Candidate-chairing.mp4",
+        "x": 0.5939,
+        "y": 0.3766,
+        "width":0.2918,
+        "height":0.2918,
+        "duration":5.0
+    },{
+        "title": "Servants",
+        "canvasIndex":3,
+        "storyIndex":3,
+        "transcript": "",
+        "videoUrl": "assets/videos/Servants.mp4",
+        "x": 0.799,
+        "y": 0.342,
+        "width":0.113,
+        "height":0.113,
+        "duration":5.0
+    },{
+        "title": "Laughing New Interest supporters in the window ",
+        "canvasIndex":3,
+        "storyIndex":4,
         "transcript": "",
         "videoUrl": "assets/videos/window.mp4",
         "x": 0.1225,
