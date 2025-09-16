@@ -30,6 +30,8 @@ export class IntroComponent implements AfterViewInit {
   ngAfterViewInit() {
     // Set the adaptive video source
     this.videoElement.nativeElement.src = this.adaptiveVideoUrl;
+    // Start muted for autoplay compliance, will unmute after user interaction
+    this.videoElement.nativeElement.muted = true;
     // Ensure video plays after view init
     this.playVideo();
     this.setupVideoProgressTracking();
@@ -63,17 +65,19 @@ export class IntroComponent implements AfterViewInit {
     if (newVideoUrl !== this.adaptiveVideoUrl) {
       const video = this.videoElement.nativeElement;
       
-      // Store current playback time and state
+      // Store current playback time, state, and audio settings
       this.currentTime = video.currentTime;
       const wasPlaying = !video.paused;
+      const wasMuted = video.muted;
       
       // Update the video source
       this.adaptiveVideoUrl = newVideoUrl;
       video.src = this.adaptiveVideoUrl;
       
-      // When the new video loads, restore playback position and state
+      // When the new video loads, restore playback position, state, and audio
       const loadedHandler = () => {
         video.currentTime = this.currentTime;
+        video.muted = wasMuted; // Preserve audio settings
         
         if (wasPlaying && !this.isVideoPaused) {
           video.play().catch(console.error);
@@ -118,6 +122,8 @@ export class IntroComponent implements AfterViewInit {
     const video = this.videoElement.nativeElement;
     
     if (this.isVideoPaused) {
+      // Ensure audio is enabled when resuming
+      video.muted = false;
       video.play();
       this.isVideoPaused = false;
     } else {
@@ -128,8 +134,11 @@ export class IntroComponent implements AfterViewInit {
 
   async playVideo() {
     try {
-      await this.videoElement.nativeElement.play();
-      console.log('Video started playing');
+      const video = this.videoElement.nativeElement;
+      // Unmute the video when user initiates playback
+      video.muted = false;
+      await video.play();
+      console.log('Video started playing with audio');
       this.showPlayButton = false;
       this.isVideoPaused = false;
     } catch (error) {
@@ -140,6 +149,8 @@ export class IntroComponent implements AfterViewInit {
   }
 
   onPlayButtonClick() {
+    // Ensure audio is enabled when user clicks play
+    this.videoElement.nativeElement.muted = false;
     this.playVideo();
   }
 
@@ -174,16 +185,43 @@ export class IntroComponent implements AfterViewInit {
     // Pause the video and skip to the end
     const video = this.videoElement.nativeElement;
     video.pause();
-    video.currentTime = video.duration;
     
-    // Trigger the same behavior as when video ends
-    this.onVideoEnded();
+    // Check if video duration is available
+    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
+      // If duration is not available, just show the content immediately
+      this.onVideoEnded();
+      return;
+    }
+    
+    // Wait for the video to seek to the end frame before showing content
+    const onSeeked = () => {
+      // Give Safari a moment to render the frame
+      setTimeout(() => {
+        this.onVideoEnded();
+      }, 100);
+      video.removeEventListener('seeked', onSeeked);
+    };
+    
+    // Add a timeout fallback in case seeking fails
+    const timeoutId = setTimeout(() => {
+      video.removeEventListener('seeked', onSeeked);
+      this.onVideoEnded();
+    }, 1000);
+    
+    video.addEventListener('seeked', () => {
+      clearTimeout(timeoutId);
+      onSeeked();
+    });
+    
+    // Seek to just before the end to ensure we get a valid frame
+    video.currentTime = Math.max(0, video.duration - 0.1);
   }
 
   playAgain() {
     // Reset the video to beginning and play again
     const video = this.videoElement.nativeElement;
     video.currentTime = 0;
+    video.muted = false; // Ensure audio is enabled
     this.showContent = false;
     this.showStartButton = false;
     this.playVideo();
