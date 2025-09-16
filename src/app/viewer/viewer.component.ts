@@ -621,8 +621,12 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     // Clear current video reference
     this.currentVideo = null;
 
-    // Remove all tracked video overlays
+    // Remove all tracked video overlays and their play buttons
     this.videoOverlays.forEach(video => {
+      // Remove associated play button if it exists
+      if (video._playButton && video._playButton.parentElement) {
+        video._playButton.parentElement.removeChild(video._playButton);
+      }
       this.viewer.removeOverlay(video);
     });
     // Clear the tracking array
@@ -1194,10 +1198,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     // Create play button overlay
     var playButton = document.createElement("div");
     playButton.innerHTML = "▶"; // Play icon
-    playButton.style.position = "absolute";
-    playButton.style.top = "50%";
-    playButton.style.left = "50%";
-    playButton.style.transform = "translate(-50%, -50%)";
+    playButton.style.position = "fixed";
     playButton.style.fontSize = "24px";
     playButton.style.color = "white";
     playButton.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
@@ -1210,17 +1211,59 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     playButton.style.opacity = "0";
     playButton.style.transition = "opacity 0.3s ease";
     playButton.style.cursor = "pointer";
-    playButton.style.zIndex = "1000";
+    playButton.style.zIndex = "8500"; // Below annotation markers but above videos
+    playButton.style.pointerEvents = "auto";
     playButton.style.paddingLeft = "2px";
-
-    // Create container for video and play button
+  
+    // Create container for video only
     var container = document.createElement("div");
     container.style.position = "relative";
     container.style.width = "100%";
     container.style.height = "100%";
     container.appendChild(video);
-    container.appendChild(playButton);
-
+  
+    // Add play button to document body instead of container
+    document.body.appendChild(playButton);
+  
+    // Function to update play button position
+    const updatePlayButtonPosition = () => {
+      if (!container.parentElement) return;
+      
+      const containerRect = container.getBoundingClientRect();
+      playButton.style.left = `${containerRect.left + containerRect.width / 2 - 30}px`;
+      playButton.style.top = `${containerRect.top + containerRect.height / 2 - 30}px`;
+    };
+  
+    // Function to bring this video to front
+    const bringToFront = () => {
+      // Reset all video overlays to lower z-index
+      this.videoOverlays.forEach(overlay => {
+        const wrapperElement = overlay.parentElement;
+        if (wrapperElement && wrapperElement.style) {
+          wrapperElement.style.zIndex = "5000"; // Below annotation markers (9999)
+        }
+      });
+  
+      // Bring current video to front (but still below annotation markers)
+      setTimeout(() => {
+        const wrapperElement = container.parentElement;
+        if (wrapperElement && wrapperElement.style) {
+          wrapperElement.style.zIndex = "8000"; // Higher than other videos but below annotation markers
+        }
+        // Update play button position after z-index changes
+        updatePlayButtonPosition();
+      }, 10);
+    };
+  
+    // Update play button position on viewport changes
+    if (this.viewer) {
+      this.viewer.addHandler('animation', updatePlayButtonPosition);
+      this.viewer.addHandler('resize', updatePlayButtonPosition);
+    }
+  
+    // Initial position update
+    setTimeout(updatePlayButtonPosition, 100);
+  
     // Handle time updates - check for stop time
     video.addEventListener('timeupdate', () => {
       // Check if we've reached the stop time
@@ -1231,7 +1274,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           if (options.storeAsCurrentVideo) {
             this.isPlaying = false;
           }
-
+  
           // If playNextOnEnd is true, trigger next animation
           if (options.playNextOnEnd) {
             console.log('Video reached stop time at:', video.currentTime, 'playing next animation');
@@ -1274,24 +1317,47 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         if (currentCueIndex === -1) currentCueIndex = navigationCues.length;
       });
     }
+  
+  // Show/hide play button on hover with timeout
+  let hideTimeout: any;
 
-    // Show/hide play button on hover
-    container.addEventListener('mouseenter', () => {
-      if (video.paused) {
-        playButton.innerHTML = "▶"; // Play icon
-        playButton.style.opacity = "1";
-      } else {
-        playButton.innerHTML = "⏸"; // Pause icon
-        playButton.style.opacity = "1";
-      }
-    });
+  container.addEventListener('mouseenter', () => {
+    // Clear any pending hide timeout
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+    
+    if (video.paused) {
+      playButton.innerHTML = "▶"; // Play icon
+      playButton.style.opacity = "1";
+    } else {
+      playButton.innerHTML = "⏸"; // Pause icon
+      playButton.style.opacity = "1";
+    }
+    updatePlayButtonPosition();
+  });
 
-    container.addEventListener('mouseleave', () => {
+  container.addEventListener('mouseleave', () => {
+    // Delay hiding to allow moving to play button
+    hideTimeout = setTimeout(() => {
       playButton.style.opacity = "0";
-    });
+    }, 200);
+  });
 
-    // Handle play button click using OpenSeadragon MouseTracker
-    // Handle play button click using OpenSeadragon MouseTracker
+  // Keep play button visible when hovering over it
+  playButton.addEventListener('mouseenter', () => {
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+  });
+
+  playButton.addEventListener('mouseleave', () => {
+    hideTimeout = setTimeout(() => {
+      playButton.style.opacity = "0";
+    }, 200);
+  });    // Handle play button click using OpenSeadragon MouseTracker
     new OpenSeadragon.MouseTracker({
       element: playButton,
       clickHandler: (event: any) => {
@@ -1300,7 +1366,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (video.paused) {
           console.log('Playing video via MouseTracker');
-
+  
+          // Bring this video to front when playing
+          bringToFront();
+          
           // Only reset to beginning if no startTime is specified
           // If startTime exists, use it; otherwise start from current position or 0
           if (options.startTime !== undefined) {
@@ -1362,6 +1431,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       if (options.storeAsCurrentVideo) {
         this.isPlaying = true;
       }
+      // Bring video to front when it starts playing
+      bringToFront();
     });
 
     video.addEventListener('pause', () => {
@@ -1406,6 +1477,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         console.log('Video loaded and ready to play');
       }
+      // Update play button position when video loads
+      updatePlayButtonPosition();
     });
 
     // Add overlay to viewer
@@ -1417,7 +1490,21 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       width: width,
       height: height
     });
-
+  
+    // Set initial z-index for video wrapper
+    setTimeout(() => {
+      const wrapperElement = container.parentElement;
+      if (wrapperElement) {
+        wrapperElement.style.zIndex = "5000"; // Below annotation markers
+      }
+      updatePlayButtonPosition();
+    }, 50);
+  
+    // Store cleanup function to remove play button when video is removed
+    const originalContainer = container as HTMLDivElement & { _playButton?: HTMLElement; _updatePosition?: () => void };
+    originalContainer._playButton = playButton;
+    originalContainer._updatePosition = updatePlayButtonPosition;
+  
     // Track this video overlay for reliable removal
     this.videoOverlays.push(container);
 
