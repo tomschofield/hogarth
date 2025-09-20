@@ -118,6 +118,50 @@ export class IntroComponent implements AfterViewInit {
     });
   }
 
+  onProgressBarClick(event: MouseEvent) {
+    const video = this.videoElement.nativeElement;
+    
+    // Only allow seeking if video has loaded and has a valid duration
+    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
+      return;
+    }
+
+    const progressBar = event.currentTarget as HTMLElement;
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const progressBarWidth = rect.width;
+    
+    // Calculate the percentage of the progress bar that was clicked
+    const clickPercentage = Math.max(0, Math.min(1, clickX / progressBarWidth));
+    
+    // Convert to video time and seek
+    const targetTime = clickPercentage * video.duration;
+    this.seekToTime(targetTime);
+  }
+
+  private seekToTime(targetTime: number) {
+    const video = this.videoElement.nativeElement;
+    
+    // Ensure video is not loading and has valid duration
+    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
+      return;
+    }
+
+    // Clamp target time to valid range
+    const clampedTime = Math.max(0, Math.min(targetTime, video.duration));
+    
+    // Store the current play state
+    const wasPlaying = !video.paused && !this.isVideoPaused;
+    
+    // Seek to the target time
+    video.currentTime = clampedTime;
+    
+    // Maintain play state after seeking
+    if (wasPlaying) {
+      video.play().catch(console.error);
+    }
+  }
+
   toggleVideoPause() {
     const video = this.videoElement.nativeElement;
     

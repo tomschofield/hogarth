@@ -9,7 +9,9 @@
   </video>
   
   <h1 class="intro-title">William Hogarth's Humours of an Election
-    <div class="progress-bar-container" *ngIf="!isVideoLoading && !showContent">
+    <div class="progress-bar-container" 
+         *ngIf="!isVideoLoading && !showContent"
+         (click)="onProgressBarClick($event)">
       <mat-progress-bar mode="determinate" [value]="videoProgress" class="video-progress-bar"></mat-progress-bar>
     </div>
     <div class="title-controls" *ngIf="!showPlayButton">
