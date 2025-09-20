@@ -1,6 +1,6 @@
 [
     {
-        "title": "A gin boy speaks",
+        "title": "A serving boy speaks",
         "canvasIndex":0,
         "storyIndex":0,
         "transcript": "blah blah blah blah",
@@ -47,7 +47,7 @@
         ]
     },
     {
-        "title": "The candidate",
+        "title": "Sir Commodity Taxem, candidate",
         "canvasIndex":0,
         "storyIndex":1,
         "transcript": "blah blah blah blah",
@@ -78,7 +78,7 @@
         ]
     },
     {
-        "title": "Fiddle away maam",
+        "title": "Fiddling Nan",
         "canvasIndex":0,
         "storyIndex":2,
         "transcript": "blah blah blah blah",
@@ -90,7 +90,7 @@
         "duration":9.0,
         "hideControls": false
     },{
-        "title": "Clerk Tailor Wife",
+        "title": "Bribing a tailor and his wife",
         "canvasIndex":0,
         "storyIndex":3,
         "transcript": "blah blah blah blah",
@@ -102,7 +102,7 @@
         "duration":9.0,
         "hideControls": false
     },{
-        "title": "The Election Agent",
+        "title": "The Election agent",
         "canvasIndex":0,
         "storyIndex":4,
         "transcript": "blah blah blah blah",
@@ -116,7 +116,7 @@
     },
     
     {
-        "title": "The candidate",
+        "title": "The candidate addresses two ladies",
         "canvasIndex":1,
         "storyIndex":1,
         "transcript": "blah blah blah blah",
@@ -128,7 +128,7 @@
         "stopTime": 11.0,
         "hideControls": false
     },{
-        "title": "Women",
+        "title": "The candidate addresses two ladies",
         "canvasIndex":1,
         "storyIndex":2,
         "transcript": "blah blah blah blah",
@@ -140,7 +140,7 @@
         "stopTime": 9.4,
         "hideControls": false
     },{
-        "title": "The candidate 2",
+        "title": "The candidate addresses two ladies",
         "canvasIndex":1,
         "storyIndex":3,
         "transcript": "blah blah blah blah",
@@ -153,7 +153,7 @@
         "stopTime": 39.0,
         "hideControls": false
     },{
-        "title": "Women",
+        "title": "The candidate addresses two ladies",
         "canvasIndex":1,
         "storyIndex":4,
         "transcript": "blah blah blah blah",
@@ -166,7 +166,7 @@
         "stopTime": 16.0,
         "hideControls": false
     },{
-        "title": "The candidate 3",
+        "title": "The candidate addresses two ladies",
         "canvasIndex":1,
         "storyIndex":5,
         "transcript": "blah blah blah blah",
@@ -178,7 +178,7 @@
         "startTime": 39.0,
         "hideControls": false
     },{
-        "title": "Women",
+        "title": "The candidate addresses two ladies",
         "canvasIndex":1,
         "storyIndex":6,
         "transcript": "blah blah blah blah",
@@ -192,7 +192,7 @@
     },
 
     {
-        "title": "Sign",
+        "title": "An election banner explained",
         "canvasIndex":1,
         "storyIndex":7,
         "transcript": "blah blah blah blah",
@@ -205,7 +205,7 @@
     },
 
      {
-        "title": "Canvassing",
+        "title": "A farmer’s votes are bought",
         "canvasIndex":1,
         "storyIndex":7,
         "transcript": "blah blah blah blah",
@@ -218,7 +218,7 @@
     },
 
     {
-        "title": "Tory Candidate",
+        "title": "The costs of an election",
         "canvasIndex":2,
         "storyIndex":1,
         "transcript": "blah blah blah blah",
@@ -229,7 +229,7 @@
         "height":0.093,
         "hideControls": false
     },{
-        "title": "Ballad Singer",
+        "title": "Singing the election",
         "canvasIndex":2,
         "storyIndex":2,
         "transcript": "blah blah blah blah",
@@ -240,7 +240,7 @@
         "height":0.1065,
         "hideControls": false
     },{
-        "title": "Former Soldier",
+        "title": "Complaints of an old solider",
         "canvasIndex":2,
         "storyIndex":2,
         "transcript": "blah blah blah blah",
@@ -253,7 +253,7 @@
     },
     
     {
-        "title": "Yikes a talking goose",
+        "title": "An eloquent goose",
         "canvasIndex":3,
         "storyIndex":1,
         "transcript": "honk honk honk",
@@ -264,7 +264,7 @@
         "height":0.1345,
         "duration":5.0
     },{
-        "title": "Thresher Sailor",
+        "title": "A fight breaks out",
         "canvasIndex":3,
         "storyIndex":2,
         "transcript": "",
@@ -275,7 +275,7 @@
         "height":0.404,
         "duration":5.0
     },{
-        "title": "Candidate Chairing",
+        "title": "Victorious but precarious",
         "canvasIndex":3,
         "storyIndex":3,
         "transcript": "",
@@ -286,7 +286,7 @@
         "height":0.2918,
         "duration":5.0
     },{
-        "title": "Servants",
+        "title": "Servant of the candidate’s wife",
         "canvasIndex":3,
         "storyIndex":3,
         "transcript": "",
@@ -297,7 +297,7 @@
         "height":0.113,
         "duration":5.0
     },{
-        "title": "Laughing New Interest supporters in the window ",
+        "title": "The political elite watch on",
         "canvasIndex":3,
         "storyIndex":4,
         "transcript": "",
