@@ -1167,6 +1167,67 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     event.target.style.display = 'none';
   }
 
+  onProgressBarClick(event: MouseEvent) {
+    if (!this.currentVideo) {
+      return;
+    }
+
+    const video = this.currentVideo;
+    
+    // Only allow seeking if video has loaded and has a valid duration
+    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
+      return;
+    }
+
+    const progressBar = event.currentTarget as HTMLElement;
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const progressBarWidth = rect.width;
+    
+    // Calculate the percentage of the progress bar that was clicked
+    const clickPercentage = Math.max(0, Math.min(1, clickX / progressBarWidth));
+    
+    // Convert to video time and seek
+    const targetTime = clickPercentage * video.duration;
+    this.seekToTime(targetTime);
+  }
+
+  private seekToTime(targetTime: number) {
+    if (!this.currentVideo) {
+      return;
+    }
+
+    const video = this.currentVideo;
+    
+    // Ensure video is not loading and has valid duration
+    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
+      return;
+    }
+
+    // Get current animation to check for time bounds
+    const animation = this.animations[this.animationIndex];
+    const startTime = animation?.startTime || 0;
+    const stopTime = animation?.stopTime || video.duration;
+    
+    // Convert the target time to the bounded range
+    const effectiveDuration = stopTime - startTime;
+    const boundedTargetTime = startTime + (targetTime / video.duration) * effectiveDuration;
+    
+    // Clamp to valid range
+    const clampedTime = Math.max(startTime, Math.min(boundedTargetTime, stopTime));
+    
+    // Store the current play state
+    const wasPlaying = !video.paused;
+    
+    // Seek to the target time
+    video.currentTime = clampedTime;
+    
+    // Maintain play state after seeking
+    if (wasPlaying) {
+      video.play().catch(console.error);
+    }
+  }
+
   private createVideoOverlay(x: number, y: number, videoUrl: string, width: number, height: number, options: {
     autoPlay?: boolean;
     hideControls?: boolean;

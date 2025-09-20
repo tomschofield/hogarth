@@ -317,8 +317,10 @@
             </div>
             
             <!-- Progress Bar (optional) -->
-            <div class="progress-container" *ngIf="isPlaying">
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            <div class="progress-container" 
+                 *ngIf="isPlaying"
+                 (click)="onProgressBarClick($event)">
+            <mat-progress-bar mode="determinate" [value]="videoProgress"></mat-progress-bar>
             </div>
         </div>
         </mat-card-content>
