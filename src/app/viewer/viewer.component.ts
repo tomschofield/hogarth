@@ -31,6 +31,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   private videoOverlays: any[] = [];
   private annotationOverlays: any[] = [];
   private currentVideo: HTMLVideoElement | null = null;
+  private videoVisibilityState: Map<HTMLVideoElement, boolean> = new Map();
+  private currentlyPlayingVideo: HTMLVideoElement | null = null;
   isPlaying: boolean = false;
   annotationImages: string[] = [];
   videoProgress: number = 0;
@@ -620,9 +622,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Clear current video reference
     this.currentVideo = null;
+    this.currentlyPlayingVideo = null;
 
     // Remove all tracked video overlays and their play buttons
     this.videoOverlays.forEach(video => {
+      // Clean up visibility state
+      this.videoVisibilityState.delete(video);
+      
       // Remove associated play button if it exists
       if (video._playButton && video._playButton.parentElement) {
         video._playButton.parentElement.removeChild(video._playButton);
@@ -631,6 +637,25 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     // Clear the tracking array
     this.videoOverlays = [];
+  }
+
+  // Method to pause and hide all videos except the specified one (for play button interactions)
+  private pauseAndHideAllVideosExcept(excludeVideo: HTMLVideoElement | null = null) {
+    this.videoOverlays.forEach(overlay => {
+      const video = overlay.querySelector('video') as HTMLVideoElement;
+      if (video && video !== excludeVideo) {
+        if (!video.paused) {
+          video.pause();
+          console.log('Paused and hiding video due to another video starting');
+        }
+        // Hide the video if it's not the one being played
+        video.style.display = "none";
+        this.videoVisibilityState.set(video, false);
+      }
+    });
+    
+    // Update currently playing video reference
+    this.currentlyPlayingVideo = excludeVideo;
   }
 
   setAnnotation(index: number) {
@@ -1003,7 +1028,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       autoPlay: false,
       storeAsCurrentVideo: false,
       startTime: animation?.startTime,
-      stopTime: animation?.stopTime
+      stopTime: animation?.stopTime,
+      showInitially: false // Keep videos hidden until play button is clicked
     });
   }
 
@@ -1012,7 +1038,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     // Use the current animation directly instead of searching by coordinates
     const animation = this.animations[this.animationIndex];
 
-
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: false,
       storeAsCurrentVideo: true,
@@ -1020,7 +1045,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       playNextOnEnd: true,
       navigationCues: animation?.navigationCues,
       startTime: animation?.startTime,
-      stopTime: animation?.stopTime
+      stopTime: animation?.stopTime,
+      showInitially: true // Show video immediately for playback mode
     });
   }
 
@@ -1035,7 +1061,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       storeAsCurrentVideo: true,
       navigationCues: animation?.navigationCues,
       startTime: animation?.startTime,
-      stopTime: animation?.stopTime
+      stopTime: animation?.stopTime,
+      showInitially: true // Show video immediately for sequence mode
     });
   }
 
@@ -1238,6 +1265,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     navigationCues?: any[];
     startTime?: number;
     stopTime?: number;
+    showInitially?: boolean;
   } = {}) {
     if (!this.viewer) {
       console.warn('Viewer not initialized, cannot create video overlay');
@@ -1250,6 +1278,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.style.width = "100%";
     video.style.height = "100%";
     video.style.cursor = "pointer";
+
+    // Initially hide the video unless showInitially is true
+    if (options.showInitially) {
+      video.style.display = "block";
+      this.videoVisibilityState.set(video, true);
+    } else {
+      video.style.display = "none";
+      this.videoVisibilityState.set(video, false);
+    }
 
     // Set start time if specified
     if (options.startTime !== undefined) {
@@ -1425,8 +1462,21 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log('Play button clicked via MouseTracker!');
         event.preventDefaultAction = true;
 
+        // Show video on first play
+        if (!this.videoVisibilityState.get(video)) {
+          video.style.display = "block";
+          this.videoVisibilityState.set(video, true);
+          console.log('Video made visible for first time');
+        }
+
         if (video.paused) {
           console.log('Playing video via MouseTracker');
+
+          // Only pause/hide other videos if this is not an animation control video
+          // (Animation control videos have storeAsCurrentVideo or trackProgress set)
+          if (!options.storeAsCurrentVideo && !options.trackProgress) {
+            this.pauseAndHideAllVideosExcept(video);
+          }
   
           // Bring this video to front when playing
           bringToFront();
@@ -1492,6 +1542,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       if (options.storeAsCurrentVideo) {
         this.isPlaying = true;
       }
+      // Update currently playing video reference for play button videos
+      if (!options.storeAsCurrentVideo && !options.trackProgress) {
+        this.currentlyPlayingVideo = video;
+      }
       // Bring video to front when it starts playing
       bringToFront();
     });
@@ -1501,11 +1555,19 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       if (options.storeAsCurrentVideo) {
         this.isPlaying = false;
       }
+      // Clear currently playing video reference if this video was paused
+      if (this.currentlyPlayingVideo === video) {
+        this.currentlyPlayingVideo = null;
+      }
     });
 
     video.addEventListener('ended', () => {
       if (options.storeAsCurrentVideo) {
         this.isPlaying = false;
+      }
+      // Clear currently playing video reference when video ends
+      if (this.currentlyPlayingVideo === video) {
+        this.currentlyPlayingVideo = null;
       }
       if (options.playNextOnEnd) {
         console.log('Video ended, playing next animation');
@@ -1521,6 +1583,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       if (options.autoPlay) {
+        // Show video when auto-playing
+        video.style.display = "block";
+        this.videoVisibilityState.set(video, true);
+        
         video.play().catch(error => {
           console.warn('Auto-play failed:', error);
         });
