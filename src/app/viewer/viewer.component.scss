@@ -540,9 +540,21 @@
     background-color: rgba(255, 255, 255, 0.1);
     width: 48px; // Make buttons consistent size
     height: 48px;
+    transition: all 0.3s ease;
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    &.active {
+      background-color: #862633 !important;
+      color: white !important;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(134, 38, 51, 0.4);
+      
+      mat-icon {
+        color: white !important;
+      }
     }
     
     mat-icon {
