@@ -22,6 +22,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input'; 
 import { AcknowledgmentsModalComponent } from './acknowledgments-modal/acknowledgments-modal.component';
+import { IntroModalComponent } from './intro-modal/intro-modal.component';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { AcknowledgmentsModalComponent } from './acknowledgments-modal/acknowled
     MiradorTestComponent,
     IntroComponent,
     ViewerComponent,
-    AcknowledgmentsModalComponent
+    AcknowledgmentsModalComponent,
+    IntroModalComponent
   ],
   imports: [
     BrowserModule,

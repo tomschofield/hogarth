@@ -112,6 +112,13 @@
     (closeModal)="closeAboutModal()">
   </app-acknowledgments-modal>
 
+  <!-- Intro Modal -->
+  <app-intro-modal 
+    [isOpen]="isIntroModalOpen"
+    [paintingIndex]="pageIndex"
+    (closeModal)="closeIntroModal()">
+  </app-intro-modal>
+
   <!-- Main Content Area with Flexbox Layout - Now full height -->
   <div class="main-content">
     <!-- Main Viewer Container -->

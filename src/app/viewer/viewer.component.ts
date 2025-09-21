@@ -41,6 +41,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   dragPosition = { x: 0, y: 0 };
   isMenuOpen: boolean = false;
   isAboutModalOpen: boolean = false;
+  isIntroModalOpen: boolean = false;
+  private hasShownInitialIntro: boolean = false;
   showingChat: boolean = false;
   showIntroductionPanel: boolean = false;
   chatMessages: {
@@ -234,6 +236,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             this.pageIndex = event.page;
             console.log("now on page ", this.pageIndex);
 
+            // Show intro modal for each new painting
+            this.openIntroModal();
+
             // Reset current annotation index to show default content
             this.currentAnnotationIndex = -1;
             
@@ -290,6 +295,14 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     
     const checkAndAutoToggle = () => {
       if (annotationsLoaded && animationsLoaded) {
+        // Show intro modal for the first painting when everything is loaded (only on initial load)
+        if (!this.hasShownInitialIntro) {
+          setTimeout(() => {
+            this.openIntroModal();
+            this.hasShownInitialIntro = true;
+          }, 500);
+        }
+        
         // Both data sets are loaded, now we can safely auto-toggle
         setTimeout(() => {
           // Toggle animations on after 1 second
@@ -323,6 +336,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.allAnimations = res;  // Store all animations here
         this.animations = res;     // Keep this for backward compatibility
         this.numAnimations = this.animations.length;
+        animationsLoaded = true;
+        checkAndAutoToggle();
       },
       error: (error) => {
         console.error("Error loading animations data:", error);
@@ -1816,6 +1831,16 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   closeAboutModal() {
     this.isAboutModalOpen = false;
+  }
+
+  openIntroModal() {
+    console.log('Opening intro modal for painting:', this.pageIndex);
+    this.isIntroModalOpen = true;
+    this.closeMenu(); // Close the menu when opening intro modal
+  }
+
+  closeIntroModal() {
+    this.isIntroModalOpen = false;
   }
 
   // Add the toggleChat method
