@@ -1565,9 +1565,12 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         if (video.paused) {
           console.log('Playing video via MouseTracker');
 
-          // Only pause/hide other videos if this is not an animation control video
-          // (Animation control videos have storeAsCurrentVideo or trackProgress set)
+          // Find the corresponding animation index and sync with animation controls
           if (!options.storeAsCurrentVideo && !options.trackProgress) {
+            const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
+            if (animationIndex !== -1) {
+              this.syncWithAnimationControls(animationIndex, video);
+            }
             this.pauseAndHideAllVideosExcept(video);
           }
   
@@ -1634,6 +1637,18 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       playButton.innerHTML = "⏸"; // Pause icon
       if (options.storeAsCurrentVideo) {
         this.isPlaying = true;
+      } else {
+        // For regular video overlays, sync with animation controls
+        const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
+        if (animationIndex !== -1) {
+          this.animationIndex = animationIndex;
+          this.currentVideo = video; // Set this video as the current video for animation controls
+          this.enableProgressTracking(video); // Enable progress tracking
+          this.isPlaying = true;
+          if (!this.showingAnimations) {
+            this.showingAnimations = true;
+          }
+        }
       }
       // Update currently playing video reference for play button videos
       if (!options.storeAsCurrentVideo && !options.trackProgress) {
@@ -1647,6 +1662,17 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       playButton.innerHTML = "▶"; // Play icon
       if (options.storeAsCurrentVideo) {
         this.isPlaying = false;
+      } else {
+        // For regular video overlays, sync with animation controls
+        const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
+        if (animationIndex !== -1 && this.animationIndex === animationIndex) {
+          this.isPlaying = false;
+          // Clear current video reference if this was the current video
+          if (this.currentVideo === video) {
+            this.disableProgressTracking(video);
+            this.currentVideo = null;
+          }
+        }
       }
       // Clear currently playing video reference if this video was paused
       if (this.currentlyPlayingVideo === video) {
@@ -1657,6 +1683,17 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.addEventListener('ended', () => {
       if (options.storeAsCurrentVideo) {
         this.isPlaying = false;
+      } else {
+        // For regular video overlays, sync with animation controls
+        const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
+        if (animationIndex !== -1 && this.animationIndex === animationIndex) {
+          this.isPlaying = false;
+          // Clear current video reference if this was the current video
+          if (this.currentVideo === video) {
+            this.disableProgressTracking(video);
+            this.currentVideo = null;
+          }
+        }
       }
       // Clear currently playing video reference when video ends
       if (this.currentlyPlayingVideo === video) {
@@ -2017,6 +2054,88 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private handleAnnotationsToggle = (event: any) => {
     this.toggleAnnotations(event.detail);
+  }
+
+  /**
+   * Find the animation index that corresponds to a video with the given coordinates and URL
+   */
+  private findAnimationIndexByVideo(x: number, y: number, videoUrl: string): number {
+    for (let i = 0; i < this.animations.length; i++) {
+      const animation = this.animations[i];
+      if (animation.x === x && animation.y === y && animation.videoUrl === videoUrl) {
+        return i;
+      }
+    }
+    return -1; // Not found
+  }
+
+  /**
+   * Sync the animation controls with the specified animation index and show playing state
+   */
+  private syncWithAnimationControls(animationIndex: number, currentVideo?: HTMLVideoElement): void {
+    console.log('Syncing animation controls to index:', animationIndex);
+    
+    // Set the animation index
+    this.animationIndex = animationIndex;
+    
+    // Show animation controls if they're not already visible
+    if (!this.showingAnimations) {
+      this.showingAnimations = true;
+    }
+    
+    // Set the current video reference if provided
+    if (currentVideo) {
+      this.currentVideo = currentVideo;
+      // Enable progress tracking for this video
+      this.enableProgressTracking(currentVideo);
+    }
+    
+    // Set playing state to true
+    this.isPlaying = true;
+    
+    // Move to the animation location
+    this.moveToAnimation(this.animationIndex);
+  }
+
+  /**
+   * Enable progress tracking for a video element
+   */
+  private enableProgressTracking(video: HTMLVideoElement): void {
+    // Remove any existing progress tracking listeners to avoid duplicates
+    video.removeEventListener('loadedmetadata', this.progressMetadataHandler);
+    video.removeEventListener('timeupdate', this.progressTimeUpdateHandler);
+    
+    // Add new progress tracking listeners
+    video.addEventListener('loadedmetadata', this.progressMetadataHandler);
+    video.addEventListener('timeupdate', this.progressTimeUpdateHandler);
+    
+    // If metadata is already loaded, calculate duration immediately
+    if (video.duration && !isNaN(video.duration)) {
+      this.videoDuration = video.duration;
+    }
+  }
+
+  /**
+   * Disable progress tracking for a video element
+   */
+  private disableProgressTracking(video: HTMLVideoElement): void {
+    video.removeEventListener('loadedmetadata', this.progressMetadataHandler);
+    video.removeEventListener('timeupdate', this.progressTimeUpdateHandler);
+    // Reset progress values
+    this.videoProgress = 0;
+    this.videoDuration = 0;
+  }
+
+  private progressMetadataHandler = (event: Event) => {
+    const video = event.target as HTMLVideoElement;
+    this.videoDuration = video.duration;
+  }
+
+  private progressTimeUpdateHandler = (event: Event) => {
+    const video = event.target as HTMLVideoElement;
+    if (video === this.currentVideo) {
+      this.videoProgress = (video.currentTime / video.duration) * 100;
+    }
   }
 
 }
