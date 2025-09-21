@@ -202,8 +202,8 @@
         "image filename 0": "WenmanDashwoodBowl.png",
         "image filename 1": "MidnightModernConversation.jpg",
         "image filename 2": "",
-        "x": 0.357,
-        "y": 0.634,
+        "x": 0.34,
+        "y": 0.65,
         "animation index": "",
         "annotation title": "Making punch"
     },
@@ -730,8 +730,8 @@
         "image filename 0": "Ballad.jpg",
         "image filename 1": "",
         "image filename 2": "",
-        "x": 0.402,
-        "y": 0.445,
+        "x": 0.36,
+        "y": 0.47,
         "animation index": "",
         "annotation title": "A ballad-seller"
     },
@@ -1018,8 +1018,8 @@
         "image filename 0": "Thomas-Pelham-Holles.jpg",
         "image filename 1": "",
         "image filename 2": "",
-        "x": 0.141,
-        "y": 0.302,
+        "x": 0.11,
+        "y": 0.345,
         "animation index": "",
         "annotation title": "New Interest supporters and the Duke of Newcastle"
     },

@@ -18,7 +18,10 @@
                 "y": 0.3,
                 "width": 0.5,
                 "height": 0.5,
-                "description": "King William"
+                "description": "King William",
+                "viewportX": 0.5,
+                "viewportY": 0.3,
+                "viewportZoom": 2.5
             },
             {
                 "time":57.0,
@@ -34,7 +37,10 @@
                 "y": 0.6,
                 "width": 0.3,
                 "height": 0.3,
-                "description": "Carter"
+                "description": "Carter",
+                "viewportX": 0.5,
+                "viewportY": 0.6,
+                "viewportZoom": 3.0
             },
             {
                 "time":120.0,
@@ -60,19 +66,27 @@
         "hideControls": false,
          "navigationCues": [
             {
-                "time":34.0,
-                "x": 0.154,
+                "time":0,
+                "x": 0.2,
+                "y": 0.4,
+                "width": 0.4,
+                "height": 0.4,
+                "description": "Flag"
+            },
+            {
+                "time":33.5,
+                "x": 0.2,
                 "y": 0.3,
-                "width": 0.3,
-                "height": 0.3,
+                "width": 0.4,
+                "height": 0.4,
                 "description": "Flag"
             },
              {
                 "time":63.0,
-                "x": 0.154,
+                "x": 0.2,
                 "y": 0.5,
-                "width": 0.2,
-                "height": 0.2,
+                "width": 0.4,
+                "height": 0.4,
                 "description": "Flag"
             }
         ]
@@ -126,7 +140,10 @@
         "width":0.189,
         "height":0.189,
         "stopTime": 11.0,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.35,
+        "viewportY": 0.32,
+        "viewportZoom": 1
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -138,7 +155,10 @@
         "width":0.21,
         "height":0.21,
         "stopTime": 9.4,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.35,
+        "viewportY": 0.32,
+        "viewportZoom": 1
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -151,7 +171,10 @@
         "height":0.189,
         "startTime": 11.0,
         "stopTime": 39.0,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.35,
+        "viewportY": 0.32,
+        "viewportZoom": 1
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -164,7 +187,10 @@
         "height":0.21,
         "startTime": 9.4,
         "stopTime": 16.0,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.35,
+        "viewportY": 0.32,
+        "viewportZoom": 1
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -176,7 +202,10 @@
         "width":0.189,
         "height":0.189,
         "startTime": 39.0,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.35,
+        "viewportY": 0.32,
+        "viewportZoom": 1
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -188,7 +217,10 @@
         "width":0.21,
         "height":0.21,
         "startTime": 16.3,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.5,
+        "viewportY": 0.32,
+        "viewportZoom": 1
     },
 
     {
@@ -201,7 +233,10 @@
         "y": 0.274,
         "width":0.236,
         "height":0.236,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.505,
+        "viewportY": 0.274,
+        "viewportZoom": 2.0
     },
 
      {
@@ -238,7 +273,10 @@
         "y": 0.4657,
         "width":0.1065,
         "height":0.1065,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.394,
+        "viewportY": 0.4657,
+        "viewportZoom": 1.3
     },{
         "title": "Complaints of an old solider",
         "canvasIndex":2,
@@ -249,7 +287,20 @@
         "y": 0.562,
         "width":0.418,
         "height":0.418,
-        "hideControls": false
+        "hideControls": false,
+        "viewportX": 0.82,
+        "viewportY": 0.7,
+        "viewportZoom": 2,
+        "navigationCues": [
+            {
+                "time":8,
+                "x": 0.82,
+                "y": 0.562,
+                "width":0.418,
+                "height":0.418,
+                "description": "Soldier"
+            }
+        ]
     },
     
     {
@@ -284,7 +335,10 @@
         "y": 0.3766,
         "width":0.2918,
         "height":0.2918,
-        "duration":5.0
+        "duration":5.0,
+        "viewportX": 0.5939,
+        "viewportY": 0.3766,
+        "viewportZoom": 1
     },{
         "title": "Servant of the candidate’s wife",
         "canvasIndex":3,
@@ -306,6 +360,16 @@
         "y": 0.2877,
         "width":0.105,
         "height":0.1015,
-        "duration":5.0
+        "duration":5.0,
+        "navigationCues": [
+            {
+                "time":34,
+                "x": 0.5,
+                "y": 0.4,
+                "width": 0.6,
+                "height": 0.6,
+                "description": "Newcastle"
+            }
+        ]
     }
 ]

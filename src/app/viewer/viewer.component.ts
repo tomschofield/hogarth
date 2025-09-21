@@ -3,6 +3,7 @@ import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
 import { CanvasDatum } from '../canvas-datum';
+import { Animation } from '../models/animation.interface';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
 declare var OpenSeadragon: any;
 
@@ -16,8 +17,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   panelText: string = "";
   canvasData: CanvasDatum[] = [];
   annotations: any[] = [];
-  animations: any[] = [];
-  allAnimations: any[] = [];
+  animations: Animation[] = [];
+  allAnimations: Animation[] = [];
   pageIndex: number = 0;
   panelTextIndex: number = 0;
   panelTitle: string = 'Annotation Details';
@@ -1055,17 +1056,37 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const animation = this.animations[index];
 
-    // Calculate the bounds for the animation with some padding
-    const padding = 0.1; // Add 10% padding around the animation
-    const bounds = new OpenSeadragon.Rect(
-      animation.x - (animation.width / 2) - padding,
-      animation.y - (animation.height / 2) - padding,
-      animation.width + (padding * 2),
-      animation.height + (padding * 2)
-    );
+    // Check if the animation has custom viewport properties
+    if (animation.viewportX !== undefined && animation.viewportY !== undefined && animation.viewportZoom !== undefined) {
+      // Use custom viewport positioning
+      this.moveToViewportPosition(animation.viewportX, animation.viewportY, animation.viewportZoom);
+    } else {
+      // Fall back to the original bounds-based positioning
+      const padding = 0.1; // Add 10% padding around the animation
+      const bounds = new OpenSeadragon.Rect(
+        animation.x - (animation.width / 2) - padding,
+        animation.y - (animation.height / 2) - padding,
+        animation.width + (padding * 2),
+        animation.height + (padding * 2)
+      );
 
-    // Smoothly pan and zoom to the animation
-    this.viewer.viewport.fitBounds(bounds, false);
+      // Smoothly pan and zoom to the animation
+      this.viewer.viewport.fitBounds(bounds, false);
+    }
+  }
+
+  private moveToViewportPosition(x: number, y: number, zoom: number) {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized');
+      return;
+    }
+
+    // Convert the normalized coordinates (0-1) to OpenSeadragon viewport coordinates
+    const viewportPoint = new OpenSeadragon.Point(x, y);
+    
+    // Set the zoom level and center the viewport on the specified point
+    this.viewer.viewport.panTo(viewportPoint, false);
+    this.viewer.viewport.zoomTo(zoom, viewportPoint, false);
   }
 
   private showAllAnimations() {
@@ -1494,8 +1515,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           if (currentTime >= nextCue.time) {
             console.log(`Navigation cue triggered at ${currentTime}s:`, nextCue.description);
 
-            // Move the viewer to the specified location
-            this.moveToLocation(nextCue.x, nextCue.y, nextCue.width, nextCue.height);
+            // Use viewport positioning if available, otherwise fall back to bounds-based positioning
+            if (nextCue.viewportX !== undefined && nextCue.viewportY !== undefined && nextCue.viewportZoom !== undefined) {
+              this.moveToLocationWithViewport(nextCue.viewportX, nextCue.viewportY, nextCue.viewportZoom);
+            } else {
+              // Move the viewer to the specified location using bounds
+              this.moveToLocation(nextCue.x, nextCue.y, nextCue.width, nextCue.height);
+            }
 
             currentCueIndex++;
           }
@@ -1794,6 +1820,32 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.viewer.animationTime = currentAnimationTime;
       }
     }, duration * 1000);
+  }
+
+  // Overloaded version for viewport-based positioning
+  private moveToLocationWithViewport(x: number, y: number, zoom: number, immediate: boolean = false, duration: number = 2) {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized');
+      return;
+    }
+
+    // Use custom animation timing for smoother transitions
+    const currentAnimationTime = this.viewer.animationTime;
+    this.viewer.animationTime = immediate ? 0 : duration;
+
+    // Convert the normalized coordinates (0-1) to OpenSeadragon viewport coordinates
+    const viewportPoint = new OpenSeadragon.Point(x, y);
+    
+    // Set the zoom level and center the viewport on the specified point
+    this.viewer.viewport.panTo(viewportPoint, false);
+    this.viewer.viewport.zoomTo(zoom, viewportPoint, false);
+
+    // Restore original animation time after transition
+    setTimeout(() => {
+      if (this.viewer) {
+        this.viewer.animationTime = currentAnimationTime;
+      }
+    }, (immediate ? 0 : duration) * 1000);
   }
 
   closeAnnotationPanel() {
