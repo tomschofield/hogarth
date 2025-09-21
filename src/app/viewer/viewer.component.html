@@ -51,9 +51,6 @@
       (click)="toggleAnnotations(!showingAnnotations)">
       <mat-icon>push_pin</mat-icon>
     </button>
-    <button id="info" mat-icon-button matTooltip="About this painting" (click)="showIntroduction()">
-      <span style="font-size: 18px; font-weight: bold; font-style: italic; transform: translateY(-2px); display: inline-block;">i</span>
-    </button>
     <button id="help" mat-icon-button matTooltip="Help" (click)="showHelp()">
       <span style="font-size: 18px; font-weight: bold; transform: translateY(-2px); display: inline-block;">?</span>
     </button>
@@ -93,14 +90,6 @@
           Annotations
         </mat-slide-toggle>
       </div>
-      <!-- <div class="menu-item">
-        <mat-slide-toggle 
-          [(ngModel)]="showingChat" 
-          (change)="toggleChat($event.checked)"
-          class="menu-toggle">
-          Ask Hogarth
-        </mat-slide-toggle>
-      </div> -->
 
       <div class="menu-item">
         <button mat-stroked-button 
@@ -131,7 +120,7 @@
     </div>
 
     <!-- Annotation Panel - Right Side -->
-    <div *ngIf="(panelText && showingAnnotations) || (panelText && currentAnnotationIndex === -1 && !showingChat)" 
+    <div *ngIf="(panelText && showingAnnotations && currentAnnotationIndex !== -1) || (panelText && currentAnnotationIndex === -1 && !showingChat && showIntroductionPanel)" 
          class="annotation-panel-right">
       <mat-card style="height: 100%;">
         <mat-card-header>

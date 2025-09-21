@@ -30,6 +30,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   numAnimations: number = 0;
   private videoOverlays: any[] = [];
   private annotationOverlays: any[] = [];
+  private infoMarkerOverlays: any[] = [];
   private currentVideo: HTMLVideoElement | null = null;
   private videoVisibilityState: Map<HTMLVideoElement, boolean> = new Map();
   private currentlyPlayingVideo: HTMLVideoElement | null = null;
@@ -41,6 +42,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   isMenuOpen: boolean = false;
   isAboutModalOpen: boolean = false;
   showingChat: boolean = false;
+  showIntroductionPanel: boolean = false;
   chatMessages: {
     message: string,
     isUser: boolean,
@@ -226,6 +228,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
             // Reset current annotation index to show default content
             this.currentAnnotationIndex = -1;
+            
+            // Reset introduction panel display state when changing pages
+            this.showIntroductionPanel = false;
 
             // Set default annotation panel content for each painting
             this.setDefaultAnnotationContent();
@@ -350,6 +355,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       index++;
     });
+
+    // Add info marker to the current painting
+    this.addInfoMarker();
   }
 
   addAnnotation(x: number, y: number, index: number, type: string) {
@@ -594,6 +602,61 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  addInfoMarker() {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized, cannot add info marker');
+      return;
+    }
+
+    // Calculate top left-center position for info marker
+    // For the top left-center of the painting, we'll use x=0.3 (left of center) and y=0.1 (near top)
+    const x = 0.4;
+    const y = 0.1;
+    
+    var elt = document.createElement("div");
+    elt.className = "info-marker";
+    elt.id = "info-marker";
+    elt.style.cursor = "pointer";
+    elt.innerHTML = "More info";
+
+    elt.style.borderRadius = "5px";
+    elt.style.position = "relative";
+    elt.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+    elt.style.color = "white";
+    elt.style.display = "flex";
+    elt.style.alignItems = "center";
+    elt.style.justifyContent = "center";
+    elt.style.padding = "6px 10px";
+    
+    // Add click handler to show introduction
+    new OpenSeadragon.MouseTracker({
+      element: elt,
+      clickHandler: e => {
+        e.preventDefaultAction = true;
+        this.showIntroduction();
+        return false;
+      },
+    });
+
+    this.viewer.addOverlay({
+      element: elt,
+      location: new OpenSeadragon.Point(x, y),
+      placement: 'CENTER',
+      checkResize: false
+    });
+
+    // Apply z-index to ensure it's visible but below annotation markers
+    setTimeout(() => {
+      const wrapperElement = elt.parentElement;
+      if (wrapperElement) {
+        wrapperElement.style.zIndex = "8000"; // Below annotation markers (9999) but above videos
+      }
+    }, 50);
+
+    // Track this info marker overlay for removal
+    this.infoMarkerOverlays.push(elt);
+  }
+
   addVideoOverlay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: true,
@@ -615,6 +678,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     // Clear the tracking array
     this.annotationOverlays = [];
+
+    // Remove all tracked info marker overlays
+    this.infoMarkerOverlays.forEach(infoMarkerElement => {
+      this.viewer.removeOverlay(infoMarkerElement);
+    });
+    // Clear the info marker tracking array
+    this.infoMarkerOverlays = [];
   }
 
   removeAnimations() {
@@ -1666,30 +1736,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     }, duration * 1000);
   }
 
-  // private showNextNavigationCue(cue: any) {
-  //   // Create a temporary highlight overlay
-  //   const highlight = document.createElement("div");
-  //   highlight.style.border = "2px dashed rgba(255, 255, 255, 0.8)";
-  //   highlight.style.borderRadius = "8px";
-  //   highlight.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
-  //   highlight.style.pointerEvents = "none";
-
-  //   // Add overlay to show next target area
-  //   this.viewer.addOverlay({
-  //     element: highlight,
-  //     location: new OpenSeadragon.Point(cue.x, cue.y),
-  //     placement: 'CENTER',
-  //     checkResize: false,
-  //     width: cue.width,
-  //     height: cue.height
-  //   });
-
-  //   // Remove highlight after 2 seconds
-  //   setTimeout(() => {
-  //     this.viewer.removeOverlay(highlight);
-  //   }, 2000);
-  // }
-
   closeAnnotationPanel() {
     // Reset selected annotation when panel is closed
     if (this.selectedAnnotationElement) {
@@ -1703,6 +1749,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentAnnotationIndex = 0;
     this.panelTextIndex = 0;
     this.numPanels = 0;
+    this.showIntroductionPanel = false;
 
     // Adjust viewport when panel is closed
     this.adjustViewportForPanel(false);
@@ -1880,6 +1927,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showingChat = false;
       this.adjustViewportForPanel(false);
     }
+
+    // Enable Introduction panel display
+    this.showIntroductionPanel = true;
 
     // Set the default annotation content (Introduction)
     this.setDefaultAnnotationContent();
