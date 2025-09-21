@@ -199,7 +199,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             navigatorBackground: "black",
             backgroundColor: 'black',
             prefixUrl: "//openseadragon.github.io/openseadragon/images/",
-            tileSources: tileSources
+            tileSources: tileSources,
+            // Initial zoom and positioning to prevent top menu from covering painting
+            defaultZoomLevel: 0.6,
+            minZoomLevel: 0.5,
+            maxZoomLevel: 3.0,
+            visibilityRatio: 0.8,
+            constrainDuringPan: false,
+            centerVertically: false,
+            homeFillsViewer: false 
           });
 
           // Only proceed if viewer was successfully created
