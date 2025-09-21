@@ -186,6 +186,20 @@
                 margin: 0;
                 padding: 0;
             }
+
+            // // Subtitle button active state
+            // &.subtitle-button.active {
+            //     background: rgba(227, 82, 5, 0.3);
+            //     border-color: rgba(227, 82, 5, 0.6);
+                
+            //     &:hover {
+            //         background: rgba(227, 82, 5, 0.4);
+            //     }
+                
+            //     mat-icon {
+            //         color: #E35205;
+            //     }
+            // }
         }
 
         .play-button {

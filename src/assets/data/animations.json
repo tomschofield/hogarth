@@ -11,6 +11,9 @@
         "height":0.237,
         "duration":20.0,
         "hideControls": false,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Serving_Boy_eng.vtt",
+        "subtitleLanguage": "en",
         "navigationCues": [
             {
                 "time":48.0,
@@ -64,15 +67,13 @@
         "height":0.142,
         "duration":9.0,
         "hideControls": false,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/candidate_eng.vtt",
+        "subtitleLanguage": "en",
+        "viewportX": 0.2,
+        "viewportY": 0.452,
+        "viewportZoom": 1,
          "navigationCues": [
-            {
-                "time":0,
-                "x": 0.2,
-                "y": 0.4,
-                "width": 0.4,
-                "height": 0.4,
-                "description": "Flag"
-            },
             {
                 "time":33.5,
                 "x": 0.2,
@@ -102,7 +103,10 @@
         "width":0.113,
         "height":0.113,
         "duration":9.0,
-        "hideControls": false
+        "hideControls": false,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/fiddling-nan_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Bribing a tailor and his wife",
         "canvasIndex":0,
@@ -114,7 +118,10 @@
         "width":0.258,
         "height":0.258,
         "duration":9.0,
-        "hideControls": false
+        "hideControls": false,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Clerk_Tailor_Wife_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "The Election agent",
         "canvasIndex":0,
@@ -126,7 +133,10 @@
         "width":0.293,
         "height":0.293,
         "duration":9.0,
-        "hideControls": false
+        "hideControls": false,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/The_Election_Agent_eng.vtt",
+        "subtitleLanguage": "en"
     },
     
     {
@@ -143,7 +153,10 @@
         "hideControls": false,
         "viewportX": 0.35,
         "viewportY": 0.32,
-        "viewportZoom": 1
+        "viewportZoom": 1,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/1-Candidate_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -158,7 +171,10 @@
         "hideControls": false,
         "viewportX": 0.35,
         "viewportY": 0.32,
-        "viewportZoom": 1
+        "viewportZoom": 1,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Women_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -174,7 +190,10 @@
         "hideControls": false,
         "viewportX": 0.35,
         "viewportY": 0.32,
-        "viewportZoom": 1
+        "viewportZoom": 1,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/1-Candidate_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -190,7 +209,10 @@
         "hideControls": false,
         "viewportX": 0.35,
         "viewportY": 0.32,
-        "viewportZoom": 1
+        "viewportZoom": 1,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Women_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -205,7 +227,10 @@
         "hideControls": false,
         "viewportX": 0.35,
         "viewportY": 0.32,
-        "viewportZoom": 1
+        "viewportZoom": 1,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/1-Candidate_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Candidate addresses two ladies",
         "canvasIndex":1,
@@ -220,7 +245,10 @@
         "hideControls": false,
         "viewportX": 0.5,
         "viewportY": 0.32,
-        "viewportZoom": 1
+        "viewportZoom": 1,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Women_eng.vtt",
+        "subtitleLanguage": "en"
     },
 
     {
@@ -236,7 +264,10 @@
         "hideControls": false,
         "viewportX": 0.505,
         "viewportY": 0.274,
-        "viewportZoom": 2.0
+        "viewportZoom": 2.0,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Sign_eng.vtt",
+        "subtitleLanguage": "en"
     },
 
      {
@@ -249,7 +280,10 @@
         "y": 0.605,
         "width":0.278,
         "height":0.278,
-        "hideControls": false
+        "hideControls": false,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/7-Canvassing_eng.vtt",
+        "subtitleLanguage": "en"
     },
 
     {
@@ -262,7 +296,10 @@
         "y": 0.365,
         "width":0.093,
         "height":0.093,
-        "hideControls": false
+        "hideControls": false,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Tory_Candidate_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Singing the election",
         "canvasIndex":2,
@@ -276,7 +313,10 @@
         "hideControls": false,
         "viewportX": 0.394,
         "viewportY": 0.4657,
-        "viewportZoom": 1.3
+        "viewportZoom": 1.3,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Ballad_Singer_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Complaints of an old solider",
         "canvasIndex":2,
@@ -291,6 +331,9 @@
         "viewportX": 0.82,
         "viewportY": 0.7,
         "viewportZoom": 2,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Former_Soldier_eng.vtt",
+        "subtitleLanguage": "en",
         "navigationCues": [
             {
                 "time":8,
@@ -313,7 +356,10 @@
         "y": 0.139,
         "width":0.1345,
         "height":0.1345,
-        "duration":5.0
+        "duration":5.0,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Goose2_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "A fight breaks out",
         "canvasIndex":3,
@@ -324,7 +370,10 @@
         "y": 0.5705,
         "width":0.404,
         "height":0.404,
-        "duration":5.0
+        "duration":5.0,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/ThresherSailor_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Victorious but precarious",
         "canvasIndex":3,
@@ -338,7 +387,10 @@
         "duration":5.0,
         "viewportX": 0.5939,
         "viewportY": 0.3766,
-        "viewportZoom": 1
+        "viewportZoom": 1,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Candidate-chairing_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "Servant of the candidate’s wife",
         "canvasIndex":3,
@@ -349,7 +401,10 @@
         "y": 0.342,
         "width":0.113,
         "height":0.113,
-        "duration":5.0
+        "duration":5.0,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/Servants_eng.vtt",
+        "subtitleLanguage": "en"
     },{
         "title": "The political elite watch on",
         "canvasIndex":3,
@@ -361,6 +416,9 @@
         "width":0.105,
         "height":0.1015,
         "duration":5.0,
+        "showSubtitles": true,
+        "subtitles": "assets/subtitles/window_eng.vtt",
+        "subtitleLanguage": "en",
         "navigationCues": [
             {
                 "time":34,

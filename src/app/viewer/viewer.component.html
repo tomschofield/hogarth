@@ -310,6 +310,16 @@
                     class="control-button">
                 <mat-icon>skip_next</mat-icon>
             </button>
+
+            <!-- Subtitle Toggle -->
+            <button mat-icon-button 
+                    *ngIf="currentAnimationHasSubtitles()"
+                    (click)="toggleSubtitles()"
+                    [class.active]="subtitlesEnabled"
+                    class="control-button subtitle-button"
+                    matTooltip="Toggle Subtitles">
+                <mat-icon>{{ subtitlesEnabled ? 'closed_caption' : 'closed_caption_disabled' }}</mat-icon>
+            </button>
             </div>
             
             <!-- Progress Bar (optional) -->
