@@ -434,7 +434,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       elt.classList.add("pushpin-blue");
       elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
     }
-    
+
     // Create tooltip element
     var tooltip = document.createElement("div");
     tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
@@ -816,10 +816,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private resetAnnotationStyle(element: HTMLElement) {
     // Determine original type from classes
-    const isMultiLevel = element.classList.contains("multi-level");
+    const isYellow = element.classList.contains("pushpin-yellow");
     
     // Reset to original SVG style
-    if (isMultiLevel) {
+    if (isYellow) {
       element.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
     } else {
       element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
