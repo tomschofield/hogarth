@@ -415,18 +415,24 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     elt.style.cursor = "pointer";
 
     // Apply inline styles for immediate effect
-    elt.style.width = "1px";
-    elt.style.height = "1px";
-    elt.style.borderRadius = "50%";
+    elt.style.width = "20px";
+    elt.style.height = "20px";
     elt.style.position = "relative";
     elt.style.transition = "all 0.1s ease";
+    elt.style.display = "block";
+    elt.style.visibility = "visible";
 
-    // Add the visual styling based on type
+    elt.style.backgroundSize = "contain";
+    elt.style.backgroundRepeat = "no-repeat";
+    elt.style.backgroundPosition = "center";
+
+    // Add color class based on type for potential future styling
     if (type === "Introduction" || type === "The political context") {
-   
-      elt.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%,  rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
+      elt.classList.add("pushpin-yellow");
+      elt.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
     } else {
-      elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(71, 151, 168) 40%,  rgb(71, 151, 168) 50%, rgba(0, 0, 0, 0) 54%)";
+      elt.classList.add("pushpin-blue");
+      elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
     }
 
     // Create tooltip element
@@ -591,11 +597,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => positionTooltip(), 10);
 
         if (type === "multi-level") {
-          elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
-          elt.style.animation = "pulse-multi 1.5s infinite";
+          elt.classList.add("pulse-multi-hover");
         } else {
-          elt.style.boxShadow = "0 0 10px rgba(71, 151, 168, 0.8)";
-          elt.style.animation = "pulse 1.5s infinite";
+          elt.classList.add("pulse-hover");
         }
       } else {
         // Show tooltip for selected annotation
@@ -614,13 +618,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           wrapperElement.style.zIndex = "9999";
         }
         
-        elt.style.animation = "none";
+        elt.classList.remove("pulse-hover", "pulse-multi-hover");
         tooltip.style.opacity = "0";
-        if (type === "multi-level") {
-          elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
-        } else {
-          elt.style.boxShadow = "0 0 10px rgba(71, 151, 168, 0)";
-        }
       } else {
         // Hide tooltip for selected annotation when not hovering
         tooltip.style.opacity = "0";
@@ -804,10 +803,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setSelectedAnnotationStyle(element: HTMLElement) {
-    // Apply selected style with orange color #E35205
-    element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, #E35205 40%, #E35205 50%, rgba(0, 0, 0, 0) 54%)";
-    element.style.boxShadow = "0 0 15px rgba(227, 82, 5, 0.9)";
-    element.style.animation = "pulse-selected 1.5s infinite";
+    // Apply selected style using orange pin SVG
+    element.style.backgroundImage = "url('assets/icons/push_pin_orange.svg')";
 
     // Update wrapper z-index for selected annotation
     const index = element.id.replace('annotation_', '');
@@ -821,15 +818,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     // Determine original type from classes
     const isMultiLevel = element.classList.contains("multi-level");
     
-    // Reset to original style
+    // Reset to original SVG style
     if (isMultiLevel) {
-      element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%, rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
+      element.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
     } else {
-      element.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(71, 151, 168) 40%, rgb(71, 151, 168) 50%, rgba(0, 0, 0, 0) 54%)";
+      element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
     }
     
-    element.style.boxShadow = "none";
-    element.style.animation = "none";
+    // Ensure all background properties are set correctly
+
 
     // Reset wrapper z-index
     const index = element.id.replace('annotation_', '');
