@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef, ViewChild } from '@angular/core';
 import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
@@ -63,6 +63,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   private originalBounds: any = null;
   private isViewportAdjusted: boolean = false;
 
+  @ViewChild('globalSubtitleContainer', { static: true }) globalSubtitleContainer!: ElementRef<HTMLDivElement>;
+
   constructor(
     private ngZone: NgZone,
     private manifestService: ManifestService,
@@ -114,6 +116,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       console.error('OpenSeadragon not loaded');
       return;
     }
+
+    // Disable any existing video subtitle tracks
+    this.disableAllVideoTracks();
 
     this.manifestService.getData().subscribe({
       next: (res) => {
@@ -719,6 +724,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentVideo = null;
     this.currentlyPlayingVideo = null;
 
+    // Clear global subtitles
+    this.clearGlobalSubtitles();
+
     // Remove all tracked video overlays and their play buttons
     this.videoOverlays.forEach(video => {
       // Clean up visibility state
@@ -736,6 +744,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Method to pause and hide all videos except the specified one (for play button interactions)
   private pauseAndHideAllVideosExcept(excludeVideo: HTMLVideoElement | null = null) {
+    // If no video is being excluded (all videos paused), clear subtitles
+    if (!excludeVideo) {
+      this.clearGlobalSubtitles();
+    }
+    
     this.videoOverlays.forEach(overlay => {
       const video = overlay.querySelector('video') as HTMLVideoElement;
       if (video && video !== excludeVideo) {
@@ -1343,6 +1356,93 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.seekToTime(targetTime);
   }
 
+  // Method to clear global subtitles
+  private clearGlobalSubtitles() {
+    if (this.globalSubtitleContainer) {
+      const globalContainer = this.globalSubtitleContainer.nativeElement;
+      globalContainer.style.display = "none";
+      globalContainer.innerHTML = "";
+    }
+  }
+
+  // Method to disable all video subtitle tracks
+  private disableAllVideoTracks() {
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = 'disabled';
+      }
+    });
+  }
+
+  // Method to load and parse WebVTT subtitle files
+  private async loadWebVTTSubtitles(vttUrl: string): Promise<any[]> {
+    try {
+      const response = await fetch(vttUrl);
+      const vttText = await response.text();
+      return this.parseWebVTT(vttText);
+    } catch (error) {
+      console.error('Error loading WebVTT file:', error);
+      return [];
+    }
+  }
+
+  // Method to parse WebVTT text into subtitle objects
+  private parseWebVTT(vttText: string): any[] {
+    const subtitles: any[] = [];
+    const lines = vttText.split('\n');
+    let i = 0;
+
+    // Skip header
+    while (i < lines.length && !lines[i].includes('-->')) {
+      i++;
+    }
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      
+      if (line.includes('-->')) {
+        const timeParts = line.split('-->');
+        const startTime = this.parseVTTTime(timeParts[0].trim());
+        const endTime = this.parseVTTTime(timeParts[1].trim());
+        
+        i++;
+        let text = '';
+        
+        // Collect subtitle text until next timestamp or end
+        while (i < lines.length && lines[i].trim() !== '' && !lines[i].includes('-->')) {
+          if (text) text += ' ';
+          text += lines[i].trim();
+          i++;
+        }
+        
+        if (text) {
+          subtitles.push({
+            start: startTime,
+            end: endTime,
+            text: text
+          });
+        }
+      } else {
+        i++;
+      }
+    }
+    
+    return subtitles;
+  }
+
+  // Helper method to parse VTT time format (HH:MM:SS.mmm)
+  private parseVTTTime(timeStr: string): number {
+    const parts = timeStr.split(':');
+    const hours = parseInt(parts[0]) || 0;
+    const minutes = parseInt(parts[1]) || 0;
+    const secondsParts = parts[2].split('.');
+    const seconds = parseInt(secondsParts[0]) || 0;
+    const milliseconds = parseInt(secondsParts[1]) || 0;
+    
+    return hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
+  }
+
   private seekToTime(targetTime: number) {
     if (!this.currentVideo) {
       return;
@@ -1447,45 +1547,31 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     container.style.height = "100%";
     container.appendChild(video);
 
-    // Create subtitle container if subtitles are provided
-    let subtitleContainer: HTMLElement | null = null;
-    let currentSubtitles: any[] = [];
-    
+    // Store subtitle information for global subtitle handling
+    let videoSubtitles: any[] = [];
     if (options.subtitles && options.showSubtitles) {
-      subtitleContainer = document.createElement("div");
-      subtitleContainer.className = "subtitle-container"; // Add CSS class for easier selection
-      subtitleContainer.style.position = "absolute";
-      subtitleContainer.style.bottom = "10%";
-      subtitleContainer.style.left = "5%";
-      subtitleContainer.style.right = "5%";
-      subtitleContainer.style.textAlign = "center";
-      subtitleContainer.style.color = "white";
-      subtitleContainer.style.fontSize = "14px";
-      subtitleContainer.style.fontWeight = "bold";
-      subtitleContainer.style.textShadow = "2px 2px 4px rgba(0, 0, 0, 0.8)";
-      subtitleContainer.style.background = "rgba(0, 0, 0, 0.7)";
-      subtitleContainer.style.padding = "8px 12px";
-      subtitleContainer.style.borderRadius = "4px";
-      subtitleContainer.style.display = "none"; // Initially hidden
-      subtitleContainer.style.zIndex = "9000";
-      subtitleContainer.style.pointerEvents = "none";
-      container.appendChild(subtitleContainer);
-
-      // Handle different subtitle formats
       if (typeof options.subtitles === 'string') {
-        // WebVTT file - add track element to video
-        const track = document.createElement("track");
-        track.kind = "subtitles";
-        track.src = options.subtitles;
-        track.srclang = options.subtitleLanguage || "en";
-        track.label = "Subtitles";
-        track.default = true;
-        video.appendChild(track);
+        // WebVTT file - load and parse manually instead of using native tracks
+        this.loadWebVTTSubtitles(options.subtitles).then(subtitles => {
+          videoSubtitles = subtitles;
+          // Store reference on video element for access in event handlers
+          (video as any)._subtitles = subtitles;
+        }).catch(error => {
+          console.warn('Failed to load WebVTT subtitles:', error);
+        });
       } else if (Array.isArray(options.subtitles)) {
         // Inline subtitles array
-        currentSubtitles = options.subtitles;
+        videoSubtitles = options.subtitles;
+        (video as any)._subtitles = options.subtitles;
       }
     }
+
+    // Disable any native video subtitles to prevent browser rendering
+    video.addEventListener('loadedmetadata', () => {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = 'disabled';
+      }
+    });
 
     // Add play button to document body instead of container
     document.body.appendChild(playButton);
@@ -1536,32 +1622,25 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.addEventListener('timeupdate', () => {
       const currentTime = video.currentTime;
 
-      // Handle inline subtitles
-      if (subtitleContainer && currentSubtitles.length > 0) {
-        const activeSubtitle = currentSubtitles.find(sub => 
+      // Handle inline subtitles using global container
+      // Get subtitles from video element (set asynchronously for WebVTT)
+      const videoSubtitles = (video as any)._subtitles || [];
+      
+      // Only show subtitles if this is the currently playing video
+      if (videoSubtitles.length > 0 && this.globalSubtitleContainer) {
+        const activeSubtitle = videoSubtitles.find((sub: any) => 
           currentTime >= sub.start && currentTime <= sub.end
         );
 
-        if (activeSubtitle && componentInstance.subtitlesEnabled) {
-          subtitleContainer.innerHTML = activeSubtitle.text;
-          subtitleContainer.style.display = "block";
-          
-          // Apply custom positioning if specified
-          if (activeSubtitle.position) {
-            if (activeSubtitle.position.x !== undefined) {
-              subtitleContainer.style.left = `${activeSubtitle.position.x * 100}%`;
-              subtitleContainer.style.right = "auto";
-              subtitleContainer.style.transform = "translateX(-50%)";
-            }
-            if (activeSubtitle.position.y !== undefined) {
-              subtitleContainer.style.bottom = `${(1 - activeSubtitle.position.y) * 100}%`;
-            }
-            if (activeSubtitle.position.align) {
-              subtitleContainer.style.textAlign = activeSubtitle.position.align;
-            }
-          }
-        } else {
-          subtitleContainer.style.display = "none";
+        if (activeSubtitle && this.subtitlesEnabled && 
+            this.currentlyPlayingVideo === video && !video.paused) {
+          const globalContainer = this.globalSubtitleContainer.nativeElement;
+          globalContainer.innerHTML = activeSubtitle.text;
+          globalContainer.style.display = "block";
+          console.log('Showing subtitle:', activeSubtitle.text);
+        } else if (this.currentlyPlayingVideo === video) {
+          // Clear subtitles when no active subtitle for this time or video is paused
+          this.clearGlobalSubtitles();
         }
       }
 
@@ -1747,9 +1826,16 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Update play button and state when video state changes
     video.addEventListener('play', () => {
+      // Disable any native subtitle tracks immediately when video starts playing
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = 'disabled';
+      }
+      
       playButton.innerHTML = "⏸"; // Pause icon
       if (options.storeAsCurrentVideo) {
         this.isPlaying = true;
+        // Set as currently playing video for subtitle display
+        this.currentlyPlayingVideo = video;
       } else {
         // For regular video overlays, sync with animation controls
         const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
@@ -1775,6 +1861,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       playButton.innerHTML = "▶"; // Play icon
       if (options.storeAsCurrentVideo) {
         this.isPlaying = false;
+        // Clear currently playing video for subtitle display
+        if (this.currentlyPlayingVideo === video) {
+          this.currentlyPlayingVideo = null;
+          this.clearGlobalSubtitles();
+        }
       } else {
         // For regular video overlays, sync with animation controls
         const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
@@ -1796,6 +1887,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.addEventListener('ended', () => {
       if (options.storeAsCurrentVideo) {
         this.isPlaying = false;
+        // Clear currently playing video and subtitles when video ends
+        if (this.currentlyPlayingVideo === video) {
+          this.currentlyPlayingVideo = null;
+          this.clearGlobalSubtitles();
+        }
       } else {
         // For regular video overlays, sync with animation controls
         const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
@@ -2296,24 +2392,17 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   toggleSubtitles(): void {
     this.subtitlesEnabled = !this.subtitlesEnabled;
     
-    // Update all current video overlays to show/hide subtitles
-    this.videoOverlays.forEach(overlay => {
-      const subtitleContainer = overlay.querySelector('.subtitle-container') as HTMLElement;
-      if (subtitleContainer) {
-        if (!this.subtitlesEnabled) {
-          // Force hide subtitles immediately when disabled
-          subtitleContainer.style.display = 'none';
-        }
-        // When enabled, let the timeupdate handler manage visibility based on timing
-      }
-    });
+    // If subtitles are disabled, clear the global subtitle container
+    if (!this.subtitlesEnabled) {
+      this.clearGlobalSubtitles();
+    }
 
-    // Update WebVTT tracks if they exist
+    // Ensure all video tracks are disabled (we handle subtitles globally now)
     const videos = document.querySelectorAll('video');
     videos.forEach(video => {
       const tracks = video.textTracks;
       for (let i = 0; i < tracks.length; i++) {
-        tracks[i].mode = this.subtitlesEnabled ? 'showing' : 'hidden';
+        tracks[i].mode = 'disabled'; // Always disabled - we use global container
       }
     });
   }

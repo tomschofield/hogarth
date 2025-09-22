@@ -317,7 +317,8 @@
                     (click)="toggleSubtitles()"
                     [class.active]="subtitlesEnabled"
                     class="control-button subtitle-button"
-                    matTooltip="Toggle Subtitles">
+                    matTooltip="Toggle Subtitles"
+                    style="border: none; background: none;">
                 <mat-icon>{{ subtitlesEnabled ? 'closed_caption' : 'closed_caption_disabled' }}</mat-icon>
             </button>
             </div>
@@ -331,6 +332,12 @@
         </div>
         </mat-card-content>
     </mat-card>
+    </div>
+
+    <!-- Global Subtitle Container -->
+    <div #globalSubtitleContainer 
+         class="global-subtitle-container"
+         [style.display]="'none'">
     </div>
 
 </section>
