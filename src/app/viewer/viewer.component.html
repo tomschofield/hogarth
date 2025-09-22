@@ -73,24 +73,55 @@
     <div class="menu-content">
       <h3>William Hogarth's Humours of an Election</h3>
       
-      <div class="menu-item">
-        <mat-slide-toggle 
-          [(ngModel)]="showingAnimations" 
-          (change)="toggleAnimations($event.checked)"
-          class="menu-toggle">
-          Animations
-        </mat-slide-toggle>
+      <!-- Mobile Controls Section -->
+      <div class="mobile-controls-section mobile-only">
+        <div class="menu-item">
+          <button mat-stroked-button 
+                  color="primary"
+                  [class.active]="showingAnimations"
+                  (click)="toggleAnimations(!showingAnimations)"
+                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
+            <mat-icon style="margin-right: 8px;">movie_filter</mat-icon>
+            Animations {{ showingAnimations ? '(ON)' : '(OFF)' }}
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-stroked-button 
+                  color="primary"
+                  [class.active]="showingAnnotations"
+                  (click)="toggleAnnotations(!showingAnnotations)"
+                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
+            <mat-icon style="margin-right: 8px;">push_pin</mat-icon>
+            Annotations {{ showingAnnotations ? '(ON)' : '(OFF)' }}
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-stroked-button 
+                  color="primary"
+                  (click)="showHelp()"
+                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
+            <span style="font-size: 18px; font-weight: bold; transform: translateY(-2px); display: inline-block; margin-right: 8px;">?</span>
+            Help
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-stroked-button 
+                  color="primary"
+                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
+            <mat-icon style="margin-right: 8px;">home</mat-icon>
+            Home View
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-stroked-button 
+                  color="primary"
+                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
+            <mat-icon style="margin-right: 8px;">fullscreen</mat-icon>
+            Full Screen
+          </button>
+        </div>
       </div>
-
-      <div class="menu-item">
-        <mat-slide-toggle 
-          [(ngModel)]="showingAnnotations" 
-          (change)="toggleAnnotations($event.checked)"
-          class="menu-toggle">
-          Annotations
-        </mat-slide-toggle>
-      </div>
-
+      
       <div class="menu-item">
         <button mat-stroked-button 
                 (click)="openAboutModal()"

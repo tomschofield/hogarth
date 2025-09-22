@@ -582,7 +582,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px;
-  z-index: 50; // Ensure it's below the menu but above content
+  z-index: 10500;
 
   @media (max-width: 768px) , 
          (max-height: 768px) and (orientation: landscape) {
@@ -1060,4 +1060,12 @@
 // CDK Overlay Container z-index
 ::ng-deep .cdk-overlay-container {
   z-index: 101004;
+}
+
+.mobile-only {
+    display: none;
+    
+    @media (max-width: 768px) {
+        display: block !important;
+    }
 }
