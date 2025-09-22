@@ -434,7 +434,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       elt.classList.add("pushpin-blue");
       elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
     }
-
+    
     // Create tooltip element
     var tooltip = document.createElement("div");
     tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
@@ -824,7 +824,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
     }
-    
+
     // Ensure all background properties are set correctly
 
 

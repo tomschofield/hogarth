@@ -811,25 +811,6 @@
     }
 }
 
-// Annotation pin styles
-.annotation-pin {
-    position: relative !important;
-    cursor: pointer !important;
-    z-index: 9999 !important;
-    width: 20px !important;
-    height: 20px !important;
-    display: block !important;
-    visibility: visible !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-
-    div {
-        z-index: 10000 !important;
-        position: absolute !important;
-    }
-}
-
 // Ensure video overlays have lower z-index
 #seadragon-viewer {
     video {

@@ -1,1 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><path d="M16,9V4l1,0c0.55,0,1-0.45,1-1v0c0-0.55-0.45-1-1-1H7C6.45,2,6,2.45,6,3v0 c0,0.55,0.45,1,1,1l1,0v5c0,1.66-1.34,3-3,3h0v2h5.97v7l1,1l1-1v-7H19v-2h0C17.34,12,16,10.66,16,9z" fill="#E35205" fill-rule="evenodd"/></g></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 24 24">
+  <!-- Generator: Adobe Illustrator 29.8.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 2)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: none;
+      }
+
+      .st1 {
+        filter: url(#drop-shadow-1);
+      }
+
+      .st2 {
+        fill: #e35205;
+        fill-rule: evenodd;
+      }
+    </style>
+    <filter id="drop-shadow-1" x="3" y="0" width="20" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dx="1" dy="1"/>
+      <feGaussianBlur result="blur" stdDeviation="1"/>
+      <feFlood flood-color="#000" flood-opacity=".8"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <rect class="st0" width="24" height="24"/>
+  <g class="st1">
+    <path class="st2" d="M16,9v-5h1c.5,0,1-.5,1-1h0c0-.5-.5-1-1-1H7c-.6,0-1,.5-1,1h0c0,.5.4,1,1,1h1v5c0,1.7-1.3,3-3,3h0v2h6v7l1,1,1-1v-7h6v-2h0c-1.7,0-3-1.3-3-3Z"/>
+  </g>
+</svg>
