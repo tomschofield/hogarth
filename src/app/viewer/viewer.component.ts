@@ -47,6 +47,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   showingChat: boolean = false;
   showIntroductionPanel: boolean = false;
   subtitlesEnabled: boolean = true; // Subtitles enabled by default
+  isMuted: boolean = false; // Audio mute state
   chatMessages: {
     message: string,
     isUser: boolean,
@@ -1505,6 +1506,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.style.width = "100%";
     video.style.height = "100%";
     video.style.cursor = "pointer";
+    
+    // Apply current mute state to new video
+    video.muted = this.isMuted;
 
     // Initially hide the video unless showInitially is true
     if (options.showInitially) {
@@ -2384,6 +2388,31 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     return !!(currentAnimation.subtitles && 
               ((Array.isArray(currentAnimation.subtitles) && currentAnimation.subtitles.length > 0) ||
                (typeof currentAnimation.subtitles === 'string' && currentAnimation.subtitles.trim().length > 0)));
+  }
+
+  /**
+   * Toggle mute state for all videos
+   */
+  toggleMute(): void {
+    this.isMuted = !this.isMuted;
+    
+    // Apply mute state to all video elements in video overlays
+    this.videoOverlays.forEach(overlay => {
+      const video = overlay.querySelector('video');
+      if (video) {
+        video.muted = this.isMuted;
+      }
+    });
+
+    // Also apply to current video if it exists
+    if (this.currentVideo) {
+      this.currentVideo.muted = this.isMuted;
+    }
+
+    // Apply to currently playing video if it exists and is different from current video
+    if (this.currentlyPlayingVideo && this.currentlyPlayingVideo !== this.currentVideo) {
+      this.currentlyPlayingVideo.muted = this.isMuted;
+    }
   }
 
   /**

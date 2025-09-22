@@ -310,18 +310,32 @@
                     class="control-button">
                 <mat-icon>skip_next</mat-icon>
             </button>
+            
+            <div style="display: flex; align-items: center;">
+            
+              <!-- Mute Toggle -->
+              <button mat-icon-button 
+                      (click)="toggleMute()"
+                      [class.active]="!isMuted"
+                      class="control-button mute-button control-button-sm"
+                      matTooltip="Toggle Audio"
+                      style="border: none; background: none;">
+                  <mat-icon>{{ isMuted ? 'volume_off' : 'volume_up' }}</mat-icon>
+              </button>
 
-            <!-- Subtitle Toggle -->
-            <button mat-icon-button 
-                    *ngIf="currentAnimationHasSubtitles()"
-                    (click)="toggleSubtitles()"
-                    [class.active]="subtitlesEnabled"
-                    class="control-button subtitle-button"
-                    matTooltip="Toggle Subtitles"
-                    style="border: none; background: none;">
-                <mat-icon>{{ subtitlesEnabled ? 'closed_caption' : 'closed_caption_disabled' }}</mat-icon>
-            </button>
+              <!-- Subtitle Toggle -->
+              <button mat-icon-button 
+                      *ngIf="currentAnimationHasSubtitles()"
+                      (click)="toggleSubtitles()"
+                      [class.active]="subtitlesEnabled"
+                      class="control-button subtitle-button control-button-sm"
+                      matTooltip="Toggle Subtitles"
+                      style="border: none; background: none;">
+                  <mat-icon>{{ subtitlesEnabled ? 'closed_caption' : 'closed_caption_disabled' }}</mat-icon>
+              </button>
+
             </div>
+          </div>
             
             <!-- Progress Bar (optional) -->
             <div class="progress-container" 
