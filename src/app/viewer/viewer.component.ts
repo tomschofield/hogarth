@@ -895,14 +895,22 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  updateImagesForCurrentPanel() {
+  private loadImagesFromFilename(imageFilename: string) {
     this.annotationImages = [];
+    if (imageFilename && imageFilename.trim() !== '') {
+      const filenames = imageFilename.trim().split(' ');
+      filenames.forEach(filename => {
+        if (filename.trim() !== '') {
+          this.annotationImages.push(`assets/panelImages/${filename.trim()}`);
+        }
+      });
+    }
+  }
 
+  updateImagesForCurrentPanel() {
     // Get images for the current panel
     const imageFilename = this.annotations[this.currentAnnotationIndex][`image filename ${this.panelTextIndex}`];
-    if (imageFilename && imageFilename.trim() !== '') {
-      this.annotationImages.push(`assets/panelImages/${imageFilename}`);
-    }
+    this.loadImagesFromFilename(imageFilename);
   }
 
   previousPanel() {
@@ -924,10 +932,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           );
           // Update images for introduction
           const imageFilename = introAnnotation[`image filename ${this.panelTextIndex}`];
-          this.annotationImages = [];
-          if (imageFilename && imageFilename.trim() !== '') {
-            this.annotationImages.push(`assets/panelImages/${imageFilename}`);
-          }
+          this.loadImagesFromFilename(imageFilename);
         }
       } else {
         // For regular annotations
@@ -959,10 +964,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           );
           // Update images for introduction
           const imageFilename = introAnnotation[`image filename ${this.panelTextIndex}`];
-          this.annotationImages = [];
-          if (imageFilename && imageFilename.trim() !== '') {
-            this.annotationImages.push(`assets/panelImages/${imageFilename}`);
-          }
+          this.loadImagesFromFilename(imageFilename);
         }
       } else {
         // For regular annotations
@@ -2211,13 +2213,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       if (introAnnotation["annotation text 2"] && introAnnotation["annotation text 2"].length > 0) this.numPanels = 3;
       if (introAnnotation["annotation text 3"] && introAnnotation["annotation text 3"].length > 0) this.numPanels = 4;
       
-      this.annotationImages = [];
-      
       // Get images for the introduction if any
       const imageFilename = introAnnotation[`image filename 0`];
-      if (imageFilename && imageFilename.trim() !== '') {
-        this.annotationImages.push(`assets/panelImages/${imageFilename}`);
-      }
+      this.loadImagesFromFilename(imageFilename);
     } 
   }
 
