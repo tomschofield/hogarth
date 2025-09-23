@@ -134,6 +134,9 @@
         "height":0.293,
         "duration":9.0,
         "hideControls": false,
+        "viewportX": 0.763,
+        "viewportY": 0.5,
+        "viewportZoom": 0.8,
         "showSubtitles": true,
         "subtitles": "assets/subtitles/The_Election_Agent_eng.vtt",
         "subtitleLanguage": "en"
@@ -357,6 +360,9 @@
         "width":0.1345,
         "height":0.1345,
         "duration":5.0,
+        "viewportX": 0.559,
+        "viewportY": 0.28,
+        "viewportZoom": 1.2,
         "showSubtitles": true,
         "subtitles": "assets/subtitles/Goose2_eng.vtt",
         "subtitleLanguage": "en"
