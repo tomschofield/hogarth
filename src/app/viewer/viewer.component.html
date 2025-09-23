@@ -51,6 +51,14 @@
       (click)="toggleAnnotations(!showingAnnotations)">
       <mat-icon>push_pin</mat-icon>
     </button>
+    <button id="chat-toggle" 
+            *ngIf="chatUnlocked"
+            mat-icon-button 
+            matTooltip="Chat with Characters" 
+            [class.active]="showingChat"
+            (click)="toggleChat(!showingChat)">
+      <mat-icon>chat</mat-icon>
+    </button>
     <button id="help" mat-icon-button matTooltip="Help" (click)="showHelp()">
       <span style="font-size: 18px; font-weight: bold; transform: translateY(-2px); display: inline-block;">?</span>
     </button>
@@ -93,6 +101,16 @@
                   style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
             <mat-icon style="margin-right: 8px;">push_pin</mat-icon>
             Annotations {{ showingAnnotations ? '(ON)' : '(OFF)' }}
+          </button>
+        </div>
+        <div class="menu-item" *ngIf="chatUnlocked">
+          <button mat-stroked-button 
+                  color="primary"
+                  [class.active]="showingChat"
+                  (click)="toggleChat(!showingChat)"
+                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
+            <mat-icon style="margin-right: 8px;">chat</mat-icon>
+            Chat {{ showingChat ? '(ON)' : '(OFF)' }} 🔓
           </button>
         </div>
         <div class="menu-item">
@@ -234,7 +252,7 @@
         <mat-card-header>
           <mat-card-title style="display: flex; align-items: center; gap: 8px;">
             <mat-icon>chat</mat-icon>
-            Ask Hogarth
+            Chat with {{ selectedCharacter }}
           </mat-card-title>
           <button mat-icon-button 
             class="close-button"
@@ -245,21 +263,52 @@
         </mat-card-header>
 
         <mat-card-content class="chat-content">
+          <!-- Character Selection -->
+          <div class="character-selection" style="padding: 10px; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">Chat with:</label>
+            <mat-chip-listbox [(ngModel)]="selectedCharacter" (ngModelChange)="selectCharacter($event)">
+              <mat-chip-option *ngFor="let character of availableCharacters" 
+                               [value]="character"
+                               [selected]="character === selectedCharacter">
+                {{ character }}
+              </mat-chip-option>
+            </mat-chip-listbox>
+          </div>
+
           <!-- Chat Messages -->
           <div class="chat-messages" #chatMessagesContainer>
             <div *ngFor="let msg of chatMessages" 
                  class="chat-message"
-                 [class.user-message]="msg.isUser"
-                 [class.hogarth-message]="!msg.isUser">
+                 [class.user-message]="msg.role === 'user'"
+                 [class.assistant-message]="msg.role === 'assistant'">
               <div class="message-bubble">
+                <!-- Character indicator for assistant messages -->
+                <div *ngIf="msg.role === 'assistant' && msg.character" 
+                     class="character-label">
+                  {{ msg.character }}
+                </div>
+                
                 <!-- Image attachment if present -->
                 <div *ngIf="msg.imageData" class="message-image">
                   <img [src]="msg.imageData" 
                        alt="Selected image section"
                        style="max-width: 100%; border-radius: 8px; margin-bottom: 8px;">
                 </div>
-                <div class="message-text">{{ msg.message }}</div>
+                
+                <div class="message-text">{{ msg.content }}</div>
                 <div class="message-time">{{ msg.timestamp | date:'short' }}</div>
+              </div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div *ngIf="isLoadingChatResponse" class="chat-message assistant-message">
+              <div class="message-bubble">
+                <div class="character-label">{{ selectedCharacter }}</div>
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
             </div>
           </div>
@@ -267,16 +316,17 @@
           <!-- Chat Input -->
           <div class="chat-input-container">
             <mat-form-field appearance="outline" class="chat-input">
-              <mat-label>Ask William Hogarth...</mat-label>
+              <mat-label>Ask {{ selectedCharacter }}...</mat-label>
               <input matInput 
                      [(ngModel)]="currentMessage" 
                      (keyup.enter)="sendChatMessage()"
+                     [disabled]="isLoadingChatResponse"
                      placeholder="Type your question here...">
             </mat-form-field>
             <button mat-fab 
                     color="primary" 
                     (click)="sendChatMessage()"
-                    [disabled]="!currentMessage.trim()"
+                    [disabled]="!currentMessage.trim() || isLoadingChatResponse"
                     class="send-button">
               <mat-icon>send</mat-icon>
             </button>

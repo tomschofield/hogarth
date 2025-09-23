@@ -1,7 +1,8 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
+import { ChatService, ChatMessage } from '../chat.service';
 import { CanvasDatum } from '../canvas-datum';
 import { Animation } from '../models/animation.interface';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
@@ -48,14 +49,19 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   showIntroductionPanel: boolean = false;
   subtitlesEnabled: boolean = true; // Subtitles enabled by default
   isMuted: boolean = false; // Audio mute state
-  chatMessages: {
-    message: string,
-    isUser: boolean,
-    timestamp: Date,
-    imageData?: string,
-    imageBounds?: any
-  }[] = [];
+  
+  // Enhanced chat properties
+  chatMessages: ChatMessage[] = [];
   currentMessage: string = '';
+  isLoadingChatResponse: boolean = false;
+  availableCharacters: string[] = ['Hogarth', 'Sir Commodity Taxem', 'Election Agent', 'Serving Boy', 'Fiddling Nan'];
+  selectedCharacter: string = 'Hogarth';
+  
+  // Konami code for unlocking chat feature
+  private konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+  private konamiIndex = 0;
+  chatUnlocked = false;
+  
   isSelecting: boolean = false;
   selectionStart: { x: number, y: number } | null = null;
   selectionEnd: { x: number, y: number } | null = null;
@@ -70,11 +76,38 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     private ngZone: NgZone,
     private manifestService: ManifestService,
     private annotationsService: AnnotationsService,
-    private animationsService: AnimationsService
+    private animationsService: AnimationsService,
+    private chatService: ChatService
   ) { }
 
   ngOnInit() {
     // Keep this empty or only put non-DOM related initialization here
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeydown(event: KeyboardEvent) {
+    if (event.code === this.konamiCode[this.konamiIndex]) {
+      this.konamiIndex++;
+      if (this.konamiIndex === this.konamiCode.length) {
+        this.chatUnlocked = !this.chatUnlocked;
+        this.konamiIndex = 0;
+        
+        if (this.chatUnlocked) {
+          console.log('🎮 Chat feature unlocked! The characters await your questions...');
+          setTimeout(() => {
+            console.log('💬 Chat buttons are now visible in the menu and controls!');
+          }, 500);
+        } else {
+          console.log('🔒 Chat feature locked! Buttons are now hidden from view.');
+          // Also close chat if it's currently open
+          if (this.showingChat) {
+            this.toggleChat(false);
+          }
+        }
+      }
+    } else {
+      this.konamiIndex = 0;
+    }
   }
 
   ngOnDestroy() {
@@ -2118,7 +2151,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isIntroModalOpen = false;
   }
 
-  // Add the toggleChat method
+  // Enhanced chat methods
   toggleChat(show: boolean) {
     this.showingChat = show;
     if (show) {
@@ -2134,60 +2167,114 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
       // Add welcome message if chat is empty
       if (this.chatMessages.length === 0) {
-        this.chatMessages.push({
-          message: "Greetings! I am William Hogarth, painter of moral tales and observer of human folly. What would you like to know about my Election Series?",
-          isUser: false,
-          timestamp: new Date()
-        });
+        this.addWelcomeMessage();
       }
     } else {
       this.adjustViewportForPanel(false);
     }
   }
 
-  // Add method to send chat message
+  private addWelcomeMessage() {
+    const welcomeMessages = {
+      'Hogarth': "Greetings! I am William Hogarth, painter of moral tales and observer of human folly. What would you like to know about my Election Series?",
+      'Sir Commodity Taxem': "Good day! I am Sir Commodity Taxem, candidate for the New Interest. How may I assist you in understanding the electoral process?",
+      'Election Agent': "Ah, another observer of our democratic proceedings! I manage the practical affairs of elections. What brings you here?",
+      'Serving Boy': "Hello there! I've seen much from my position serving at the tavern. What would you like to know?",
+      'Fiddling Nan': "Well hello! I play my fiddle for all sorts of gatherings. Music tells stories too, you know!"
+    };
+
+    this.chatMessages.push({
+      content: welcomeMessages[this.selectedCharacter] || welcomeMessages['Hogarth'],
+      role: 'assistant',
+      timestamp: new Date(),
+      character: this.selectedCharacter
+    });
+  }
+
+  selectCharacter(character: string) {
+    if (character !== this.selectedCharacter) {
+      this.selectedCharacter = character;
+      this.chatService.setCurrentCharacter(character);
+      
+      // Clear existing messages and add new welcome message
+      this.chatMessages = [];
+      this.addWelcomeMessage();
+    }
+  }
+
   sendChatMessage() {
-    if (this.currentMessage.trim()) {
-      // Add user message (without image)
-      this.chatMessages.push({
-        message: this.currentMessage,
-        isUser: true,
+    if (this.currentMessage.trim() && !this.isLoadingChatResponse) {
+      // Add user message
+      const userMessage: ChatMessage = {
+        content: this.currentMessage,
+        role: 'user',
         timestamp: new Date()
+      };
+      
+      this.chatMessages.push(userMessage);
+      this.isLoadingChatResponse = true;
+
+      // Get current painting information to provide context
+      const paintingTitles = ["An Election Entertainment", "Canvassing for Votes", "The Polling", "Chairing the Member"];
+      const currentPaintingTitle = paintingTitles[this.pageIndex];
+      const paintingContext = ` (I'm viewing the painting "${currentPaintingTitle}")`;
+      
+      // Prepend painting context to user message for AI
+      const contextualMessage = this.currentMessage + paintingContext;
+
+      // Send to AI service
+      this.chatService.sendMessage(contextualMessage).subscribe({
+        next: (response) => {
+          console.log('Chat response:', response);
+          
+          // Add AI response
+          const aiMessage: ChatMessage = {
+            content: response.data?.reply?.content?.[0]?.value || response.data?.content || response.message || "I'm afraid I didn't quite catch that. Could you rephrase?",
+            role: 'assistant',
+            timestamp: new Date(),
+            character: this.selectedCharacter
+          };
+          
+          this.chatMessages.push(aiMessage);
+          this.isLoadingChatResponse = false;
+          
+          // Scroll to bottom of chat
+          setTimeout(() => this.scrollChatToBottom(), 100);
+        },
+        error: (error) => {
+          console.error('Chat error:', error);
+          
+          // Add error message
+          const errorMessage: ChatMessage = {
+            content: "My apologies, but I seem to be having trouble hearing you at the moment. Please try again.",
+            role: 'assistant',
+            timestamp: new Date(),
+            character: this.selectedCharacter
+          };
+          
+          this.chatMessages.push(errorMessage);
+          this.isLoadingChatResponse = false;
+        }
       });
-
-      // Generate dummy Hogarth response
-      const responses = [
-        "Ah, a most perceptive question! In my paintings, I sought to expose the corruption and vice that plagued society.",
-        "Indeed! Each figure in my compositions tells a story of human nature - both its nobility and its failings.",
-        "You see clearly, my friend. The Election Series reveals how power corrupts and democracy can be bought.",
-        "Precisely! Notice how I've used symbolism throughout - every dog, every fallen hat, every gesture has meaning.",
-        "A keen observation! I painted not just what I saw, but what I felt about the moral state of our nation.",
-        "Quite right! My brush was my weapon against hypocrisy and social pretense.",
-        "Excellent question! Each painting in this series follows the progression of electoral corruption."
-      ];
-
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-      setTimeout(() => {
-        this.chatMessages.push({
-          message: randomResponse,
-          isUser: false,
-          timestamp: new Date()
-        });
-      }, 1000);
 
       this.currentMessage = '';
     }
   }
 
-  // Add method to clear chat
+  private scrollChatToBottom() {
+    try {
+      const chatContainer = document.querySelector('.chat-messages');
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    } catch (err) {
+      console.error('Error scrolling chat:', err);
+    }
+  }
+
   clearChat() {
     this.chatMessages = [];
-    this.chatMessages.push({
-      message: "Greetings! I am William Hogarth, painter of moral tales and observer of human folly. What would you like to know about my Election Series?",
-      isUser: false,
-      timestamp: new Date()
-    });
+    this.addWelcomeMessage();
   }
 
   private setDefaultAnnotationContent() {

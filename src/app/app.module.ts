@@ -23,6 +23,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input'; 
 import { AcknowledgmentsModalComponent } from './acknowledgments-modal/acknowledgments-modal.component';
 import { IntroModalComponent } from './intro-modal/intro-modal.component';
+import { ChatService } from './chat.service';
 
 
 @NgModule({
@@ -53,7 +54,9 @@ import { IntroModalComponent } from './intro-modal/intro-modal.component';
     MatFormFieldModule,
     MatInputModule
   ],
-  providers: [],
+  providers: [
+    ChatService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

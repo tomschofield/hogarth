@@ -1,0 +1,11 @@
+{
+  "/api/*": {
+    "target": "https://nwhy4r5874.execute-api.eu-west-2.amazonaws.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": ""
+    }
+  }
+}
