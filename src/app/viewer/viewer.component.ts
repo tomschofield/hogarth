@@ -44,6 +44,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   isAboutModalOpen: boolean = false;
   isIntroModalOpen: boolean = false;
   private hasShownInitialIntro: boolean = false;
+  private shownIntroForPaintings: Set<number> = new Set();
   showingChat: boolean = false;
   showIntroductionPanel: boolean = false;
   subtitlesEnabled: boolean = true; // Subtitles enabled by default
@@ -244,8 +245,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             this.pageIndex = event.page;
             console.log("now on page ", this.pageIndex);
 
-            // Show intro modal for each new painting
-            this.openIntroModal();
+            // Show intro modal for each new painting only if not shown before
+            if (!this.shownIntroForPaintings.has(this.pageIndex)) {
+              this.openIntroModal();
+              this.shownIntroForPaintings.add(this.pageIndex);
+            }
 
             // Reset current annotation index to show default content
             this.currentAnnotationIndex = -1;
@@ -306,7 +310,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         // Show intro modal for the first painting when everything is loaded (only on initial load)
         if (!this.hasShownInitialIntro) {
           setTimeout(() => {
-            this.openIntroModal();
+            if (!this.shownIntroForPaintings.has(this.pageIndex)) {
+              this.openIntroModal();
+              this.shownIntroForPaintings.add(this.pageIndex);
+            }
             this.hasShownInitialIntro = true;
           }, 500);
         }
@@ -2111,7 +2118,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openIntroModal() {
-    console.log('Opening intro modal for painting:', this.pageIndex);
     this.isIntroModalOpen = true;
     this.closeMenu(); // Close the menu when opening intro modal
   }
