@@ -45,6 +45,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   isAboutModalOpen: boolean = false;
   isIntroModalOpen: boolean = false;
   private hasShownInitialIntro: boolean = false;
+  private shownIntroForPaintings: Set<number> = new Set();
   showingChat: boolean = false;
   showIntroductionPanel: boolean = false;
   subtitlesEnabled: boolean = true; // Subtitles enabled by default
@@ -277,8 +278,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             this.pageIndex = event.page;
             console.log("now on page ", this.pageIndex);
 
-            // Show intro modal for each new painting
-            this.openIntroModal();
+            // Show intro modal for each new painting only if not shown before
+            if (!this.shownIntroForPaintings.has(this.pageIndex)) {
+              this.openIntroModal();
+              this.shownIntroForPaintings.add(this.pageIndex);
+            }
 
             // Reset current annotation index to show default content
             this.currentAnnotationIndex = -1;
@@ -339,7 +343,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         // Show intro modal for the first painting when everything is loaded (only on initial load)
         if (!this.hasShownInitialIntro) {
           setTimeout(() => {
-            this.openIntroModal();
+            if (!this.shownIntroForPaintings.has(this.pageIndex)) {
+              this.openIntroModal();
+              this.shownIntroForPaintings.add(this.pageIndex);
+            }
             this.hasShownInitialIntro = true;
           }, 500);
         }
@@ -460,13 +467,14 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     elt.style.backgroundPosition = "center";
 
     // Add color class based on type for potential future styling
-    if (type === "Introduction" || type === "The political context") {
-      elt.classList.add("pushpin-yellow");
-      elt.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
-    } else {
-      elt.classList.add("pushpin-blue");
-      elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
-    }
+    // if (type === "Introduction" || type === "The political context") {
+    //   elt.classList.add("pushpin-yellow");
+    //   elt.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
+    // } else {
+    //   elt.classList.add("pushpin-blue");
+    //   elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
+    // }
+    elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
 
     // Create tooltip element
     var tooltip = document.createElement("div");
@@ -680,7 +688,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     elt.className = "info-marker";
     elt.id = "info-marker";
     elt.style.cursor = "pointer";
-    elt.innerHTML = "More info";
+    elt.innerHTML = "Introductory note";
 
     elt.style.borderRadius = "5px";
     elt.style.position = "relative";
@@ -849,14 +857,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private resetAnnotationStyle(element: HTMLElement) {
     // Determine original type from classes
-    const isYellow = element.classList.contains("pushpin-yellow");
+    // const isYellow = element.classList.contains("pushpin-yellow");
     
-    // Reset to original SVG style
-    if (isYellow) {
-      element.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
-    } else {
-      element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
-    }
+    // // Reset to original SVG style
+    // if (isYellow) {
+    //   element.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
+    // } else {
+    //   element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
+    // }
+    element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
 
     // Ensure all background properties are set correctly
 
@@ -2142,7 +2151,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openIntroModal() {
-    console.log('Opening intro modal for painting:', this.pageIndex);
     this.isIntroModalOpen = true;
     this.closeMenu(); // Close the menu when opening intro modal
   }

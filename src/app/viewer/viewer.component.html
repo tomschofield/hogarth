@@ -47,9 +47,9 @@
       (click)="toggleAnimations(!showingAnimations)">
       <mat-icon>movie_filter</mat-icon>
     </button>
-    <button id="annotations-toggle" mat-icon-button matTooltip="Annotations" [class.active]="showingAnnotations"
+    <button id="annotations-toggle" mat-icon-button matTooltip="Notes" [class.active]="showingAnnotations"
       (click)="toggleAnnotations(!showingAnnotations)">
-      <mat-icon>push_pin</mat-icon>
+      <img src="assets/icons/push_pin_white.svg" alt="Notes" style="width: 24px; height: 24px;">
     </button>
     <button id="chat-toggle" 
             *ngIf="chatUnlocked"
@@ -99,7 +99,7 @@
                   [class.active]="showingAnnotations"
                   (click)="toggleAnnotations(!showingAnnotations)"
                   style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <mat-icon style="margin-right: 8px;">push_pin</mat-icon>
+            <img src="assets/icons/push_pin_white.svg" alt="Notes" style="width: 24px; height: 24px; margin-right: 8px;">
             Annotations {{ showingAnnotations ? '(ON)' : '(OFF)' }}
           </button>
         </div>
