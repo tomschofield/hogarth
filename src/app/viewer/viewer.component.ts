@@ -427,13 +427,14 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     elt.style.backgroundPosition = "center";
 
     // Add color class based on type for potential future styling
-    if (type === "Introduction" || type === "The political context") {
-      elt.classList.add("pushpin-yellow");
-      elt.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
-    } else {
-      elt.classList.add("pushpin-blue");
-      elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
-    }
+    // if (type === "Introduction" || type === "The political context") {
+    //   elt.classList.add("pushpin-yellow");
+    //   elt.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
+    // } else {
+    //   elt.classList.add("pushpin-blue");
+    //   elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
+    // }
+    elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
 
     // Create tooltip element
     var tooltip = document.createElement("div");
@@ -647,7 +648,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     elt.className = "info-marker";
     elt.id = "info-marker";
     elt.style.cursor = "pointer";
-    elt.innerHTML = "More info";
+    elt.innerHTML = "Introductory note";
 
     elt.style.borderRadius = "5px";
     elt.style.position = "relative";
@@ -816,14 +817,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private resetAnnotationStyle(element: HTMLElement) {
     // Determine original type from classes
-    const isYellow = element.classList.contains("pushpin-yellow");
+    // const isYellow = element.classList.contains("pushpin-yellow");
     
-    // Reset to original SVG style
-    if (isYellow) {
-      element.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
-    } else {
-      element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
-    }
+    // // Reset to original SVG style
+    // if (isYellow) {
+    //   element.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
+    // } else {
+    //   element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
+    // }
+    element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
 
     // Ensure all background properties are set correctly
 
