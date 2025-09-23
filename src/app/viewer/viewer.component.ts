@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
@@ -68,6 +69,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('globalSubtitleContainer', { static: true }) globalSubtitleContainer!: ElementRef<HTMLDivElement>;
 
   constructor(
+    private router: Router,
     private ngZone: NgZone,
     private manifestService: ManifestService,
     private annotationsService: AnnotationsService,
@@ -655,7 +657,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     elt.className = "info-marker";
     elt.id = "info-marker";
     elt.style.cursor = "pointer";
-    elt.innerHTML = "Introductory note";
+    elt.innerHTML = "ⓘ Introductory note";
 
     elt.style.borderRadius = "5px";
     elt.style.position = "relative";
@@ -665,6 +667,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     elt.style.alignItems = "center";
     elt.style.justifyContent = "center";
     elt.style.padding = "6px 10px";
+    elt.style.fontStyle = "italic";
     
     // Add click handler to show introduction
     new OpenSeadragon.MouseTracker({
@@ -2278,6 +2281,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Adjust viewport for annotation panel
     this.adjustViewportForPanel(true);
+  }
+
+  returnToIntro() {
+    this.router.navigate(['']);
   }
 
   private setupHelpToggleListeners() {
