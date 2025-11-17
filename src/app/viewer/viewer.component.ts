@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
@@ -1205,7 +1205,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       showInitially: false, // Keep videos hidden until play button is clicked
       subtitles: animation?.subtitles,
       showSubtitles: animation?.showSubtitles,
-      subtitleLanguage: animation?.subtitleLanguage
+      subtitleLanguage: animation?.subtitleLanguage,
+      playbackRate: animation?.playbackRate
     });
   }
 
@@ -1225,7 +1226,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       showInitially: true, // Show video immediately for playback mode
       subtitles: animation?.subtitles,
       showSubtitles: animation?.showSubtitles,
-      subtitleLanguage: animation?.subtitleLanguage
+      subtitleLanguage: animation?.subtitleLanguage,
+      playbackRate: animation?.playbackRate
     });
   }
 
@@ -1244,7 +1246,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       showInitially: true, // Show video immediately for sequence mode
       subtitles: animation?.subtitles,
       showSubtitles: animation?.showSubtitles,
-      subtitleLanguage: animation?.subtitleLanguage
+      subtitleLanguage: animation?.subtitleLanguage,
+      playbackRate: animation?.playbackRate
     });
   }
 
@@ -1538,6 +1541,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     subtitles?: any[] | string;  // Inline subtitles or WebVTT file path
     showSubtitles?: boolean;
     subtitleLanguage?: string;
+    playbackRate?: number;
   } = {}) {
     if (!this.viewer) {
       console.warn('Viewer not initialized, cannot create video overlay');
@@ -1550,6 +1554,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.style.width = "100%";
     video.style.height = "100%";
     video.style.cursor = "pointer";
+    
+    // Set playback rate if specified, otherwise default to normal speed
+    video.playbackRate = options.playbackRate !== undefined ? options.playbackRate : 1.0;
     
     // Apply current mute state to new video
     video.muted = this.isMuted;

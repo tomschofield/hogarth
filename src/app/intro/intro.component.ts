@@ -32,6 +32,8 @@ export class IntroComponent implements AfterViewInit {
     this.videoElement.nativeElement.src = this.adaptiveVideoUrl;
     // Start muted for autoplay compliance, will unmute after user interaction
     this.videoElement.nativeElement.muted = true;
+    // Set playback rate to 20% faster
+    this.videoElement.nativeElement.playbackRate = 1.2;
     // Ensure video plays after view init
     this.playVideo();
     this.setupVideoProgressTracking();
@@ -78,6 +80,7 @@ export class IntroComponent implements AfterViewInit {
       const loadedHandler = () => {
         video.currentTime = this.currentTime;
         video.muted = wasMuted; // Preserve audio settings
+        video.playbackRate = 1.2; // Restore playback rate
         
         if (wasPlaying && !this.isVideoPaused) {
           video.play().catch(console.error);

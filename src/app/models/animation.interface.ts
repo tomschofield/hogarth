@@ -12,6 +12,7 @@ export interface Animation {
   hideControls?: boolean;
   startTime?: number;
   stopTime?: number;
+  playbackRate?: number;  // Optional playback speed (1.0 = normal, 1.2 = 20% faster, etc.)
   navigationCues?: NavigationCue[];
   // New viewport properties for enhanced positioning control
   viewportX?: number;     // Optional x position for viewport center (0-1)
