@@ -20,7 +20,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input'; 
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { AcknowledgmentsModalComponent } from './acknowledgments-modal/acknowledgments-modal.component';
 import { IntroModalComponent } from './intro-modal/intro-modal.component';
 import { ChatService } from './chat.service';
@@ -52,7 +53,8 @@ import { ChatService } from './chat.service';
     MatProgressBarModule,
     DragDropModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatSelectModule
   ],
   providers: [
     ChatService

@@ -427,6 +427,19 @@
             </div>
           </div>
             
+            <!-- Playback Rate Selector -->
+            <div class="playback-rate-selector">
+              <mat-form-field appearance="outline" class="playback-rate-field">
+                <mat-label>Speed</mat-label>
+                <mat-select [(ngModel)]="currentPlaybackRate" 
+                            (ngModelChange)="changePlaybackRate($event)">
+                  <mat-option *ngFor="let rate of availablePlaybackRates" [value]="rate">
+                    {{ rate }}x
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            
             <!-- Progress Bar (optional) -->
             <div class="progress-container" 
                  *ngIf="isPlaying"

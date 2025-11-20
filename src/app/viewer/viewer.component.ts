@@ -51,6 +51,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   showIntroductionPanel: boolean = false;
   subtitlesEnabled: boolean = true; // Subtitles enabled by default
   isMuted: boolean = false; // Audio mute state
+  currentPlaybackRate: number = 1.0; // Current playback rate (1.0 = normal speed)
+  availablePlaybackRates: number[] = [1.0, 1.1, 1.2, 1.25, 1.5, 2.0]; // Available playback speeds
   
   // Enhanced chat properties
   chatMessages: ChatMessage[] = [];
@@ -1555,8 +1557,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.style.height = "100%";
     video.style.cursor = "pointer";
     
-    // Set playback rate if specified, otherwise default to normal speed
-    video.playbackRate = options.playbackRate !== undefined ? options.playbackRate : 1.0;
+    // Set playback rate: prioritize user-selected rate, then animation-specific rate, then default
+    // Use currentPlaybackRate if it's not the default (1.0), otherwise use options.playbackRate
+    video.playbackRate = this.currentPlaybackRate !== 1.0 
+      ? this.currentPlaybackRate 
+      : (options.playbackRate !== undefined ? options.playbackRate : 1.0);
     
     // Apply current mute state to new video
     video.muted = this.isMuted;
@@ -2538,6 +2543,31 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         tracks[i].mode = 'disabled'; // Always disabled - we use global container
       }
     });
+  }
+
+  /**
+   * Change playback rate for all videos
+   */
+  changePlaybackRate(rate: number): void {
+    this.currentPlaybackRate = rate;
+    
+    // Apply playback rate to all video elements in video overlays
+    this.videoOverlays.forEach(overlay => {
+      const video = overlay.querySelector('video');
+      if (video) {
+        video.playbackRate = rate;
+      }
+    });
+
+    // Also apply to current video if it exists
+    if (this.currentVideo) {
+      this.currentVideo.playbackRate = rate;
+    }
+
+    // Apply to currently playing video if it exists and is different from current video
+    if (this.currentlyPlayingVideo && this.currentlyPlayingVideo !== this.currentVideo) {
+      this.currentlyPlayingVideo.playbackRate = rate;
+    }
   }
 
 }
