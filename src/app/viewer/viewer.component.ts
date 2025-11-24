@@ -36,6 +36,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   videoProgress: number = 0;
   videoDuration: number = 0;
   dragPosition = { x: 0, y: 0 };
+<<<<<<< Updated upstream
   isMenuOpen: boolean = false;
   isAboutModalOpen: boolean = false;
   showingChat: boolean = false;
@@ -54,6 +55,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   private selectedAnnotationElement: HTMLElement | null = null;
   private originalBounds: any = null;
   private isViewportAdjusted: boolean = false;
+=======
+>>>>>>> Stashed changes
 
   constructor(
     private ngZone: NgZone,
@@ -128,6 +131,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           // Try different possible paths for the image service
           let imageServiceUrl = '';
 
+<<<<<<< Updated upstream
           // Try the standard IIIF structure
           if (element.images && element.images[0] && element.images[0].resource && element.images[0].resource.service) {
             const service = element.images[0].resource.service;
@@ -170,6 +174,42 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           console.error('No tile sources created');
           return;
         }
+=======
+      // Initialize OpenSeadragon viewer
+      try {
+        this.viewer = new OpenSeadragon.Viewer({
+          id: "seadragon-viewer",
+          homeButton: "home",
+          fullPageButton: "full-page",
+          nextButton: "next",
+          previousButton: "previous",
+          sequenceMode: true,
+          showHomeControl: true,
+          blendTime: 0.5,
+          springStiffness: 6.5,       
+          animationTime: 1.5,         
+          immediateRender: false, 
+          showZoomControl: false,
+          showFullPageControl: true,
+          showRotationControl: false,
+          showFlipControl: false,
+          showSequenceControl: true,
+          navigatorBackground: "black",
+          backgroundColor: 'black',
+          prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+          tileSources: tileSources
+        });
+
+        // Also set the canvas element background color directly
+        this.viewer.addHandler('open', () => {
+          const canvas = this.viewer.canvas;
+          if (canvas) {
+            canvas.style.backgroundColor = 'black';
+          }
+        });
+        
+        console.log('OpenSeadragon viewer initialized successfully');
+>>>>>>> Stashed changes
 
         console.log('Final tile sources:', tileSources); // Debug log
 
@@ -313,6 +353,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error("Error loading animations data:", error);
       }
     });
+<<<<<<< Updated upstream
+=======
+
+    this.viewer.addHandler('open', function () {
+      console.log("Viewer opened successfully");
+    });
+>>>>>>> Stashed changes
   }
 
   move(x: number, y: number, width: number, height: number) {
@@ -351,6 +398,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addAnnotation(x: number, y: number, index: number, type: string) {
+<<<<<<< Updated upstream
     if (!this.viewer) {
       console.warn('Viewer not initialized, cannot add annotation');
       return;
@@ -364,6 +412,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     var elt = document.createElement("div");
     elt.className = "annotation-pin";
 
+=======
+    var elt = document.createElement("div");
+    elt.className = "annotation-pin";
+    
+>>>>>>> Stashed changes
     if (type === "multi-level") {
       elt.classList.add("multi-level");
     } else {
@@ -372,13 +425,18 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     elt.id = "annotation_" + index;
     elt.style.cursor = "pointer";
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     // Apply inline styles for immediate effect
     elt.style.width = "1px";
     elt.style.height = "1px";
     elt.style.borderRadius = "50%";
     elt.style.position = "relative";
     elt.style.transition = "all 0.1s ease";
+<<<<<<< Updated upstream
 
     // Add the visual styling based on type
     if (type === "Introduction" || type === "The political context") {
@@ -392,6 +450,23 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     var tooltip = document.createElement("div");
     tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
     tooltip.style.position = "absolute";
+=======
+    
+    // Add the visual styling based on type
+    if (type === "multi-level") {
+      elt.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%,  rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
+    } else {
+      elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%,  rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
+    }
+
+        // Create tooltip element
+    var tooltip = document.createElement("div");
+    tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
+    tooltip.style.position = "absolute";
+    tooltip.style.bottom = "100%";
+    tooltip.style.left = "50%";
+    tooltip.style.transform = "translateX(-50%)";
+>>>>>>> Stashed changes
     tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
     tooltip.style.color = "white";
     tooltip.style.padding = "8px 12px";
@@ -403,14 +478,25 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     tooltip.style.transition = "opacity 0.3s ease";
     tooltip.style.zIndex = "10000";
     tooltip.style.marginBottom = "8px";
+<<<<<<< Updated upstream
 
     // Add arrow to tooltip
     var arrow = document.createElement("div");
     arrow.style.position = "absolute";
+=======
+    
+    // Add arrow to tooltip
+    var arrow = document.createElement("div");
+    arrow.style.position = "absolute";
+    arrow.style.top = "100%";
+    arrow.style.left = "50%";
+    arrow.style.marginLeft = "-5px";
+>>>>>>> Stashed changes
     arrow.style.width = "0";
     arrow.style.height = "0";
     arrow.style.borderLeft = "5px solid transparent";
     arrow.style.borderRight = "5px solid transparent";
+<<<<<<< Updated upstream
 
     // Function to position tooltip dynamically
     // Function to position tooltip dynamically
@@ -513,6 +599,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     tooltip.appendChild(arrow);
     elt.appendChild(tooltip);
 
+=======
+    arrow.style.borderTop = "5px solid rgba(0, 0, 0, 0.9)";
+    
+    tooltip.appendChild(arrow);
+    elt.appendChild(tooltip);
+    
+    this.currentAnnotationIndex = index;
+    
+>>>>>>> Stashed changes
     this.viewer.addOverlay({
       element: elt,
       location: new OpenSeadragon.Point(x, y),
@@ -523,6 +618,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       index: index
     });
 
+<<<<<<< Updated upstream
     // Apply z-index to the OpenSeadragon wrapper element after overlay is added
     setTimeout(() => {
       const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
@@ -531,10 +627,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }, 50);
 
+=======
+>>>>>>> Stashed changes
     // Track this annotation overlay for reliable removal
     this.annotationOverlays.push(elt);
 
     // Add hover effects using JavaScript since CSS might not penetrate OpenSeadragon
+<<<<<<< Updated upstream
      elt.addEventListener('mouseenter', () => {
       // Only apply hover effects if not selected
       if (this.selectedAnnotationElement !== elt) {
@@ -561,6 +660,34 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         tooltip.style.opacity = "1";
         setTimeout(() => positionTooltip(), 10);
       }
+=======
+    elt.addEventListener('mouseenter', () => {
+      elt.style.transform = "scale(1.6)";
+      tooltip.style.opacity = "1";
+      if (type === "multi-level") {
+        elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
+        elt.style.animation = "pulse-multi 1.5s infinite";
+      } else {
+        elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0.8)";
+        elt.style.animation = "pulse 1.5s infinite";
+      }
+    });
+    
+    elt.addEventListener('mouseleave', () => {
+      elt.style.transform = "scale(1)";
+      elt.style.animation = "none";
+      tooltip.style.opacity = "0";
+      if (type === "multi-level") {
+        elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
+      } else {
+        elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0)";
+      }
+    });
+
+    new OpenSeadragon.MouseTracker({
+      element: elt,
+      clickHandler: e => this.setAnnotation(index),
+>>>>>>> Stashed changes
     });
 
     elt.addEventListener('mouseleave', () => {
@@ -602,11 +729,14 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   removeAnnotations() {
+<<<<<<< Updated upstream
     if (!this.viewer) return;
 
     // Reset selected annotation reference
     this.selectedAnnotationElement = null;
 
+=======
+>>>>>>> Stashed changes
     // Remove all tracked annotation overlays
     this.annotationOverlays.forEach(annotationElement => {
       this.viewer.removeOverlay(annotationElement);
@@ -620,7 +750,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Clear current video reference
     this.currentVideo = null;
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     // Remove all tracked video overlays
     this.videoOverlays.forEach(video => {
       this.viewer.removeOverlay(video);
@@ -652,7 +786,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.annotations[index]["annotation text 1"].length > 0) this.numPanels = 2;
     if (this.annotations[index]["annotation text 2"].length > 0) this.numPanels = 3;
     if (this.annotations[index]["annotation text 3"].length > 0) this.numPanels = 4;
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     // Collect annotation images
     this.annotationImages = [];
 
@@ -762,7 +900,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   updateImagesForCurrentPanel() {
     this.annotationImages = [];
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     // Get images for the current panel
     const imageFilename = this.annotations[this.currentAnnotationIndex][`image filename ${this.panelTextIndex}`];
     if (imageFilename && imageFilename.trim() !== '') {
@@ -803,6 +945,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.updateImagesForCurrentPanel();
       }
     }
+    // Update images for the new panel
+    this.updateImagesForCurrentPanel();
   }
 
   nextPanel() {
@@ -838,6 +982,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.updateImagesForCurrentPanel();
       }
     }
+    // Update images for the new panel
+    this.updateImagesForCurrentPanel();
   }
 
   previousAnimation() {
@@ -896,7 +1042,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
               console.warn('Play failed:', error);
             });
             this.isPlaying = true;
+<<<<<<< Updated upstream
 
+=======
+            
+>>>>>>> Stashed changes
             // Move and zoom to animation location
             this.moveToAnimation(this.animationIndex);
           }
@@ -917,7 +1067,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             console.warn('Play failed:', error);
           });
           this.isPlaying = true;
+<<<<<<< Updated upstream
 
+=======
+          
+>>>>>>> Stashed changes
           // Move and zoom to animation location
           this.moveToAnimation(this.animationIndex);
         }
@@ -926,6 +1080,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   moveToAnimation(index: number) {
+<<<<<<< Updated upstream
     if (!this.viewer || this.animations.length === 0 || index >= this.animations.length) {
       console.warn('Cannot move to animation: viewer not initialized or invalid index');
       return;
@@ -944,13 +1099,34 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Smoothly pan and zoom to the animation
     this.viewer.viewport.fitBounds(bounds, false);
+=======
+    if (this.animations.length > 0 && index < this.animations.length) {
+      const animation = this.animations[index];
+      
+      // Calculate the bounds for the animation with some padding
+      const padding = 0.1; // Add 10% padding around the animation
+      const bounds = new OpenSeadragon.Rect(
+        animation.x - (animation.width / 2) - padding,
+        animation.y - (animation.height / 2) - padding,
+        animation.width + (padding * 2),
+        animation.height + (padding * 2)
+      );
+      
+      // Smoothly pan and zoom to the animation
+      this.viewer.viewport.fitBounds(bounds, false);
+    }
+>>>>>>> Stashed changes
   }
 
   private showAllAnimations() {
     // Remove existing overlays first
     this.removeAnimations();
     this.isPlaying = false;
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     // Add all animations for current page (not playing)
     this.animations.forEach(animation => {
       this.addVideoOverlayForDisplay(
@@ -990,6 +1166,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addVideoOverlayForDisplay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+<<<<<<< Updated upstream
     // Find the animation data to get timing information
     const animation = this.animations.find(anim =>
       anim.x === x && anim.y === y && anim.videoUrl === videoUrl
@@ -1000,38 +1177,67 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       storeAsCurrentVideo: false,
       startTime: animation?.startTime,
       stopTime: animation?.stopTime
+=======
+    return this.createVideoOverlay(x, y, videoUrl, width, height, {
+      autoPlay: false,
+      storeAsCurrentVideo: false
+>>>>>>> Stashed changes
     });
   }
 
   addVideoOverlayForPlayback(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+<<<<<<< Updated upstream
     // Find the animation data to get navigation cues and timing
     // Use the current animation directly instead of searching by coordinates
     const animation = this.animations[this.animationIndex];
 
 
+=======
+    // Find the animation data to get navigation cues
+    const animation = this.animations.find(anim => 
+      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
+    );
+    
+>>>>>>> Stashed changes
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: false,
       storeAsCurrentVideo: true,
       trackProgress: true,
       playNextOnEnd: true,
+<<<<<<< Updated upstream
       navigationCues: animation?.navigationCues,
       startTime: animation?.startTime,
       stopTime: animation?.stopTime
+=======
+      navigationCues: animation?.navigationCues 
+>>>>>>> Stashed changes
     });
   }
 
   addVideoOverlayWithSequence(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
+<<<<<<< Updated upstream
     // Find the animation data to get navigation cues and timing
     const animation = this.animations[this.animationIndex];
 
+=======
+    // Find the animation data to get navigation cues
+    const animation = this.animations.find(anim => 
+      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
+    );
+    
+>>>>>>> Stashed changes
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: true,
       moveToOnLoad: true,
       playNextOnEnd: true,
       storeAsCurrentVideo: true,
+<<<<<<< Updated upstream
       navigationCues: animation?.navigationCues,
       startTime: animation?.startTime,
       stopTime: animation?.stopTime
+=======
+      navigationCues: animation?.navigationCues 
+>>>>>>> Stashed changes
     });
   }
 
@@ -1044,6 +1250,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       const nextAnimation = this.animations[this.animationIndex];
       const currentAnimation = this.animations[this.animationIndex - 1];
       console.log('Playing next animation:', nextAnimation);
+<<<<<<< Updated upstream
 
       // Check if it's the same video file
       if (currentAnimation && nextAnimation.videoUrl === currentAnimation.videoUrl && this.currentVideo) {
@@ -1119,6 +1326,33 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }, 100);
       }
+=======
+      
+      // Remove current video overlay
+      this.removeAnimations();
+      
+      // Add next video overlay
+      this.addVideoOverlayWithSequence(
+        nextAnimation.x, 
+        nextAnimation.y, 
+        nextAnimation.videoUrl, 
+        nextAnimation.width, 
+        nextAnimation.height,
+        nextAnimation.hideControls
+      );
+      // Auto-play the next video after a short delay and maintain play state
+      setTimeout(() => {
+        if (this.currentVideo) {
+          this.currentVideo.play().catch(error => {
+            console.warn('Auto-play failed:', error);
+          });
+          this.isPlaying = true; // Maintain playing state
+          
+          // Move to the animation with smooth transition
+          this.moveToAnimation(this.animationIndex);
+        }
+      }, 100);
+>>>>>>> Stashed changes
     } else {
       console.log('All animations played, sequence complete');
       // Optionally reset to first animation or show all animations
@@ -1171,6 +1405,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     moveToOnLoad?: boolean;
     playNextOnEnd?: boolean;
     navigationCues?: any[];
+<<<<<<< Updated upstream
     startTime?: number;
     stopTime?: number;
   } = {}) {
@@ -1179,6 +1414,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       return null;
     }
 
+=======
+  } = {}) {
+>>>>>>> Stashed changes
     var video = document.createElement("video");
     video.src = videoUrl;
     video.controls = false;
@@ -1186,11 +1424,14 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.style.height = "100%";
     video.style.cursor = "pointer";
 
+<<<<<<< Updated upstream
     // Set start time if specified
     if (options.startTime !== undefined) {
       video.currentTime = options.startTime;
     }
 
+=======
+>>>>>>> Stashed changes
     // Create play button overlay
     var playButton = document.createElement("div");
     playButton.innerHTML = "▶"; // Play icon
@@ -1221,6 +1462,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     container.appendChild(video);
     container.appendChild(playButton);
 
+<<<<<<< Updated upstream
     // Handle time updates - check for stop time
     video.addEventListener('timeupdate', () => {
       // Check if we've reached the stop time
@@ -1244,6 +1486,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
+=======
+>>>>>>> Stashed changes
     // Track navigation cues if provided
     if (options.navigationCues && options.navigationCues.length > 0) {
       console.log('Navigation cues provided:', options.navigationCues);
@@ -1252,6 +1496,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
       video.addEventListener('timeupdate', () => {
         const currentTime = video.currentTime;
+<<<<<<< Updated upstream
 
         // Check if we've reached the next navigation cue
         if (currentCueIndex < navigationCues.length) {
@@ -1269,6 +1514,38 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       // Reset cue index when video starts over or is seeked
+=======
+        
+        // Check if we've reached the next navigation cue
+        if (currentCueIndex < navigationCues.length) {
+          const nextCue = navigationCues[currentCueIndex];
+          
+          if (currentTime >= nextCue.time) {
+            console.log(`Navigation cue triggered at ${currentTime}s:`, nextCue.description);
+            
+            // Move the viewer to the specified location
+            this.moveToLocation(nextCue.x, nextCue.y, nextCue.width, nextCue.height);
+            
+            currentCueIndex++;
+          }
+        }
+
+        // Show preview of next navigation cue when we're 2 seconds away
+        // if (currentCueIndex < navigationCues.length) {
+        //   const nextCue = navigationCues[currentCueIndex];
+        //   if (currentTime >= (nextCue.time - 2) && currentTime < nextCue.time) {
+        //     // Only show the preview once per cue
+        //     if (!nextCue.previewShown) {
+        //       this.showNextNavigationCue(nextCue);
+        //       nextCue.previewShown = true; // Mark as shown to prevent repeated calls
+        //     }
+        //   }
+        // }
+
+      });
+
+      // Reset cue index when video starts over
+>>>>>>> Stashed changes
       video.addEventListener('seeked', () => {
         currentCueIndex = navigationCues.findIndex(cue => cue.time > video.currentTime);
         if (currentCueIndex === -1) currentCueIndex = navigationCues.length;
@@ -1291,12 +1568,16 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     // Handle play button click using OpenSeadragon MouseTracker
+<<<<<<< Updated upstream
     // Handle play button click using OpenSeadragon MouseTracker
+=======
+>>>>>>> Stashed changes
     new OpenSeadragon.MouseTracker({
       element: playButton,
       clickHandler: (event: any) => {
         console.log('Play button clicked via MouseTracker!');
         event.preventDefaultAction = true;
+<<<<<<< Updated upstream
 
         if (video.paused) {
           console.log('Playing video via MouseTracker');
@@ -1313,6 +1594,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           }
           // Otherwise, continue from current position
 
+=======
+        
+        if (video.paused) {
+          console.log('Playing video via MouseTracker');
+>>>>>>> Stashed changes
           video.play().catch(error => {
             console.warn('Play failed:', error);
           });
@@ -1328,7 +1614,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isPlaying = false;
           }
         }
+<<<<<<< Updated upstream
 
+=======
+        
+>>>>>>> Stashed changes
         return false; // Prevent further event propagation
       }
     });
@@ -1341,6 +1631,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     // Track video progress if requested
     if (options.trackProgress) {
       video.addEventListener('loadedmetadata', () => {
+<<<<<<< Updated upstream
         // Calculate effective duration (stopTime - startTime or full duration)
         const startTime = options.startTime || 0;
         const stopTime = options.stopTime || video.duration;
@@ -1353,6 +1644,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         const effectiveDuration = stopTime - startTime;
         const currentPosition = Math.max(0, video.currentTime - startTime);
         this.videoProgress = (currentPosition / effectiveDuration) * 100;
+=======
+        this.videoDuration = video.duration;
+      });
+
+      video.addEventListener('timeupdate', () => {
+        this.videoProgress = (video.currentTime / video.duration) * 100;
+>>>>>>> Stashed changes
       });
     }
 
@@ -1381,6 +1679,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
+<<<<<<< Updated upstream
     // Handle video loading and auto-play
     video.addEventListener('loadeddata', () => {
       // Set start time when video is loaded
@@ -1393,6 +1692,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           console.warn('Auto-play failed:', error);
         });
 
+=======
+    // Auto-play and move to video if requested
+    if (options.autoPlay) {
+      video.addEventListener('loadeddata', () => {
+        video.play().catch(error => {
+          console.warn('Auto-play failed:', error);
+        });
+        
+>>>>>>> Stashed changes
         if (options.moveToOnLoad) {
           // Move and zoom to this video when it starts playing
           const bounds = new OpenSeadragon.Rect(
@@ -1403,10 +1711,19 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           );
           this.viewer.viewport.fitBounds(bounds, !options.playNextOnEnd); // Use immediate for sequence
         }
+<<<<<<< Updated upstream
       } else {
         console.log('Video loaded and ready to play');
       }
     });
+=======
+      });
+    } else {
+      video.addEventListener('loadeddata', () => {
+        console.log('Video loaded and ready to play');
+      });
+    }
+>>>>>>> Stashed changes
 
     // Add overlay to viewer
     this.viewer.addOverlay({
@@ -1425,11 +1742,14 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private moveToLocation(x: number, y: number, width: number, height: number, immediate: boolean = false, duration: number = 2) {
+<<<<<<< Updated upstream
     if (!this.viewer) {
       console.warn('Viewer not initialized');
       return;
     }
 
+=======
+>>>>>>> Stashed changes
     const padding = 0.05; // Add some padding around the target area
     const bounds = new OpenSeadragon.Rect(
       x - (width / 2) - padding,
@@ -1437,6 +1757,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       width + (padding * 2),
       height + (padding * 2)
     );
+<<<<<<< Updated upstream
 
     // Use custom animation timing for smoother transitions
     const currentAnimationTime = this.viewer.animationTime;
@@ -1483,12 +1804,53 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedAnnotationElement = null;
     }
 
+=======
+    
+    // Use custom animation timing for smoother transitions
+    const currentAnimationTime = this.viewer.animationTime;
+    this.viewer.animationTime = duration;
+    
+    this.viewer.viewport.fitBounds(bounds, false);
+    
+    // Restore original animation time after transition
+    setTimeout(() => {
+      this.viewer.animationTime = currentAnimationTime;
+    }, duration * 1000);
+  }
+
+  private showNextNavigationCue(cue: any) {
+    // Create a temporary highlight overlay
+    const highlight = document.createElement("div");
+    highlight.style.border = "2px dashed rgba(255, 255, 255, 0.8)";
+    highlight.style.borderRadius = "8px";
+    highlight.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+    highlight.style.pointerEvents = "none";
+    
+    // Add overlay to show next target area
+    this.viewer.addOverlay({
+      element: highlight,
+      location: new OpenSeadragon.Point(cue.x, cue.y),
+      placement: 'CENTER',
+      checkResize: false,
+      width: cue.width,
+      height: cue.height
+    });
+    
+    // Remove highlight after 2 seconds
+    setTimeout(() => {
+      this.viewer.removeOverlay(highlight);
+    }, 2000);
+  }
+
+  closeAnnotationPanel() {
+>>>>>>> Stashed changes
     this.panelText = "";
     this.annotationImages = [];
     this.panelTitle = 'Annotation Details';
     this.currentAnnotationIndex = 0;
     this.panelTextIndex = 0;
     this.numPanels = 0;
+<<<<<<< Updated upstream
 
     // Adjust viewport when panel is closed
     this.adjustViewportForPanel(false);
@@ -1722,4 +2084,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.toggleAnnotations(event.detail);
   }
 
+=======
+  }
+>>>>>>> Stashed changes
 }

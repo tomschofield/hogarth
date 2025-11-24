@@ -46,7 +46,11 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "8kb",
+<<<<<<< Updated upstream
                   "maximumError": "32kb"
+=======
+                  "maximumError": "16kb"
+>>>>>>> Stashed changes
                 }
               ],
               "outputHashing": "all"

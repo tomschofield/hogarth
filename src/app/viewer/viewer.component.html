@@ -19,12 +19,17 @@
           <mat-icon>navigate_before</mat-icon>
         </button>
 
+<<<<<<< Updated upstream
         <span class="page-counter">Painting {{ pageIndex + 1 }} in a series of 4</span>
+=======
+        <span class="page-counter">{{ pageIndex + 1 }} of 4</span>
+>>>>>>> Stashed changes
         
         <button id="next" mat-icon-button matTooltip="Next Painting">
           <mat-icon>navigate_next</mat-icon>
         </button>
       </div>
+<<<<<<< Updated upstream
     </div>
     
     <!-- Menu Button - visible on all screen sizes -->
@@ -131,6 +136,47 @@
 
     <!-- Annotation Panel - Right Side -->
     <div *ngIf="(panelText && showingAnnotations) || (panelText && currentAnnotationIndex === -1 && !showingChat)" 
+=======
+      
+      <!-- Home/Fullscreen Controls -->
+      <div class="controls-section">
+        <button id="home" mat-icon-button matTooltip="Home View">
+          <mat-icon>home</mat-icon>
+        </button>
+        <button id="full-page" mat-icon-button matTooltip="Full Screen">
+          <mat-icon>fullscreen</mat-icon>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Toggle Controls in Menu Bar -->
+    <div class="menu-toggles">
+      <mat-slide-toggle 
+        [(ngModel)]="showingAnnotations" 
+        (change)="toggleAnnotations($event.checked)"
+        class="menu-toggle">
+        Show Annotations
+      </mat-slide-toggle>
+      
+      <mat-slide-toggle 
+        [(ngModel)]="showingAnimations" 
+        (change)="toggleAnimations($event.checked)"
+        class="menu-toggle">
+        Show Animations
+      </mat-slide-toggle>
+    </div>
+  </div>
+
+  <!-- Main Content Area with Flexbox Layout - Now full height -->
+  <div class="main-content">
+    <!-- Main Viewer Container -->
+    <div id="seadragon-viewer" 
+         [style.width]="showingAnnotations && panelText ? '70%' : '100%'">
+    </div>
+
+    <!-- Annotation Panel - Right Side -->
+    <div *ngIf="panelText && showingAnnotations" 
+>>>>>>> Stashed changes
          class="annotation-panel-right">
       <mat-card style="height: 100%;">
         <mat-card-header>
@@ -155,6 +201,7 @@
           
           <div [innerHTML]="panelText" class="annotation-content"></div>
           
+<<<<<<< Updated upstream
           <!-- Exploration Buttons - Only show for default content on first painting -->
           <div *ngIf="currentAnnotationIndex === -2" class="exploration-buttons">
             <h4>Explore Further:</h4>
@@ -179,6 +226,8 @@
               </div>
             </div>
           </div>
+=======
+>>>>>>> Stashed changes
 
           <!-- Panel Navigation -->
           <div *ngIf="numPanels > 1" class="panel-navigation" style="margin-top: 20px; text-align: center;">
@@ -200,6 +249,7 @@
       </mat-card>
     </div>
 
+<<<<<<< Updated upstream
     <!-- Chat Panel - Right Side -->
     <div *ngIf="showingChat" class="chat-panel-right">
       <mat-card style="height: 100%;">
@@ -266,6 +316,8 @@
     </div>
   </div>
 
+=======
+>>>>>>> Stashed changes
   <!-- Animation Controls -->
     <div *ngIf="showingAnimations" 
         class="animation-controls" 
@@ -324,4 +376,21 @@
     </mat-card>
     </div>
 
+<<<<<<< Updated upstream
+=======
+  <!-- Video Tour Controls -->
+  <div *ngIf="showingVideoTour" class="video-tour-controls" style="position: absolute; bottom: 60px; left: 10px; z-index: 1000;">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Video Tour</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <button mat-raised-button color="warn" (click)="stopVideoTour()">
+          Stop Tour
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+>>>>>>> Stashed changes
 </section>

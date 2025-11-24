@@ -12,7 +12,11 @@
     width: 300px;
     max-height: 60vh;
     overflow-y: auto;
+<<<<<<< Updated upstream
     z-index: 10100;
+=======
+    z-index: 1000;
+>>>>>>> Stashed changes
 
     mat-card {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -32,8 +36,13 @@
     position: fixed;
     bottom: 20px;
     left: 20px;
+<<<<<<< Updated upstream
     width: 280px;
     z-index: 10100;
+=======
+    width: 320px;
+    z-index: 1000;
+>>>>>>> Stashed changes
     cursor: move;
     
     // Remove the hover transform since it interferes with dragging
@@ -49,11 +58,19 @@
     mat-card {
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         border-radius: 16px;
+<<<<<<< Updated upstream
         background: #862633;
         color: white;
 
         mat-card-content {
             padding: 10px;
+=======
+        background: linear-gradient(135deg, #862633 0%, #af5e20 100%);
+        color: white;
+
+        mat-card-content {
+            padding: 20px;
+>>>>>>> Stashed changes
         }
     }
 }
@@ -88,9 +105,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+<<<<<<< Updated upstream
     gap: 2px;
     margin-top: 8px;
     font-family: "Figgins", serif;
+=======
+    gap: 12px;
+     margin-top: 8px;
+>>>>>>> Stashed changes
 
     .animation-title {
         font-size: 16px;
@@ -234,7 +256,11 @@
     top: 0;
     left: 0;
     right: 0;
+<<<<<<< Updated upstream
     z-index: 101003;
+=======
+    z-index: 1000;
+>>>>>>> Stashed changes
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -270,8 +296,14 @@
         order: 1;
     }
     .painting-title {
+<<<<<<< Updated upstream
         font-family: "Requiem Text", serif;
         font-size: 2rem;
+=======
+        font-family: "Ballet", cursive;
+        font-size: 3rem;
+        font-weight: 700;
+>>>>>>> Stashed changes
         letter-spacing: 1.2px;
         color: white;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
@@ -331,15 +363,21 @@
 
 .page-counter {
     font-size: 14px;
+<<<<<<< Updated upstream
     font-family: "Figgins", serif;
     font-weight: 400;
     color: #ffffff;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+=======
+    font-weight: 500;
+    color: #dbdbdb;
+>>>>>>> Stashed changes
     min-width: 40px;
     text-align: center;
 }
 
+<<<<<<< Updated upstream
 // Mobile/Desktop visibility utilities
 .desktop-only {
     @media (max-width: 768px) {
@@ -487,11 +525,64 @@
                     margin-right: 8px;
                     color: white;
                 }
+=======
+.menu-toggles {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 0 20px;
+
+    @media (max-width: 768px) {
+        order: 4;
+        justify-content: center;
+        margin: 10px 0;
+        gap: 15px;
+    }
+    
+    .menu-toggle {
+        color: white;
+        
+        ::ng-deep .mat-slide-toggle-label {
+            color: white !important;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+        }
+
+        ::ng-deep .mdc-form-field > label {
+            color: white !important;
+        }
+        
+        ::ng-deep .mat-mdc-slide-toggle .mdc-form-field {
+            color: white !important;
+        }
+        
+        ::ng-deep .mat-slide-toggle-bar {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        ::ng-deep .mat-slide-toggle-thumb {
+            background-color: white;
+        }
+        
+        ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+            background-color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            ::ng-deep .mat-slide-toggle-label {
+                font-size: 12px;
+>>>>>>> Stashed changes
             }
         }
     }
 }
 
+<<<<<<< Updated upstream
 // Modal animations
 @keyframes fadeIn {
     from {
@@ -523,6 +614,14 @@
   gap: 8px;
   padding: 10px;
   z-index: 50; // Ensure it's below the menu but above content
+=======
+.controls-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+>>>>>>> Stashed changes
 
   @media (max-width: 768px) , 
          (max-height: 768px) and (orientation: landscape) {
@@ -532,6 +631,7 @@
   button {
     color: white;
     background-color: rgba(255, 255, 255, 0.1);
+<<<<<<< Updated upstream
     width: 48px; // Make buttons consistent size
     height: 48px;
 
@@ -566,6 +666,8 @@
     background-color: rgba(255, 255, 255, 0.1);
     width: 48px; // Make buttons consistent size
     height: 48px;
+=======
+>>>>>>> Stashed changes
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.2);
@@ -592,7 +694,10 @@
 
 #seadragon-viewer {
     height: 100%; 
+<<<<<<< Updated upstream
     width: 100%;
+=======
+>>>>>>> Stashed changes
     background-color: #000000; 
     color: #333; 
     transition: width 0.3s ease;
@@ -608,7 +713,10 @@
     a {
         color: #1976d2;
         text-decoration: underline;
+<<<<<<< Updated upstream
         font-family: "Figgins", serif;
+=======
+>>>>>>> Stashed changes
         cursor: pointer;
 
         &:hover {
@@ -624,6 +732,7 @@
 
 .annotation-panel-right {
     position: absolute;
+<<<<<<< Updated upstream
     top: 150px; 
     right: 0;
     width: 30%;
@@ -633,6 +742,17 @@
     // background-color: white;
     z-index: 10100;
     // box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+=======
+    top: 80px; 
+    right: 0;
+    width: 30%;
+    height: calc(100% - 80px); 
+    overflow-y: auto;
+    padding: 10px;
+    background-color: white;
+    z-index: 100;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+>>>>>>> Stashed changes
 
     @media (max-width: 768px) and (orientation: portrait) {
         top: auto;
@@ -642,6 +762,7 @@
         width: 100%;
         height: 40vh;
         max-height: 50vh;
+<<<<<<< Updated upstream
         background-color: white;
         box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
         padding: 0px;
@@ -670,12 +791,19 @@
         -webkit-font-smoothing: antialiased;
     }
 
+=======
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        border-top: 1px solid #ddd;
+    }
+
+>>>>>>> Stashed changes
     .annotation-content {
 
         // Ensure links are clickable and don't interfere with panel interactions
         a {
             pointer-events: auto;
         }
+<<<<<<< Updated upstream
         
         button {
             font-family: "Figgins", serif;
@@ -691,10 +819,13 @@
             }
         }
 
+=======
+>>>>>>> Stashed changes
     }
 
     .close-button {
         position: absolute;
+<<<<<<< Updated upstream
         top: 2px;
         right: 2px;
         color: rgba(0, 0, 0, 0.6);
@@ -715,6 +846,23 @@
         text-align: center;
         padding: 20px;
     }
+=======
+        top: -2px;
+        right: 8px;
+        color: rgba(0, 0, 0, 0.6);
+        
+        &:hover {
+        color: rgba(0, 0, 0, 0.8);
+        background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        }
+    }
+>>>>>>> Stashed changes
 }
 
 // Annotation pin styles
@@ -722,16 +870,25 @@
     border-radius: 50% !important;
     position: relative !important;
     cursor: pointer !important;
+<<<<<<< Updated upstream
     z-index: 9999 !important;
     
     /* Base styles for single-level annotations */
     &.single-level {
         background: radial-gradient(circle, #1976d2 30%, rgba(71, 151, 168, 0.8) 60%, rgba(71, 151, 168, 0.4) 10%) !important;
         box-shadow: 0 0 10px rgba(71, 151, 168, 0.5) !important;
+=======
+    
+    /* Base styles for single-level annotations */
+    &.single-level {
+        background: radial-gradient(circle, #1976d2 30%, rgba(25, 118, 210, 0.8) 60%, rgba(25, 118, 210, 0.4) 10%) !important;
+        box-shadow: 0 0 10px rgba(25, 118, 210, 0.5) !important;
+>>>>>>> Stashed changes
     }
     
     /* Base styles for multi-level annotations */
     &.multi-level {
+<<<<<<< Updated upstream
         background: radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%, rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%) !important;
         box-shadow: 0 0 10px rgba(255, 169, 24, 0.5) !important;
     }
@@ -948,11 +1105,30 @@
         &.hogarth-message .message-bubble {
             max-width: 90%;
         }
+=======
+        background: radial-gradient(circle, #862633 30%, rgba(134, 38, 51, 0.8) 60%, rgba(134, 38, 51, 0.4) 10%) !important;
+        box-shadow: 0 0 10px rgba(134, 38, 51, 0.5) !important;
+    }
+    
+    /* Inner dot for more definition */
+    &::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 8px !important;
+        height: 8px !important;
+        border-radius: 50% !important;
+        background: white !important;
+        opacity: 0.9 !important;
+>>>>>>> Stashed changes
     }
 }
 
 @keyframes pulse {
   0% {
+<<<<<<< Updated upstream
     box-shadow: 0 0 0 0 rgba(71, 151, 168, 0.7);
   }
   50% {
@@ -960,6 +1136,15 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(71, 151, 168, 0);
+=======
+    box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(25, 118, 210, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(25, 118, 210, 0);
+>>>>>>> Stashed changes
   }
 }
 
@@ -972,6 +1157,7 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(134, 38, 51, 0);
+<<<<<<< Updated upstream
   }
 }
 
@@ -984,5 +1170,7 @@
   }
   100% {
     box-shadow: 0 0 15px rgba(227, 82, 5, 0.9);
+=======
+>>>>>>> Stashed changes
   }
 }

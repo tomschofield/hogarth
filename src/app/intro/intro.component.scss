@@ -15,7 +15,11 @@
 }
 
 .intro-title {
+<<<<<<< Updated upstream
   font-family: "Requiem Text", serif;
+=======
+  font-family: "Ballet", cursive;
+>>>>>>> Stashed changes
   letter-spacing: 1.2px;
   position: absolute;
   top: 0;
@@ -25,19 +29,29 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   margin: 0;
   z-index: 2;
+<<<<<<< Updated upstream
   font-size: 2rem;
+=======
+  font-size: 3rem;
+>>>>>>> Stashed changes
   padding: 2rem 2rem 1.5rem 1.5rem;
   text-align: left;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.3) 100%);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+<<<<<<< Updated upstream
   min-height: 90px;
   box-sizing: border-box;
 
   @media (max-width: 768px) {
     font-size: 2rem;
     min-height: 140px; 
+=======
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+>>>>>>> Stashed changes
   }
 
   .pause-button,
@@ -93,7 +107,11 @@
   .title-controls {
     position: absolute;
     top: 1.5rem; 
+<<<<<<< Updated upstream
     right: 4.5rem; 
+=======
+    right: 2rem; 
+>>>>>>> Stashed changes
     display: flex;
     align-items: center;
     gap: 8px;
@@ -103,6 +121,7 @@
     }
   }
 
+<<<<<<< Updated upstream
   // Menu button container - always visible, positioned independently
   .menu-button-container {
     position: absolute;
@@ -157,6 +176,8 @@
     }
   }
 
+=======
+>>>>>>> Stashed changes
   // Add thin white line under the title
   &::after {
     content: '';
@@ -227,8 +248,13 @@
   button[mat-raised-button] {
     background: rgba(0, 0, 0, 0.7) !important;
     color: white !important;
+<<<<<<< Updated upstream
     font-size: 25px !important;
     font-family: "Requiem Text", serif !important;
+=======
+    font-size: 45px !important;
+    font-family: "ballet", cursive !important;
+>>>>>>> Stashed changes
     font-weight: 600 !important;
     padding: 26px 32px !important;
     min-height: 96px !important;
@@ -295,6 +321,7 @@
   transform: translateX(-50%);
   z-index: 10;
 }
+<<<<<<< Updated upstream
 
 // Menu button - visible on all screen sizes, positioned like viewer page
 .menu-button {
@@ -413,3 +440,5 @@
     opacity: 1;
   }
 }
+=======
+>>>>>>> Stashed changes
