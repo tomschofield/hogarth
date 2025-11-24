@@ -18,13 +18,10 @@ export class IntroComponent implements AfterViewInit {
   adaptiveVideoUrl = '';
   private orientationChangeListener?: () => void;
   private currentTime = 0;
-<<<<<<< Updated upstream
   
   // Menu properties
   isMenuOpen: boolean = false;
   isAboutModalOpen: boolean = false;
-=======
->>>>>>> Stashed changes
 
   constructor(private router: Router) { 
     this.adaptiveVideoUrl = this.getOptimalVideoUrl('assets/videos/Hogarth.mp4');
@@ -33,8 +30,6 @@ export class IntroComponent implements AfterViewInit {
   ngAfterViewInit() {
     // Set the adaptive video source
     this.videoElement.nativeElement.src = this.adaptiveVideoUrl;
-    // Start muted for autoplay compliance, will unmute after user interaction
-    this.videoElement.nativeElement.muted = true;
     // Ensure video plays after view init
     this.playVideo();
     this.setupVideoProgressTracking();
@@ -68,19 +63,17 @@ export class IntroComponent implements AfterViewInit {
     if (newVideoUrl !== this.adaptiveVideoUrl) {
       const video = this.videoElement.nativeElement;
       
-      // Store current playback time, state, and audio settings
+      // Store current playback time and state
       this.currentTime = video.currentTime;
       const wasPlaying = !video.paused;
-      const wasMuted = video.muted;
       
       // Update the video source
       this.adaptiveVideoUrl = newVideoUrl;
       video.src = this.adaptiveVideoUrl;
       
-      // When the new video loads, restore playback position, state, and audio
+      // When the new video loads, restore playback position and state
       const loadedHandler = () => {
         video.currentTime = this.currentTime;
-        video.muted = wasMuted; // Preserve audio settings
         
         if (wasPlaying && !this.isVideoPaused) {
           video.play().catch(console.error);
@@ -121,56 +114,10 @@ export class IntroComponent implements AfterViewInit {
     });
   }
 
-  onProgressBarClick(event: MouseEvent) {
-    const video = this.videoElement.nativeElement;
-    
-    // Only allow seeking if video has loaded and has a valid duration
-    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
-      return;
-    }
-
-    const progressBar = event.currentTarget as HTMLElement;
-    const rect = progressBar.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const progressBarWidth = rect.width;
-    
-    // Calculate the percentage of the progress bar that was clicked
-    const clickPercentage = Math.max(0, Math.min(1, clickX / progressBarWidth));
-    
-    // Convert to video time and seek
-    const targetTime = clickPercentage * video.duration;
-    this.seekToTime(targetTime);
-  }
-
-  private seekToTime(targetTime: number) {
-    const video = this.videoElement.nativeElement;
-    
-    // Ensure video is not loading and has valid duration
-    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
-      return;
-    }
-
-    // Clamp target time to valid range
-    const clampedTime = Math.max(0, Math.min(targetTime, video.duration));
-    
-    // Store the current play state
-    const wasPlaying = !video.paused && !this.isVideoPaused;
-    
-    // Seek to the target time
-    video.currentTime = clampedTime;
-    
-    // Maintain play state after seeking
-    if (wasPlaying) {
-      video.play().catch(console.error);
-    }
-  }
-
   toggleVideoPause() {
     const video = this.videoElement.nativeElement;
     
     if (this.isVideoPaused) {
-      // Ensure audio is enabled when resuming
-      video.muted = false;
       video.play();
       this.isVideoPaused = false;
     } else {
@@ -181,11 +128,8 @@ export class IntroComponent implements AfterViewInit {
 
   async playVideo() {
     try {
-      const video = this.videoElement.nativeElement;
-      // Unmute the video when user initiates playback
-      video.muted = false;
-      await video.play();
-      console.log('Video started playing with audio');
+      await this.videoElement.nativeElement.play();
+      console.log('Video started playing');
       this.showPlayButton = false;
       this.isVideoPaused = false;
     } catch (error) {
@@ -196,8 +140,6 @@ export class IntroComponent implements AfterViewInit {
   }
 
   onPlayButtonClick() {
-    // Ensure audio is enabled when user clicks play
-    this.videoElement.nativeElement.muted = false;
     this.playVideo();
   }
 
@@ -232,49 +174,21 @@ export class IntroComponent implements AfterViewInit {
     // Pause the video and skip to the end
     const video = this.videoElement.nativeElement;
     video.pause();
+    video.currentTime = video.duration;
     
-    // Check if video duration is available
-    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
-      // If duration is not available, just show the content immediately
-      this.onVideoEnded();
-      return;
-    }
-    
-    // Wait for the video to seek to the end frame before showing content
-    const onSeeked = () => {
-      // Give Safari a moment to render the frame
-      setTimeout(() => {
-        this.onVideoEnded();
-      }, 100);
-      video.removeEventListener('seeked', onSeeked);
-    };
-    
-    // Add a timeout fallback in case seeking fails
-    const timeoutId = setTimeout(() => {
-      video.removeEventListener('seeked', onSeeked);
-      this.onVideoEnded();
-    }, 1000);
-    
-    video.addEventListener('seeked', () => {
-      clearTimeout(timeoutId);
-      onSeeked();
-    });
-    
-    // Seek to just before the end to ensure we get a valid frame
-    video.currentTime = Math.max(0, video.duration - 0.1);
+    // Trigger the same behavior as when video ends
+    this.onVideoEnded();
   }
 
   playAgain() {
     // Reset the video to beginning and play again
     const video = this.videoElement.nativeElement;
     video.currentTime = 0;
-    video.muted = false; // Ensure audio is enabled
     this.showContent = false;
     this.showStartButton = false;
     this.playVideo();
   }
 
-<<<<<<< Updated upstream
   // Menu functionality methods
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
@@ -297,6 +211,4 @@ export class IntroComponent implements AfterViewInit {
   onModalClose() {
     this.isAboutModalOpen = false;
   }
-=======
->>>>>>> Stashed changes
 }

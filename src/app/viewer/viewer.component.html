@@ -39,7 +39,9 @@
   </div>
 
   <div class="left-controls-section">
-
+    <button id="info" mat-icon-button matTooltip="About this painting" (click)="showIntroduction()">
+      <span style="font-size: 18px; font-weight: bold; font-style: italic; transform: translateY(-2px); display: inline-block;">i</span>
+    </button>
   </div>
   <!-- Home/Fullscreen Controls -->
   <div class="controls-section">
@@ -47,9 +49,9 @@
       (click)="toggleAnimations(!showingAnimations)">
       <mat-icon>movie_filter</mat-icon>
     </button>
-    <button id="annotations-toggle" mat-icon-button matTooltip="Notes" [class.active]="showingAnnotations"
+    <button id="annotations-toggle" mat-icon-button matTooltip="Annotations" [class.active]="showingAnnotations"
       (click)="toggleAnnotations(!showingAnnotations)">
-      <img src="assets/icons/push_pin_white.svg" alt="Notes" style="width: 24px; height: 24px;">
+      <mat-icon>info_outline</mat-icon>
     </button>
     <button id="help" mat-icon-button matTooltip="Help" (click)="showHelp()">
       <span style="font-size: 18px; font-weight: bold; transform: translateY(-2px); display: inline-block;">?</span>
@@ -73,63 +75,31 @@
     <div class="menu-content">
       <h3>William Hogarth's Humours of an Election</h3>
       
-      <!-- Mobile Controls Section -->
-      <div class="mobile-controls-section mobile-only">
-        <div class="menu-item">
-          <button mat-stroked-button 
-                  color="primary"
-                  [class.active]="showingAnimations"
-                  (click)="toggleAnimations(!showingAnimations)"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <mat-icon style="margin-right: 8px;">movie_filter</mat-icon>
-            Animations {{ showingAnimations ? '(ON)' : '(OFF)' }}
-          </button>
-        </div>
-        <div class="menu-item">
-          <button mat-stroked-button 
-                  color="primary"
-                  [class.active]="showingAnnotations"
-                  (click)="toggleAnnotations(!showingAnnotations)"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <img src="assets/icons/push_pin_white.svg" alt="Notes" style="width: 24px; height: 24px; margin-right: 8px;">
-            Annotations {{ showingAnnotations ? '(ON)' : '(OFF)' }}
-          </button>
-        </div>
-        <div class="menu-item">
-          <button mat-stroked-button 
-                  color="primary"
-                  (click)="showHelp()"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <span style="font-size: 18px; font-weight: bold; transform: translateY(-2px); display: inline-block; margin-right: 8px;">?</span>
-            Help
-          </button>
-        </div>
-        <div class="menu-item">
-          <button mat-stroked-button 
-                  color="primary"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <mat-icon style="margin-right: 8px;">home</mat-icon>
-            Home View
-          </button>
-        </div>
-        <div class="menu-item">
-          <button mat-stroked-button 
-                  color="primary"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <mat-icon style="margin-right: 8px;">fullscreen</mat-icon>
-            Full Screen
-          </button>
-        </div>
-      </div>
-      
-      
       <div class="menu-item">
-        <button mat-stroked-button 
-                (click)="returnToIntro()"
-                class="about-button">
-           Hogarth's Introduction 
-        </button>
+        <mat-slide-toggle 
+          [(ngModel)]="showingAnimations" 
+          (change)="toggleAnimations($event.checked)"
+          class="menu-toggle">
+          Animations
+        </mat-slide-toggle>
       </div>
+
+      <div class="menu-item">
+        <mat-slide-toggle 
+          [(ngModel)]="showingAnnotations" 
+          (change)="toggleAnnotations($event.checked)"
+          class="menu-toggle">
+          Annotations
+        </mat-slide-toggle>
+      </div>
+      <!-- <div class="menu-item">
+        <mat-slide-toggle 
+          [(ngModel)]="showingChat" 
+          (change)="toggleChat($event.checked)"
+          class="menu-toggle">
+          Ask Hogarth
+        </mat-slide-toggle>
+      </div> -->
 
       <div class="menu-item">
         <button mat-stroked-button 
@@ -152,13 +122,6 @@
     (closeModal)="closeAboutModal()">
   </app-acknowledgments-modal>
 
-  <!-- Intro Modal -->
-  <app-intro-modal 
-    [isOpen]="isIntroModalOpen"
-    [paintingIndex]="pageIndex"
-    (closeModal)="closeIntroModal()">
-  </app-intro-modal>
-
   <!-- Main Content Area with Flexbox Layout - Now full height -->
   <div class="main-content">
     <!-- Main Viewer Container -->
@@ -167,7 +130,7 @@
     </div>
 
     <!-- Annotation Panel - Right Side -->
-    <div *ngIf="(panelText && showingAnnotations && currentAnnotationIndex !== -1) || (panelText && currentAnnotationIndex === -1 && !showingChat && showIntroductionPanel)" 
+    <div *ngIf="(panelText && showingAnnotations) || (panelText && currentAnnotationIndex === -1 && !showingChat)" 
          class="annotation-panel-right">
       <mat-card style="height: 100%;">
         <mat-card-header>
@@ -350,48 +313,15 @@
                     class="control-button">
                 <mat-icon>skip_next</mat-icon>
             </button>
-            
-            <div style="display: flex; align-items: center;">
-            
-              <!-- Mute Toggle -->
-              <button mat-icon-button 
-                      (click)="toggleMute()"
-                      [class.active]="!isMuted"
-                      class="control-button mute-button control-button-sm"
-                      matTooltip="Toggle Audio"
-                      style="border: none; background: none;">
-                  <mat-icon>{{ isMuted ? 'volume_off' : 'volume_up' }}</mat-icon>
-              </button>
-
-              <!-- Subtitle Toggle -->
-              <button mat-icon-button 
-                      *ngIf="currentAnimationHasSubtitles()"
-                      (click)="toggleSubtitles()"
-                      [class.active]="subtitlesEnabled"
-                      class="control-button subtitle-button control-button-sm"
-                      matTooltip="Toggle Subtitles"
-                      style="border: none; background: none;">
-                  <mat-icon>{{ subtitlesEnabled ? 'closed_caption' : 'closed_caption_disabled' }}</mat-icon>
-              </button>
-
             </div>
-          </div>
             
             <!-- Progress Bar (optional) -->
-            <div class="progress-container" 
-                 *ngIf="isPlaying"
-                 (click)="onProgressBarClick($event)">
-            <mat-progress-bar mode="determinate" [value]="videoProgress"></mat-progress-bar>
+            <div class="progress-container" *ngIf="isPlaying">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
             </div>
         </div>
         </mat-card-content>
     </mat-card>
-    </div>
-
-    <!-- Global Subtitle Container -->
-    <div #globalSubtitleContainer 
-         class="global-subtitle-container"
-         [style.display]="'none'">
     </div>
 
 </section>

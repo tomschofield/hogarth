@@ -16,7 +16,6 @@
 
 .intro-title {
   font-family: "Requiem Text", serif;
-  font-style: italic;
   letter-spacing: 1.2px;
   position: absolute;
   top: 0;
@@ -180,11 +179,6 @@
     width: 100vw;
     height: 2px; // Slightly thicker for better visibility
     z-index: 3;
-    cursor: pointer; // Make it clear the progress bar is clickable
-    
-    // Add a slightly larger click area for better UX
-    padding: 8px 0;
-    margin: -8px 0;
 
     .video-progress-bar {
       height: 3px;

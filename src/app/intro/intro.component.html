@@ -2,6 +2,7 @@
   <video #backgroundVideo 
        class="background-video"
        autoplay 
+       muted 
        playsinline
        (canplay)="onVideoCanPlay()"
        (error)="onVideoError($event)"
@@ -9,9 +10,7 @@
   </video>
   
   <h1 class="intro-title">William Hogarth's Humours of an Election
-    <div class="progress-bar-container" 
-         *ngIf="!isVideoLoading && !showContent"
-         (click)="onProgressBarClick($event)">
+    <div class="progress-bar-container" *ngIf="!isVideoLoading && !showContent">
       <mat-progress-bar mode="determinate" [value]="videoProgress" class="video-progress-bar"></mat-progress-bar>
     </div>
     <div class="title-controls" *ngIf="!showPlayButton">
