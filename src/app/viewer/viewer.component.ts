@@ -1,8 +1,10 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
 import { CanvasDatum } from '../canvas-datum';
+import { Animation } from '../models/animation.interface';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
 declare var OpenSeadragon: any;
 
@@ -16,8 +18,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   panelText: string = "";
   canvasData: CanvasDatum[] = [];
   annotations: any[] = [];
-  animations: any[] = [];
-  allAnimations: any[] = [];
+  animations: Animation[] = [];
+  allAnimations: Animation[] = [];
   pageIndex: number = 0;
   panelTextIndex: number = 0;
   panelTitle: string = 'Annotation Details';
@@ -30,16 +32,24 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   numAnimations: number = 0;
   private videoOverlays: any[] = [];
   private annotationOverlays: any[] = [];
+  private infoMarkerOverlays: any[] = [];
   private currentVideo: HTMLVideoElement | null = null;
+  private videoVisibilityState: Map<HTMLVideoElement, boolean> = new Map();
+  private currentlyPlayingVideo: HTMLVideoElement | null = null;
   isPlaying: boolean = false;
   annotationImages: string[] = [];
   videoProgress: number = 0;
   videoDuration: number = 0;
   dragPosition = { x: 0, y: 0 };
-<<<<<<< Updated upstream
   isMenuOpen: boolean = false;
   isAboutModalOpen: boolean = false;
+  isIntroModalOpen: boolean = false;
+  private hasShownInitialIntro: boolean = false;
+  private shownIntroForPaintings: Set<number> = new Set();
   showingChat: boolean = false;
+  showIntroductionPanel: boolean = false;
+  subtitlesEnabled: boolean = true; // Subtitles enabled by default
+  isMuted: boolean = false; // Audio mute state
   chatMessages: {
     message: string,
     isUser: boolean,
@@ -55,10 +65,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   private selectedAnnotationElement: HTMLElement | null = null;
   private originalBounds: any = null;
   private isViewportAdjusted: boolean = false;
-=======
->>>>>>> Stashed changes
+
+  @ViewChild('globalSubtitleContainer', { static: true }) globalSubtitleContainer!: ElementRef<HTMLDivElement>;
 
   constructor(
+    private router: Router,
     private ngZone: NgZone,
     private manifestService: ManifestService,
     private annotationsService: AnnotationsService,
@@ -110,6 +121,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // Disable any existing video subtitle tracks
+    this.disableAllVideoTracks();
+
     this.manifestService.getData().subscribe({
       next: (res) => {
         console.log('Canvas data received:', res); // Debug log
@@ -131,7 +145,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           // Try different possible paths for the image service
           let imageServiceUrl = '';
 
-<<<<<<< Updated upstream
           // Try the standard IIIF structure
           if (element.images && element.images[0] && element.images[0].resource && element.images[0].resource.service) {
             const service = element.images[0].resource.service;
@@ -174,42 +187,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           console.error('No tile sources created');
           return;
         }
-=======
-      // Initialize OpenSeadragon viewer
-      try {
-        this.viewer = new OpenSeadragon.Viewer({
-          id: "seadragon-viewer",
-          homeButton: "home",
-          fullPageButton: "full-page",
-          nextButton: "next",
-          previousButton: "previous",
-          sequenceMode: true,
-          showHomeControl: true,
-          blendTime: 0.5,
-          springStiffness: 6.5,       
-          animationTime: 1.5,         
-          immediateRender: false, 
-          showZoomControl: false,
-          showFullPageControl: true,
-          showRotationControl: false,
-          showFlipControl: false,
-          showSequenceControl: true,
-          navigatorBackground: "black",
-          backgroundColor: 'black',
-          prefixUrl: "//openseadragon.github.io/openseadragon/images/",
-          tileSources: tileSources
-        });
-
-        // Also set the canvas element background color directly
-        this.viewer.addHandler('open', () => {
-          const canvas = this.viewer.canvas;
-          if (canvas) {
-            canvas.style.backgroundColor = 'black';
-          }
-        });
-        
-        console.log('OpenSeadragon viewer initialized successfully');
->>>>>>> Stashed changes
 
         console.log('Final tile sources:', tileSources); // Debug log
 
@@ -235,7 +212,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             navigatorBackground: "black",
             backgroundColor: 'black',
             prefixUrl: "//openseadragon.github.io/openseadragon/images/",
-            tileSources: tileSources
+            tileSources: tileSources,
+            // Initial zoom and positioning to prevent top menu from covering painting
+            defaultZoomLevel: 0.6,
+            minZoomLevel: 0.5,
+            maxZoomLevel: 3.0,
+            visibilityRatio: 0.8,
+            constrainDuringPan: false,
+            centerVertically: false,
+            homeFillsViewer: false 
           });
 
           // Only proceed if viewer was successfully created
@@ -262,8 +247,17 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             this.pageIndex = event.page;
             console.log("now on page ", this.pageIndex);
 
+            // Show intro modal for each new painting only if not shown before
+            if (!this.shownIntroForPaintings.has(this.pageIndex)) {
+              this.openIntroModal();
+              this.shownIntroForPaintings.add(this.pageIndex);
+            }
+
             // Reset current annotation index to show default content
             this.currentAnnotationIndex = -1;
+            
+            // Reset introduction panel display state when changing pages
+            this.showIntroductionPanel = false;
 
             // Set default annotation panel content for each painting
             this.setDefaultAnnotationContent();
@@ -315,6 +309,17 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     
     const checkAndAutoToggle = () => {
       if (annotationsLoaded && animationsLoaded) {
+        // Show intro modal for the first painting when everything is loaded (only on initial load)
+        if (!this.hasShownInitialIntro) {
+          setTimeout(() => {
+            if (!this.shownIntroForPaintings.has(this.pageIndex)) {
+              this.openIntroModal();
+              this.shownIntroForPaintings.add(this.pageIndex);
+            }
+            this.hasShownInitialIntro = true;
+          }, 500);
+        }
+        
         // Both data sets are loaded, now we can safely auto-toggle
         setTimeout(() => {
           // Toggle animations on after 1 second
@@ -348,18 +353,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.allAnimations = res;  // Store all animations here
         this.animations = res;     // Keep this for backward compatibility
         this.numAnimations = this.animations.length;
+        animationsLoaded = true;
+        checkAndAutoToggle();
       },
       error: (error) => {
         console.error("Error loading animations data:", error);
       }
     });
-<<<<<<< Updated upstream
-=======
-
-    this.viewer.addHandler('open', function () {
-      console.log("Viewer opened successfully");
-    });
->>>>>>> Stashed changes
   }
 
   move(x: number, y: number, width: number, height: number) {
@@ -395,10 +395,12 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       index++;
     });
+
+    // Add info marker to the current painting
+    this.addInfoMarker();
   }
 
   addAnnotation(x: number, y: number, index: number, type: string) {
-<<<<<<< Updated upstream
     if (!this.viewer) {
       console.warn('Viewer not initialized, cannot add annotation');
       return;
@@ -412,11 +414,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     var elt = document.createElement("div");
     elt.className = "annotation-pin";
 
-=======
-    var elt = document.createElement("div");
-    elt.className = "annotation-pin";
-    
->>>>>>> Stashed changes
     if (type === "multi-level") {
       elt.classList.add("multi-level");
     } else {
@@ -425,48 +422,33 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     elt.id = "annotation_" + index;
     elt.style.cursor = "pointer";
-<<<<<<< Updated upstream
 
-=======
-    
->>>>>>> Stashed changes
     // Apply inline styles for immediate effect
-    elt.style.width = "1px";
-    elt.style.height = "1px";
-    elt.style.borderRadius = "50%";
+    elt.style.width = "20px";
+    elt.style.height = "20px";
     elt.style.position = "relative";
     elt.style.transition = "all 0.1s ease";
-<<<<<<< Updated upstream
+    elt.style.display = "block";
+    elt.style.visibility = "visible";
 
-    // Add the visual styling based on type
-    if (type === "Introduction" || type === "The political context") {
-   
-      elt.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%,  rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
-    } else {
-      elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(71, 151, 168) 40%,  rgb(71, 151, 168) 50%, rgba(0, 0, 0, 0) 54%)";
-    }
+    elt.style.backgroundSize = "contain";
+    elt.style.backgroundRepeat = "no-repeat";
+    elt.style.backgroundPosition = "center";
+
+    // Add color class based on type for potential future styling
+    // if (type === "Introduction" || type === "The political context") {
+    //   elt.classList.add("pushpin-yellow");
+    //   elt.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
+    // } else {
+    //   elt.classList.add("pushpin-blue");
+    //   elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
+    // }
+    elt.style.backgroundImage = "url('assets/icons/push_pin.svg')";
 
     // Create tooltip element
     var tooltip = document.createElement("div");
     tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
     tooltip.style.position = "absolute";
-=======
-    
-    // Add the visual styling based on type
-    if (type === "multi-level") {
-      elt.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%,  rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
-    } else {
-      elt.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(15, 179, 255) 40%,  rgb(15, 179, 255) 50%, rgba(0, 0, 0, 0) 54%)";
-    }
-
-        // Create tooltip element
-    var tooltip = document.createElement("div");
-    tooltip.innerHTML = this.annotations[index]["annotation title"] || "Annotation";
-    tooltip.style.position = "absolute";
-    tooltip.style.bottom = "100%";
-    tooltip.style.left = "50%";
-    tooltip.style.transform = "translateX(-50%)";
->>>>>>> Stashed changes
     tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
     tooltip.style.color = "white";
     tooltip.style.padding = "8px 12px";
@@ -478,25 +460,14 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     tooltip.style.transition = "opacity 0.3s ease";
     tooltip.style.zIndex = "10000";
     tooltip.style.marginBottom = "8px";
-<<<<<<< Updated upstream
 
     // Add arrow to tooltip
     var arrow = document.createElement("div");
     arrow.style.position = "absolute";
-=======
-    
-    // Add arrow to tooltip
-    var arrow = document.createElement("div");
-    arrow.style.position = "absolute";
-    arrow.style.top = "100%";
-    arrow.style.left = "50%";
-    arrow.style.marginLeft = "-5px";
->>>>>>> Stashed changes
     arrow.style.width = "0";
     arrow.style.height = "0";
     arrow.style.borderLeft = "5px solid transparent";
     arrow.style.borderRight = "5px solid transparent";
-<<<<<<< Updated upstream
 
     // Function to position tooltip dynamically
     // Function to position tooltip dynamically
@@ -599,15 +570,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     tooltip.appendChild(arrow);
     elt.appendChild(tooltip);
 
-=======
-    arrow.style.borderTop = "5px solid rgba(0, 0, 0, 0.9)";
-    
-    tooltip.appendChild(arrow);
-    elt.appendChild(tooltip);
-    
-    this.currentAnnotationIndex = index;
-    
->>>>>>> Stashed changes
     this.viewer.addOverlay({
       element: elt,
       location: new OpenSeadragon.Point(x, y),
@@ -618,7 +580,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       index: index
     });
 
-<<<<<<< Updated upstream
     // Apply z-index to the OpenSeadragon wrapper element after overlay is added
     setTimeout(() => {
       const wrapperElement = document.querySelector(`[id*="overlay-wrapper-annotation_${index}"]`) as HTMLElement;
@@ -627,13 +588,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }, 50);
 
-=======
->>>>>>> Stashed changes
     // Track this annotation overlay for reliable removal
     this.annotationOverlays.push(elt);
 
     // Add hover effects using JavaScript since CSS might not penetrate OpenSeadragon
-<<<<<<< Updated upstream
      elt.addEventListener('mouseenter', () => {
       // Only apply hover effects if not selected
       if (this.selectedAnnotationElement !== elt) {
@@ -649,45 +607,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => positionTooltip(), 10);
 
         if (type === "multi-level") {
-          elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
-          elt.style.animation = "pulse-multi 1.5s infinite";
+          elt.classList.add("pulse-multi-hover");
         } else {
-          elt.style.boxShadow = "0 0 10px rgba(71, 151, 168, 0.8)";
-          elt.style.animation = "pulse 1.5s infinite";
+          elt.classList.add("pulse-hover");
         }
       } else {
         // Show tooltip for selected annotation
         tooltip.style.opacity = "1";
         setTimeout(() => positionTooltip(), 10);
       }
-=======
-    elt.addEventListener('mouseenter', () => {
-      elt.style.transform = "scale(1.6)";
-      tooltip.style.opacity = "1";
-      if (type === "multi-level") {
-        elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0.8)";
-        elt.style.animation = "pulse-multi 1.5s infinite";
-      } else {
-        elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0.8)";
-        elt.style.animation = "pulse 1.5s infinite";
-      }
-    });
-    
-    elt.addEventListener('mouseleave', () => {
-      elt.style.transform = "scale(1)";
-      elt.style.animation = "none";
-      tooltip.style.opacity = "0";
-      if (type === "multi-level") {
-        elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
-      } else {
-        elt.style.boxShadow = "0 0 10px rgba(15, 179, 255, 0)";
-      }
-    });
-
-    new OpenSeadragon.MouseTracker({
-      element: elt,
-      clickHandler: e => this.setAnnotation(index),
->>>>>>> Stashed changes
     });
 
     elt.addEventListener('mouseleave', () => {
@@ -700,13 +628,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           wrapperElement.style.zIndex = "9999";
         }
         
-        elt.style.animation = "none";
+        elt.classList.remove("pulse-hover", "pulse-multi-hover");
         tooltip.style.opacity = "0";
-        if (type === "multi-level") {
-          elt.style.boxShadow = "0 0 10px rgba(255, 169, 24, 0)";
-        } else {
-          elt.style.boxShadow = "0 0 10px rgba(71, 151, 168, 0)";
-        }
       } else {
         // Hide tooltip for selected annotation when not hovering
         tooltip.style.opacity = "0";
@@ -719,6 +642,62 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  addInfoMarker() {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized, cannot add info marker');
+      return;
+    }
+
+    // Calculate top left-center position for info marker
+    // For the top left-center of the painting, we'll use x=0.3 (left of center) and y=0.1 (near top)
+    const x = 0.4;
+    const y = 0.1;
+    
+    var elt = document.createElement("div");
+    elt.className = "info-marker";
+    elt.id = "info-marker";
+    elt.style.cursor = "pointer";
+    elt.innerHTML = "ⓘ Introductory note";
+
+    elt.style.borderRadius = "5px";
+    elt.style.position = "relative";
+    elt.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+    elt.style.color = "white";
+    elt.style.display = "flex";
+    elt.style.alignItems = "center";
+    elt.style.justifyContent = "center";
+    elt.style.padding = "6px 10px";
+    elt.style.fontStyle = "italic";
+    
+    // Add click handler to show introduction
+    new OpenSeadragon.MouseTracker({
+      element: elt,
+      clickHandler: e => {
+        e.preventDefaultAction = true;
+        this.showIntroduction();
+        return false;
+      },
+    });
+
+    this.viewer.addOverlay({
+      element: elt,
+      location: new OpenSeadragon.Point(x, y),
+      placement: 'CENTER',
+      checkResize: false
+    });
+
+    // Apply z-index to ensure it's visible but below annotation markers
+    setTimeout(() => {
+      const wrapperElement = elt.parentElement;
+      if (wrapperElement) {
+        wrapperElement.style.zIndex = "8000"; // Below annotation markers (9999) but above videos
+      }
+    }, 50);
+
+    // Track this info marker overlay for removal
+    this.infoMarkerOverlays.push(elt);
+  }
+
   addVideoOverlay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: true,
@@ -729,20 +708,24 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   removeAnnotations() {
-<<<<<<< Updated upstream
     if (!this.viewer) return;
 
     // Reset selected annotation reference
     this.selectedAnnotationElement = null;
 
-=======
->>>>>>> Stashed changes
     // Remove all tracked annotation overlays
     this.annotationOverlays.forEach(annotationElement => {
       this.viewer.removeOverlay(annotationElement);
     });
     // Clear the tracking array
     this.annotationOverlays = [];
+
+    // Remove all tracked info marker overlays
+    this.infoMarkerOverlays.forEach(infoMarkerElement => {
+      this.viewer.removeOverlay(infoMarkerElement);
+    });
+    // Clear the info marker tracking array
+    this.infoMarkerOverlays = [];
   }
 
   removeAnimations() {
@@ -750,17 +733,48 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Clear current video reference
     this.currentVideo = null;
-<<<<<<< Updated upstream
+    this.currentlyPlayingVideo = null;
 
-=======
-    
->>>>>>> Stashed changes
-    // Remove all tracked video overlays
+    // Clear global subtitles
+    this.clearGlobalSubtitles();
+
+    // Remove all tracked video overlays and their play buttons
     this.videoOverlays.forEach(video => {
+      // Clean up visibility state
+      this.videoVisibilityState.delete(video);
+      
+      // Remove associated play button if it exists
+      if (video._playButton && video._playButton.parentElement) {
+        video._playButton.parentElement.removeChild(video._playButton);
+      }
       this.viewer.removeOverlay(video);
     });
     // Clear the tracking array
     this.videoOverlays = [];
+  }
+
+  // Method to pause and hide all videos except the specified one (for play button interactions)
+  private pauseAndHideAllVideosExcept(excludeVideo: HTMLVideoElement | null = null) {
+    // If no video is being excluded (all videos paused), clear subtitles
+    if (!excludeVideo) {
+      this.clearGlobalSubtitles();
+    }
+    
+    this.videoOverlays.forEach(overlay => {
+      const video = overlay.querySelector('video') as HTMLVideoElement;
+      if (video && video !== excludeVideo) {
+        if (!video.paused) {
+          video.pause();
+          console.log('Paused and hiding video due to another video starting');
+        }
+        // Hide the video if it's not the one being played
+        video.style.display = "none";
+        this.videoVisibilityState.set(video, false);
+      }
+    });
+    
+    // Update currently playing video reference
+    this.currentlyPlayingVideo = excludeVideo;
   }
 
   setAnnotation(index: number) {
@@ -786,11 +800,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.annotations[index]["annotation text 1"].length > 0) this.numPanels = 2;
     if (this.annotations[index]["annotation text 2"].length > 0) this.numPanels = 3;
     if (this.annotations[index]["annotation text 3"].length > 0) this.numPanels = 4;
-<<<<<<< Updated upstream
 
-=======
-    
->>>>>>> Stashed changes
     // Collect annotation images
     this.annotationImages = [];
 
@@ -804,10 +814,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setSelectedAnnotationStyle(element: HTMLElement) {
-    // Apply selected style with orange color #E35205
-    element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, #E35205 40%, #E35205 50%, rgba(0, 0, 0, 0) 54%)";
-    element.style.boxShadow = "0 0 15px rgba(227, 82, 5, 0.9)";
-    element.style.animation = "pulse-selected 1.5s infinite";
+    // Apply selected style using orange pin SVG
+    element.style.backgroundImage = "url('assets/icons/push_pin_orange.svg')";
 
     // Update wrapper z-index for selected annotation
     const index = element.id.replace('annotation_', '');
@@ -819,17 +827,18 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private resetAnnotationStyle(element: HTMLElement) {
     // Determine original type from classes
-    const isMultiLevel = element.classList.contains("multi-level");
+    // const isYellow = element.classList.contains("pushpin-yellow");
     
-    // Reset to original style
-    if (isMultiLevel) {
-      element.style.background = "radial-gradient(circle, rgba(0, 0, 0, 0) 36%, rgb(255, 167, 15) 40%, rgb(255, 169, 20) 50%, rgba(0, 0, 0, 0) 54%)";
-    } else {
-      element.style.background = "radial-gradient(circle,rgba(0, 0, 0, 0) 36%, rgb(71, 151, 168) 40%, rgb(71, 151, 168) 50%, rgba(0, 0, 0, 0) 54%)";
-    }
-    
-    element.style.boxShadow = "none";
-    element.style.animation = "none";
+    // // Reset to original SVG style
+    // if (isYellow) {
+    //   element.style.backgroundImage = "url('assets/icons/push_pin_yellow.svg')";
+    // } else {
+    //   element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
+    // }
+    element.style.backgroundImage = "url('assets/icons/push_pin.svg')";
+
+    // Ensure all background properties are set correctly
+
 
     // Reset wrapper z-index
     const index = element.id.replace('annotation_', '');
@@ -898,18 +907,22 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  updateImagesForCurrentPanel() {
+  private loadImagesFromFilename(imageFilename: string) {
     this.annotationImages = [];
-<<<<<<< Updated upstream
+    if (imageFilename && imageFilename.trim() !== '') {
+      const filenames = imageFilename.trim().split(' ');
+      filenames.forEach(filename => {
+        if (filename.trim() !== '') {
+          this.annotationImages.push(`assets/panelImages/${filename.trim()}`);
+        }
+      });
+    }
+  }
 
-=======
-    
->>>>>>> Stashed changes
+  updateImagesForCurrentPanel() {
     // Get images for the current panel
     const imageFilename = this.annotations[this.currentAnnotationIndex][`image filename ${this.panelTextIndex}`];
-    if (imageFilename && imageFilename.trim() !== '') {
-      this.annotationImages.push(`assets/panelImages/${imageFilename}`);
-    }
+    this.loadImagesFromFilename(imageFilename);
   }
 
   previousPanel() {
@@ -931,10 +944,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           );
           // Update images for introduction
           const imageFilename = introAnnotation[`image filename ${this.panelTextIndex}`];
-          this.annotationImages = [];
-          if (imageFilename && imageFilename.trim() !== '') {
-            this.annotationImages.push(`assets/panelImages/${imageFilename}`);
-          }
+          this.loadImagesFromFilename(imageFilename);
         }
       } else {
         // For regular annotations
@@ -945,8 +955,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.updateImagesForCurrentPanel();
       }
     }
-    // Update images for the new panel
-    this.updateImagesForCurrentPanel();
   }
 
   nextPanel() {
@@ -968,10 +976,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           );
           // Update images for introduction
           const imageFilename = introAnnotation[`image filename ${this.panelTextIndex}`];
-          this.annotationImages = [];
-          if (imageFilename && imageFilename.trim() !== '') {
-            this.annotationImages.push(`assets/panelImages/${imageFilename}`);
-          }
+          this.loadImagesFromFilename(imageFilename);
         }
       } else {
         // For regular annotations
@@ -982,8 +987,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.updateImagesForCurrentPanel();
       }
     }
-    // Update images for the new panel
-    this.updateImagesForCurrentPanel();
   }
 
   previousAnimation() {
@@ -1042,11 +1045,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
               console.warn('Play failed:', error);
             });
             this.isPlaying = true;
-<<<<<<< Updated upstream
 
-=======
-            
->>>>>>> Stashed changes
             // Move and zoom to animation location
             this.moveToAnimation(this.animationIndex);
           }
@@ -1067,11 +1066,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             console.warn('Play failed:', error);
           });
           this.isPlaying = true;
-<<<<<<< Updated upstream
 
-=======
-          
->>>>>>> Stashed changes
           // Move and zoom to animation location
           this.moveToAnimation(this.animationIndex);
         }
@@ -1080,7 +1075,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   moveToAnimation(index: number) {
-<<<<<<< Updated upstream
     if (!this.viewer || this.animations.length === 0 || index >= this.animations.length) {
       console.warn('Cannot move to animation: viewer not initialized or invalid index');
       return;
@@ -1088,22 +1082,12 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const animation = this.animations[index];
 
-    // Calculate the bounds for the animation with some padding
-    const padding = 0.1; // Add 10% padding around the animation
-    const bounds = new OpenSeadragon.Rect(
-      animation.x - (animation.width / 2) - padding,
-      animation.y - (animation.height / 2) - padding,
-      animation.width + (padding * 2),
-      animation.height + (padding * 2)
-    );
-
-    // Smoothly pan and zoom to the animation
-    this.viewer.viewport.fitBounds(bounds, false);
-=======
-    if (this.animations.length > 0 && index < this.animations.length) {
-      const animation = this.animations[index];
-      
-      // Calculate the bounds for the animation with some padding
+    // Check if the animation has custom viewport properties
+    if (animation.viewportX !== undefined && animation.viewportY !== undefined && animation.viewportZoom !== undefined) {
+      // Use custom viewport positioning
+      this.moveToViewportPosition(animation.viewportX, animation.viewportY, animation.viewportZoom);
+    } else {
+      // Fall back to the original bounds-based positioning
       const padding = 0.1; // Add 10% padding around the animation
       const bounds = new OpenSeadragon.Rect(
         animation.x - (animation.width / 2) - padding,
@@ -1111,22 +1095,31 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         animation.width + (padding * 2),
         animation.height + (padding * 2)
       );
-      
+
       // Smoothly pan and zoom to the animation
       this.viewer.viewport.fitBounds(bounds, false);
     }
->>>>>>> Stashed changes
+  }
+
+  private moveToViewportPosition(x: number, y: number, zoom: number) {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized');
+      return;
+    }
+
+    // Convert the normalized coordinates (0-1) to OpenSeadragon viewport coordinates
+    const viewportPoint = new OpenSeadragon.Point(x, y);
+    
+    // Set the zoom level and center the viewport on the specified point
+    this.viewer.viewport.panTo(viewportPoint, false);
+    this.viewer.viewport.zoomTo(zoom, viewportPoint, false);
   }
 
   private showAllAnimations() {
     // Remove existing overlays first
     this.removeAnimations();
     this.isPlaying = false;
-<<<<<<< Updated upstream
 
-=======
-    
->>>>>>> Stashed changes
     // Add all animations for current page (not playing)
     this.animations.forEach(animation => {
       this.addVideoOverlayForDisplay(
@@ -1166,7 +1159,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addVideoOverlayForDisplay(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-<<<<<<< Updated upstream
     // Find the animation data to get timing information
     const animation = this.animations.find(anim =>
       anim.x === x && anim.y === y && anim.videoUrl === videoUrl
@@ -1176,68 +1168,50 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       autoPlay: false,
       storeAsCurrentVideo: false,
       startTime: animation?.startTime,
-      stopTime: animation?.stopTime
-=======
-    return this.createVideoOverlay(x, y, videoUrl, width, height, {
-      autoPlay: false,
-      storeAsCurrentVideo: false
->>>>>>> Stashed changes
+      stopTime: animation?.stopTime,
+      showInitially: false, // Keep videos hidden until play button is clicked
+      subtitles: animation?.subtitles,
+      showSubtitles: animation?.showSubtitles,
+      subtitleLanguage: animation?.subtitleLanguage
     });
   }
 
   addVideoOverlayForPlayback(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-<<<<<<< Updated upstream
     // Find the animation data to get navigation cues and timing
     // Use the current animation directly instead of searching by coordinates
     const animation = this.animations[this.animationIndex];
 
-
-=======
-    // Find the animation data to get navigation cues
-    const animation = this.animations.find(anim => 
-      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
-    );
-    
->>>>>>> Stashed changes
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: false,
       storeAsCurrentVideo: true,
       trackProgress: true,
       playNextOnEnd: true,
-<<<<<<< Updated upstream
       navigationCues: animation?.navigationCues,
       startTime: animation?.startTime,
-      stopTime: animation?.stopTime
-=======
-      navigationCues: animation?.navigationCues 
->>>>>>> Stashed changes
+      stopTime: animation?.stopTime,
+      showInitially: true, // Show video immediately for playback mode
+      subtitles: animation?.subtitles,
+      showSubtitles: animation?.showSubtitles,
+      subtitleLanguage: animation?.subtitleLanguage
     });
   }
 
   addVideoOverlayWithSequence(x: number, y: number, videoUrl: string, width: number, height: number, hideControls?: boolean) {
-<<<<<<< Updated upstream
     // Find the animation data to get navigation cues and timing
     const animation = this.animations[this.animationIndex];
 
-=======
-    // Find the animation data to get navigation cues
-    const animation = this.animations.find(anim => 
-      anim.x === x && anim.y === y && anim.videoUrl === videoUrl
-    );
-    
->>>>>>> Stashed changes
     return this.createVideoOverlay(x, y, videoUrl, width, height, {
       autoPlay: true,
       moveToOnLoad: true,
       playNextOnEnd: true,
       storeAsCurrentVideo: true,
-<<<<<<< Updated upstream
       navigationCues: animation?.navigationCues,
       startTime: animation?.startTime,
-      stopTime: animation?.stopTime
-=======
-      navigationCues: animation?.navigationCues 
->>>>>>> Stashed changes
+      stopTime: animation?.stopTime,
+      showInitially: true, // Show video immediately for sequence mode
+      subtitles: animation?.subtitles,
+      showSubtitles: animation?.showSubtitles,
+      subtitleLanguage: animation?.subtitleLanguage
     });
   }
 
@@ -1250,7 +1224,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       const nextAnimation = this.animations[this.animationIndex];
       const currentAnimation = this.animations[this.animationIndex - 1];
       console.log('Playing next animation:', nextAnimation);
-<<<<<<< Updated upstream
 
       // Check if it's the same video file
       if (currentAnimation && nextAnimation.videoUrl === currentAnimation.videoUrl && this.currentVideo) {
@@ -1326,33 +1299,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }, 100);
       }
-=======
-      
-      // Remove current video overlay
-      this.removeAnimations();
-      
-      // Add next video overlay
-      this.addVideoOverlayWithSequence(
-        nextAnimation.x, 
-        nextAnimation.y, 
-        nextAnimation.videoUrl, 
-        nextAnimation.width, 
-        nextAnimation.height,
-        nextAnimation.hideControls
-      );
-      // Auto-play the next video after a short delay and maintain play state
-      setTimeout(() => {
-        if (this.currentVideo) {
-          this.currentVideo.play().catch(error => {
-            console.warn('Auto-play failed:', error);
-          });
-          this.isPlaying = true; // Maintain playing state
-          
-          // Move to the animation with smooth transition
-          this.moveToAnimation(this.animationIndex);
-        }
-      }, 100);
->>>>>>> Stashed changes
     } else {
       console.log('All animations played, sequence complete');
       // Optionally reset to first animation or show all animations
@@ -1397,6 +1343,154 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     event.target.style.display = 'none';
   }
 
+  onProgressBarClick(event: MouseEvent) {
+    if (!this.currentVideo) {
+      return;
+    }
+
+    const video = this.currentVideo;
+    
+    // Only allow seeking if video has loaded and has a valid duration
+    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
+      return;
+    }
+
+    const progressBar = event.currentTarget as HTMLElement;
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const progressBarWidth = rect.width;
+    
+    // Calculate the percentage of the progress bar that was clicked
+    const clickPercentage = Math.max(0, Math.min(1, clickX / progressBarWidth));
+    
+    // Convert to video time and seek
+    const targetTime = clickPercentage * video.duration;
+    this.seekToTime(targetTime);
+  }
+
+  // Method to clear global subtitles
+  private clearGlobalSubtitles() {
+    if (this.globalSubtitleContainer) {
+      const globalContainer = this.globalSubtitleContainer.nativeElement;
+      globalContainer.style.display = "none";
+      globalContainer.innerHTML = "";
+    }
+  }
+
+  // Method to disable all video subtitle tracks
+  private disableAllVideoTracks() {
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = 'disabled';
+      }
+    });
+  }
+
+  // Method to load and parse WebVTT subtitle files
+  private async loadWebVTTSubtitles(vttUrl: string): Promise<any[]> {
+    try {
+      const response = await fetch(vttUrl);
+      const vttText = await response.text();
+      return this.parseWebVTT(vttText);
+    } catch (error) {
+      console.error('Error loading WebVTT file:', error);
+      return [];
+    }
+  }
+
+  // Method to parse WebVTT text into subtitle objects
+  private parseWebVTT(vttText: string): any[] {
+    const subtitles: any[] = [];
+    const lines = vttText.split('\n');
+    let i = 0;
+
+    // Skip header
+    while (i < lines.length && !lines[i].includes('-->')) {
+      i++;
+    }
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      
+      if (line.includes('-->')) {
+        const timeParts = line.split('-->');
+        const startTime = this.parseVTTTime(timeParts[0].trim());
+        const endTime = this.parseVTTTime(timeParts[1].trim());
+        
+        i++;
+        let text = '';
+        
+        // Collect subtitle text until next timestamp or end
+        while (i < lines.length && lines[i].trim() !== '' && !lines[i].includes('-->')) {
+          if (text) text += ' ';
+          text += lines[i].trim();
+          i++;
+        }
+        
+        if (text) {
+          subtitles.push({
+            start: startTime,
+            end: endTime,
+            text: text
+          });
+        }
+      } else {
+        i++;
+      }
+    }
+    
+    return subtitles;
+  }
+
+  // Helper method to parse VTT time format (HH:MM:SS.mmm)
+  private parseVTTTime(timeStr: string): number {
+    const parts = timeStr.split(':');
+    const hours = parseInt(parts[0]) || 0;
+    const minutes = parseInt(parts[1]) || 0;
+    const secondsParts = parts[2].split('.');
+    const seconds = parseInt(secondsParts[0]) || 0;
+    const milliseconds = parseInt(secondsParts[1]) || 0;
+    
+    return hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
+  }
+
+  private seekToTime(targetTime: number) {
+    if (!this.currentVideo) {
+      return;
+    }
+
+    const video = this.currentVideo;
+    
+    // Ensure video is not loading and has valid duration
+    if (!video.duration || video.duration === Infinity || isNaN(video.duration)) {
+      return;
+    }
+
+    // Get current animation to check for time bounds
+    const animation = this.animations[this.animationIndex];
+    const startTime = animation?.startTime || 0;
+    const stopTime = animation?.stopTime || video.duration;
+    
+    // Convert the target time to the bounded range
+    const effectiveDuration = stopTime - startTime;
+    const boundedTargetTime = startTime + (targetTime / video.duration) * effectiveDuration;
+    
+    // Clamp to valid range
+    const clampedTime = Math.max(startTime, Math.min(boundedTargetTime, stopTime));
+    
+    // Store the current play state
+    const wasPlaying = !video.paused;
+    
+    // Seek to the target time
+    video.currentTime = clampedTime;
+    
+    // Maintain play state after seeking
+    if (wasPlaying) {
+      video.play().catch(console.error);
+    }
+  }
+
   private createVideoOverlay(x: number, y: number, videoUrl: string, width: number, height: number, options: {
     autoPlay?: boolean;
     hideControls?: boolean;
@@ -1405,40 +1499,46 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     moveToOnLoad?: boolean;
     playNextOnEnd?: boolean;
     navigationCues?: any[];
-<<<<<<< Updated upstream
     startTime?: number;
     stopTime?: number;
+    showInitially?: boolean;
+    subtitles?: any[] | string;  // Inline subtitles or WebVTT file path
+    showSubtitles?: boolean;
+    subtitleLanguage?: string;
   } = {}) {
     if (!this.viewer) {
       console.warn('Viewer not initialized, cannot create video overlay');
       return null;
     }
 
-=======
-  } = {}) {
->>>>>>> Stashed changes
     var video = document.createElement("video");
     video.src = videoUrl;
     video.controls = false;
     video.style.width = "100%";
     video.style.height = "100%";
     video.style.cursor = "pointer";
+    
+    // Apply current mute state to new video
+    video.muted = this.isMuted;
 
-<<<<<<< Updated upstream
+    // Initially hide the video unless showInitially is true
+    if (options.showInitially) {
+      video.style.display = "block";
+      this.videoVisibilityState.set(video, true);
+    } else {
+      video.style.display = "none";
+      this.videoVisibilityState.set(video, false);
+    }
+
     // Set start time if specified
     if (options.startTime !== undefined) {
       video.currentTime = options.startTime;
     }
 
-=======
->>>>>>> Stashed changes
     // Create play button overlay
     var playButton = document.createElement("div");
     playButton.innerHTML = "▶"; // Play icon
-    playButton.style.position = "absolute";
-    playButton.style.top = "50%";
-    playButton.style.left = "50%";
-    playButton.style.transform = "translate(-50%, -50%)";
+    playButton.style.position = "fixed";
     playButton.style.fontSize = "24px";
     playButton.style.color = "white";
     playButton.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
@@ -1451,32 +1551,126 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     playButton.style.opacity = "0";
     playButton.style.transition = "opacity 0.3s ease";
     playButton.style.cursor = "pointer";
-    playButton.style.zIndex = "1000";
+    playButton.style.zIndex = "8500"; // Below annotation markers but above videos
+    playButton.style.pointerEvents = "auto";
     playButton.style.paddingLeft = "2px";
-
-    // Create container for video and play button
+  
+    // Create container for video only
     var container = document.createElement("div");
     container.style.position = "relative";
     container.style.width = "100%";
     container.style.height = "100%";
     container.appendChild(video);
-    container.appendChild(playButton);
 
-<<<<<<< Updated upstream
-    // Handle time updates - check for stop time
+    // Store subtitle information for global subtitle handling
+    let videoSubtitles: any[] = [];
+    if (options.subtitles && options.showSubtitles) {
+      if (typeof options.subtitles === 'string') {
+        // WebVTT file - load and parse manually instead of using native tracks
+        this.loadWebVTTSubtitles(options.subtitles).then(subtitles => {
+          videoSubtitles = subtitles;
+          // Store reference on video element for access in event handlers
+          (video as any)._subtitles = subtitles;
+        }).catch(error => {
+          console.warn('Failed to load WebVTT subtitles:', error);
+        });
+      } else if (Array.isArray(options.subtitles)) {
+        // Inline subtitles array
+        videoSubtitles = options.subtitles;
+        (video as any)._subtitles = options.subtitles;
+      }
+    }
+
+    // Disable any native video subtitles to prevent browser rendering
+    video.addEventListener('loadedmetadata', () => {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = 'disabled';
+      }
+    });
+
+    // Add play button to document body instead of container
+    document.body.appendChild(playButton);
+
+    // Store reference to component instance for use in event handlers
+    const componentInstance = this;
+  
+    // Function to update play button position
+    const updatePlayButtonPosition = () => {
+      if (!container.parentElement) return;
+      
+      const containerRect = container.getBoundingClientRect();
+      playButton.style.left = `${containerRect.left + containerRect.width / 2 - 30}px`;
+      playButton.style.top = `${containerRect.top + containerRect.height / 2 - 30}px`;
+    };
+  
+    // Function to bring this video to front
+    const bringToFront = () => {
+      // Reset all video overlays to lower z-index
+      this.videoOverlays.forEach(overlay => {
+        const wrapperElement = overlay.parentElement;
+        if (wrapperElement && wrapperElement.style) {
+          wrapperElement.style.zIndex = "5000"; // Below annotation markers (9999)
+        }
+      });
+  
+      // Bring current video to front (but still below annotation markers)
+      setTimeout(() => {
+        const wrapperElement = container.parentElement;
+        if (wrapperElement && wrapperElement.style) {
+          wrapperElement.style.zIndex = "8000"; // Higher than other videos but below annotation markers
+        }
+        // Update play button position after z-index changes
+        updatePlayButtonPosition();
+      }, 10);
+    };
+  
+    // Update play button position on viewport changes
+    if (this.viewer) {
+      this.viewer.addHandler('animation', updatePlayButtonPosition);
+      this.viewer.addHandler('resize', updatePlayButtonPosition);
+    }
+  
+    // Initial position update
+    setTimeout(updatePlayButtonPosition, 100);
+  
+    // Handle time updates - check for stop time and update subtitles
     video.addEventListener('timeupdate', () => {
+      const currentTime = video.currentTime;
+
+      // Handle inline subtitles using global container
+      // Get subtitles from video element (set asynchronously for WebVTT)
+      const videoSubtitles = (video as any)._subtitles || [];
+      
+      // Only show subtitles if this is the currently playing video
+      if (videoSubtitles.length > 0 && this.globalSubtitleContainer) {
+        const activeSubtitle = videoSubtitles.find((sub: any) => 
+          currentTime >= sub.start && currentTime <= sub.end
+        );
+
+        if (activeSubtitle && this.subtitlesEnabled && 
+            this.currentlyPlayingVideo === video && !video.paused) {
+          const globalContainer = this.globalSubtitleContainer.nativeElement;
+          globalContainer.innerHTML = activeSubtitle.text;
+          globalContainer.style.display = "block";
+          console.log('Showing subtitle:', activeSubtitle.text);
+        } else if (this.currentlyPlayingVideo === video) {
+          // Clear subtitles when no active subtitle for this time or video is paused
+          this.clearGlobalSubtitles();
+        }
+      }
+
       // Check if we've reached the stop time
-      if (options.stopTime !== undefined && video.currentTime >= options.stopTime) {
+      if (options.stopTime !== undefined && currentTime >= options.stopTime) {
         // Only trigger if video is still playing (prevent multiple triggers)
         if (!video.paused) {
           video.pause();
           if (options.storeAsCurrentVideo) {
             this.isPlaying = false;
           }
-
+  
           // If playNextOnEnd is true, trigger next animation
           if (options.playNextOnEnd) {
-            console.log('Video reached stop time at:', video.currentTime, 'playing next animation');
+            console.log('Video reached stop time at:', currentTime, 'playing next animation');
             // Add a small delay to ensure the video state is properly updated
             setTimeout(() => {
               this.playNextAnimationInSequence();
@@ -1486,8 +1680,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-=======
->>>>>>> Stashed changes
     // Track navigation cues if provided
     if (options.navigationCues && options.navigationCues.length > 0) {
       console.log('Navigation cues provided:', options.navigationCues);
@@ -1496,7 +1688,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
       video.addEventListener('timeupdate', () => {
         const currentTime = video.currentTime;
-<<<<<<< Updated upstream
 
         // Check if we've reached the next navigation cue
         if (currentCueIndex < navigationCues.length) {
@@ -1505,8 +1696,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           if (currentTime >= nextCue.time) {
             console.log(`Navigation cue triggered at ${currentTime}s:`, nextCue.description);
 
-            // Move the viewer to the specified location
-            this.moveToLocation(nextCue.x, nextCue.y, nextCue.width, nextCue.height);
+            // Use viewport positioning if available, otherwise fall back to bounds-based positioning
+            if (nextCue.viewportX !== undefined && nextCue.viewportY !== undefined && nextCue.viewportZoom !== undefined) {
+              this.moveToLocationWithViewport(nextCue.viewportX, nextCue.viewportY, nextCue.viewportZoom);
+            } else {
+              // Move the viewer to the specified location using bounds
+              this.moveToLocation(nextCue.x, nextCue.y, nextCue.width, nextCue.height);
+            }
 
             currentCueIndex++;
           }
@@ -1514,74 +1710,80 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       // Reset cue index when video starts over or is seeked
-=======
-        
-        // Check if we've reached the next navigation cue
-        if (currentCueIndex < navigationCues.length) {
-          const nextCue = navigationCues[currentCueIndex];
-          
-          if (currentTime >= nextCue.time) {
-            console.log(`Navigation cue triggered at ${currentTime}s:`, nextCue.description);
-            
-            // Move the viewer to the specified location
-            this.moveToLocation(nextCue.x, nextCue.y, nextCue.width, nextCue.height);
-            
-            currentCueIndex++;
-          }
-        }
-
-        // Show preview of next navigation cue when we're 2 seconds away
-        // if (currentCueIndex < navigationCues.length) {
-        //   const nextCue = navigationCues[currentCueIndex];
-        //   if (currentTime >= (nextCue.time - 2) && currentTime < nextCue.time) {
-        //     // Only show the preview once per cue
-        //     if (!nextCue.previewShown) {
-        //       this.showNextNavigationCue(nextCue);
-        //       nextCue.previewShown = true; // Mark as shown to prevent repeated calls
-        //     }
-        //   }
-        // }
-
-      });
-
-      // Reset cue index when video starts over
->>>>>>> Stashed changes
       video.addEventListener('seeked', () => {
         currentCueIndex = navigationCues.findIndex(cue => cue.time > video.currentTime);
         if (currentCueIndex === -1) currentCueIndex = navigationCues.length;
       });
     }
+  
+  // Show/hide play button on hover with timeout
+  let hideTimeout: any;
 
-    // Show/hide play button on hover
-    container.addEventListener('mouseenter', () => {
-      if (video.paused) {
-        playButton.innerHTML = "▶"; // Play icon
-        playButton.style.opacity = "1";
-      } else {
-        playButton.innerHTML = "⏸"; // Pause icon
-        playButton.style.opacity = "1";
-      }
-    });
+  container.addEventListener('mouseenter', () => {
+    // Clear any pending hide timeout
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+    
+    if (video.paused) {
+      playButton.innerHTML = "▶"; // Play icon
+      playButton.style.opacity = "1";
+    } else {
+      playButton.innerHTML = "⏸"; // Pause icon
+      playButton.style.opacity = "1";
+    }
+    updatePlayButtonPosition();
+  });
 
-    container.addEventListener('mouseleave', () => {
+  container.addEventListener('mouseleave', () => {
+    // Delay hiding to allow moving to play button
+    hideTimeout = setTimeout(() => {
       playButton.style.opacity = "0";
-    });
+    }, 200);
+  });
 
-    // Handle play button click using OpenSeadragon MouseTracker
-<<<<<<< Updated upstream
-    // Handle play button click using OpenSeadragon MouseTracker
-=======
->>>>>>> Stashed changes
+  // Keep play button visible when hovering over it
+  playButton.addEventListener('mouseenter', () => {
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+  });
+
+  playButton.addEventListener('mouseleave', () => {
+    hideTimeout = setTimeout(() => {
+      playButton.style.opacity = "0";
+    }, 200);
+  });    // Handle play button click using OpenSeadragon MouseTracker
     new OpenSeadragon.MouseTracker({
       element: playButton,
       clickHandler: (event: any) => {
         console.log('Play button clicked via MouseTracker!');
         event.preventDefaultAction = true;
-<<<<<<< Updated upstream
+
+        // Show video on first play
+        if (!this.videoVisibilityState.get(video)) {
+          video.style.display = "block";
+          this.videoVisibilityState.set(video, true);
+          console.log('Video made visible for first time');
+        }
 
         if (video.paused) {
           console.log('Playing video via MouseTracker');
 
+          // Find the corresponding animation index and sync with animation controls
+          if (!options.storeAsCurrentVideo && !options.trackProgress) {
+            const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
+            if (animationIndex !== -1) {
+              this.syncWithAnimationControls(animationIndex, video);
+            }
+            this.pauseAndHideAllVideosExcept(video);
+          }
+  
+          // Bring this video to front when playing
+          bringToFront();
+          
           // Only reset to beginning if no startTime is specified
           // If startTime exists, use it; otherwise start from current position or 0
           if (options.startTime !== undefined) {
@@ -1594,11 +1796,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           }
           // Otherwise, continue from current position
 
-=======
-        
-        if (video.paused) {
-          console.log('Playing video via MouseTracker');
->>>>>>> Stashed changes
           video.play().catch(error => {
             console.warn('Play failed:', error);
           });
@@ -1614,11 +1811,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isPlaying = false;
           }
         }
-<<<<<<< Updated upstream
 
-=======
-        
->>>>>>> Stashed changes
         return false; // Prevent further event propagation
       }
     });
@@ -1631,7 +1824,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     // Track video progress if requested
     if (options.trackProgress) {
       video.addEventListener('loadedmetadata', () => {
-<<<<<<< Updated upstream
         // Calculate effective duration (stopTime - startTime or full duration)
         const startTime = options.startTime || 0;
         const stopTime = options.stopTime || video.duration;
@@ -1644,34 +1836,92 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         const effectiveDuration = stopTime - startTime;
         const currentPosition = Math.max(0, video.currentTime - startTime);
         this.videoProgress = (currentPosition / effectiveDuration) * 100;
-=======
-        this.videoDuration = video.duration;
-      });
-
-      video.addEventListener('timeupdate', () => {
-        this.videoProgress = (video.currentTime / video.duration) * 100;
->>>>>>> Stashed changes
       });
     }
 
     // Update play button and state when video state changes
     video.addEventListener('play', () => {
+      // Disable any native subtitle tracks immediately when video starts playing
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = 'disabled';
+      }
+      
       playButton.innerHTML = "⏸"; // Pause icon
       if (options.storeAsCurrentVideo) {
         this.isPlaying = true;
+        // Set as currently playing video for subtitle display
+        this.currentlyPlayingVideo = video;
+      } else {
+        // For regular video overlays, sync with animation controls
+        const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
+        if (animationIndex !== -1) {
+          this.animationIndex = animationIndex;
+          this.currentVideo = video; // Set this video as the current video for animation controls
+          this.enableProgressTracking(video); // Enable progress tracking
+          this.isPlaying = true;
+          if (!this.showingAnimations) {
+            this.showingAnimations = true;
+          }
+        }
       }
+      // Update currently playing video reference for play button videos
+      if (!options.storeAsCurrentVideo && !options.trackProgress) {
+        this.currentlyPlayingVideo = video;
+      }
+      // Bring video to front when it starts playing
+      bringToFront();
     });
 
     video.addEventListener('pause', () => {
       playButton.innerHTML = "▶"; // Play icon
       if (options.storeAsCurrentVideo) {
         this.isPlaying = false;
+        // Clear currently playing video for subtitle display
+        if (this.currentlyPlayingVideo === video) {
+          this.currentlyPlayingVideo = null;
+          this.clearGlobalSubtitles();
+        }
+      } else {
+        // For regular video overlays, sync with animation controls
+        const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
+        if (animationIndex !== -1 && this.animationIndex === animationIndex) {
+          this.isPlaying = false;
+          // Clear current video reference if this was the current video
+          if (this.currentVideo === video) {
+            this.disableProgressTracking(video);
+            this.currentVideo = null;
+          }
+        }
+      }
+      // Clear currently playing video reference if this video was paused
+      if (this.currentlyPlayingVideo === video) {
+        this.currentlyPlayingVideo = null;
       }
     });
 
     video.addEventListener('ended', () => {
       if (options.storeAsCurrentVideo) {
         this.isPlaying = false;
+        // Clear currently playing video and subtitles when video ends
+        if (this.currentlyPlayingVideo === video) {
+          this.currentlyPlayingVideo = null;
+          this.clearGlobalSubtitles();
+        }
+      } else {
+        // For regular video overlays, sync with animation controls
+        const animationIndex = this.findAnimationIndexByVideo(x, y, videoUrl);
+        if (animationIndex !== -1 && this.animationIndex === animationIndex) {
+          this.isPlaying = false;
+          // Clear current video reference if this was the current video
+          if (this.currentVideo === video) {
+            this.disableProgressTracking(video);
+            this.currentVideo = null;
+          }
+        }
+      }
+      // Clear currently playing video reference when video ends
+      if (this.currentlyPlayingVideo === video) {
+        this.currentlyPlayingVideo = null;
       }
       if (options.playNextOnEnd) {
         console.log('Video ended, playing next animation');
@@ -1679,7 +1929,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-<<<<<<< Updated upstream
     // Handle video loading and auto-play
     video.addEventListener('loadeddata', () => {
       // Set start time when video is loaded
@@ -1688,19 +1937,14 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       if (options.autoPlay) {
+        // Show video when auto-playing
+        video.style.display = "block";
+        this.videoVisibilityState.set(video, true);
+        
         video.play().catch(error => {
           console.warn('Auto-play failed:', error);
         });
 
-=======
-    // Auto-play and move to video if requested
-    if (options.autoPlay) {
-      video.addEventListener('loadeddata', () => {
-        video.play().catch(error => {
-          console.warn('Auto-play failed:', error);
-        });
-        
->>>>>>> Stashed changes
         if (options.moveToOnLoad) {
           // Move and zoom to this video when it starts playing
           const bounds = new OpenSeadragon.Rect(
@@ -1711,19 +1955,12 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           );
           this.viewer.viewport.fitBounds(bounds, !options.playNextOnEnd); // Use immediate for sequence
         }
-<<<<<<< Updated upstream
       } else {
         console.log('Video loaded and ready to play');
       }
+      // Update play button position when video loads
+      updatePlayButtonPosition();
     });
-=======
-      });
-    } else {
-      video.addEventListener('loadeddata', () => {
-        console.log('Video loaded and ready to play');
-      });
-    }
->>>>>>> Stashed changes
 
     // Add overlay to viewer
     this.viewer.addOverlay({
@@ -1734,7 +1971,21 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       width: width,
       height: height
     });
-
+  
+    // Set initial z-index for video wrapper
+    setTimeout(() => {
+      const wrapperElement = container.parentElement;
+      if (wrapperElement) {
+        wrapperElement.style.zIndex = "5000"; // Below annotation markers
+      }
+      updatePlayButtonPosition();
+    }, 50);
+  
+    // Store cleanup function to remove play button when video is removed
+    const originalContainer = container as HTMLDivElement & { _playButton?: HTMLElement; _updatePosition?: () => void };
+    originalContainer._playButton = playButton;
+    originalContainer._updatePosition = updatePlayButtonPosition;
+  
     // Track this video overlay for reliable removal
     this.videoOverlays.push(container);
 
@@ -1742,14 +1993,11 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private moveToLocation(x: number, y: number, width: number, height: number, immediate: boolean = false, duration: number = 2) {
-<<<<<<< Updated upstream
     if (!this.viewer) {
       console.warn('Viewer not initialized');
       return;
     }
 
-=======
->>>>>>> Stashed changes
     const padding = 0.05; // Add some padding around the target area
     const bounds = new OpenSeadragon.Rect(
       x - (width / 2) - padding,
@@ -1757,7 +2005,6 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       width + (padding * 2),
       height + (padding * 2)
     );
-<<<<<<< Updated upstream
 
     // Use custom animation timing for smoother transitions
     const currentAnimationTime = this.viewer.animationTime;
@@ -1773,29 +2020,31 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     }, duration * 1000);
   }
 
-  // private showNextNavigationCue(cue: any) {
-  //   // Create a temporary highlight overlay
-  //   const highlight = document.createElement("div");
-  //   highlight.style.border = "2px dashed rgba(255, 255, 255, 0.8)";
-  //   highlight.style.borderRadius = "8px";
-  //   highlight.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
-  //   highlight.style.pointerEvents = "none";
+  // Overloaded version for viewport-based positioning
+  private moveToLocationWithViewport(x: number, y: number, zoom: number, immediate: boolean = false, duration: number = 2) {
+    if (!this.viewer) {
+      console.warn('Viewer not initialized');
+      return;
+    }
 
-  //   // Add overlay to show next target area
-  //   this.viewer.addOverlay({
-  //     element: highlight,
-  //     location: new OpenSeadragon.Point(cue.x, cue.y),
-  //     placement: 'CENTER',
-  //     checkResize: false,
-  //     width: cue.width,
-  //     height: cue.height
-  //   });
+    // Use custom animation timing for smoother transitions
+    const currentAnimationTime = this.viewer.animationTime;
+    this.viewer.animationTime = immediate ? 0 : duration;
 
-  //   // Remove highlight after 2 seconds
-  //   setTimeout(() => {
-  //     this.viewer.removeOverlay(highlight);
-  //   }, 2000);
-  // }
+    // Convert the normalized coordinates (0-1) to OpenSeadragon viewport coordinates
+    const viewportPoint = new OpenSeadragon.Point(x, y);
+    
+    // Set the zoom level and center the viewport on the specified point
+    this.viewer.viewport.panTo(viewportPoint, false);
+    this.viewer.viewport.zoomTo(zoom, viewportPoint, false);
+
+    // Restore original animation time after transition
+    setTimeout(() => {
+      if (this.viewer) {
+        this.viewer.animationTime = currentAnimationTime;
+      }
+    }, (immediate ? 0 : duration) * 1000);
+  }
 
   closeAnnotationPanel() {
     // Reset selected annotation when panel is closed
@@ -1804,53 +2053,13 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedAnnotationElement = null;
     }
 
-=======
-    
-    // Use custom animation timing for smoother transitions
-    const currentAnimationTime = this.viewer.animationTime;
-    this.viewer.animationTime = duration;
-    
-    this.viewer.viewport.fitBounds(bounds, false);
-    
-    // Restore original animation time after transition
-    setTimeout(() => {
-      this.viewer.animationTime = currentAnimationTime;
-    }, duration * 1000);
-  }
-
-  private showNextNavigationCue(cue: any) {
-    // Create a temporary highlight overlay
-    const highlight = document.createElement("div");
-    highlight.style.border = "2px dashed rgba(255, 255, 255, 0.8)";
-    highlight.style.borderRadius = "8px";
-    highlight.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
-    highlight.style.pointerEvents = "none";
-    
-    // Add overlay to show next target area
-    this.viewer.addOverlay({
-      element: highlight,
-      location: new OpenSeadragon.Point(cue.x, cue.y),
-      placement: 'CENTER',
-      checkResize: false,
-      width: cue.width,
-      height: cue.height
-    });
-    
-    // Remove highlight after 2 seconds
-    setTimeout(() => {
-      this.viewer.removeOverlay(highlight);
-    }, 2000);
-  }
-
-  closeAnnotationPanel() {
->>>>>>> Stashed changes
     this.panelText = "";
     this.annotationImages = [];
     this.panelTitle = 'Annotation Details';
     this.currentAnnotationIndex = 0;
     this.panelTextIndex = 0;
     this.numPanels = 0;
-<<<<<<< Updated upstream
+    this.showIntroductionPanel = false;
 
     // Adjust viewport when panel is closed
     this.adjustViewportForPanel(false);
@@ -1909,6 +2118,15 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   closeAboutModal() {
     this.isAboutModalOpen = false;
+  }
+
+  openIntroModal() {
+    this.isIntroModalOpen = true;
+    this.closeMenu(); // Close the menu when opening intro modal
+  }
+
+  closeIntroModal() {
+    this.isIntroModalOpen = false;
   }
 
   // Add the toggleChat method
@@ -2006,13 +2224,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       if (introAnnotation["annotation text 2"] && introAnnotation["annotation text 2"].length > 0) this.numPanels = 3;
       if (introAnnotation["annotation text 3"] && introAnnotation["annotation text 3"].length > 0) this.numPanels = 4;
       
-      this.annotationImages = [];
-      
       // Get images for the introduction if any
       const imageFilename = introAnnotation[`image filename 0`];
-      if (imageFilename && imageFilename.trim() !== '') {
-        this.annotationImages.push(`assets/panelImages/${imageFilename}`);
-      }
+      this.loadImagesFromFilename(imageFilename);
     } 
   }
 
@@ -2028,6 +2242,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showingChat = false;
       this.adjustViewportForPanel(false);
     }
+
+    // Enable Introduction panel display
+    this.showIntroductionPanel = true;
 
     // Set the default annotation content (Introduction)
     this.setDefaultAnnotationContent();
@@ -2066,6 +2283,10 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.adjustViewportForPanel(true);
   }
 
+  returnToIntro() {
+    this.router.navigate(['']);
+  }
+
   private setupHelpToggleListeners() {
     // Remove existing listeners first
     document.removeEventListener('toggleAnimations', this.handleAnimationsToggle);
@@ -2084,7 +2305,145 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.toggleAnnotations(event.detail);
   }
 
-=======
+  /**
+   * Find the animation index that corresponds to a video with the given coordinates and URL
+   */
+  private findAnimationIndexByVideo(x: number, y: number, videoUrl: string): number {
+    for (let i = 0; i < this.animations.length; i++) {
+      const animation = this.animations[i];
+      if (animation.x === x && animation.y === y && animation.videoUrl === videoUrl) {
+        return i;
+      }
+    }
+    return -1; // Not found
   }
->>>>>>> Stashed changes
+
+  /**
+   * Sync the animation controls with the specified animation index and show playing state
+   */
+  private syncWithAnimationControls(animationIndex: number, currentVideo?: HTMLVideoElement): void {
+    console.log('Syncing animation controls to index:', animationIndex);
+    
+    // Set the animation index
+    this.animationIndex = animationIndex;
+    
+    // Show animation controls if they're not already visible
+    if (!this.showingAnimations) {
+      this.showingAnimations = true;
+    }
+    
+    // Set the current video reference if provided
+    if (currentVideo) {
+      this.currentVideo = currentVideo;
+      // Enable progress tracking for this video
+      this.enableProgressTracking(currentVideo);
+    }
+    
+    // Set playing state to true
+    this.isPlaying = true;
+    
+    // Move to the animation location
+    this.moveToAnimation(this.animationIndex);
+  }
+
+  /**
+   * Enable progress tracking for a video element
+   */
+  private enableProgressTracking(video: HTMLVideoElement): void {
+    // Remove any existing progress tracking listeners to avoid duplicates
+    video.removeEventListener('loadedmetadata', this.progressMetadataHandler);
+    video.removeEventListener('timeupdate', this.progressTimeUpdateHandler);
+    
+    // Add new progress tracking listeners
+    video.addEventListener('loadedmetadata', this.progressMetadataHandler);
+    video.addEventListener('timeupdate', this.progressTimeUpdateHandler);
+    
+    // If metadata is already loaded, calculate duration immediately
+    if (video.duration && !isNaN(video.duration)) {
+      this.videoDuration = video.duration;
+    }
+  }
+
+  /**
+   * Disable progress tracking for a video element
+   */
+  private disableProgressTracking(video: HTMLVideoElement): void {
+    video.removeEventListener('loadedmetadata', this.progressMetadataHandler);
+    video.removeEventListener('timeupdate', this.progressTimeUpdateHandler);
+    // Reset progress values
+    this.videoProgress = 0;
+    this.videoDuration = 0;
+  }
+
+  private progressMetadataHandler = (event: Event) => {
+    const video = event.target as HTMLVideoElement;
+    this.videoDuration = video.duration;
+  }
+
+  private progressTimeUpdateHandler = (event: Event) => {
+    const video = event.target as HTMLVideoElement;
+    if (video === this.currentVideo) {
+      this.videoProgress = (video.currentTime / video.duration) * 100;
+    }
+  }
+
+  /**
+   * Check if the current animation has subtitles available
+   */
+  currentAnimationHasSubtitles(): boolean {
+    if (this.animations.length === 0 || this.animationIndex >= this.animations.length) {
+      return false;
+    }
+    const currentAnimation = this.animations[this.animationIndex];
+    return !!(currentAnimation.subtitles && 
+              ((Array.isArray(currentAnimation.subtitles) && currentAnimation.subtitles.length > 0) ||
+               (typeof currentAnimation.subtitles === 'string' && currentAnimation.subtitles.trim().length > 0)));
+  }
+
+  /**
+   * Toggle mute state for all videos
+   */
+  toggleMute(): void {
+    this.isMuted = !this.isMuted;
+    
+    // Apply mute state to all video elements in video overlays
+    this.videoOverlays.forEach(overlay => {
+      const video = overlay.querySelector('video');
+      if (video) {
+        video.muted = this.isMuted;
+      }
+    });
+
+    // Also apply to current video if it exists
+    if (this.currentVideo) {
+      this.currentVideo.muted = this.isMuted;
+    }
+
+    // Apply to currently playing video if it exists and is different from current video
+    if (this.currentlyPlayingVideo && this.currentlyPlayingVideo !== this.currentVideo) {
+      this.currentlyPlayingVideo.muted = this.isMuted;
+    }
+  }
+
+  /**
+   * Toggle subtitle display for videos
+   */
+  toggleSubtitles(): void {
+    this.subtitlesEnabled = !this.subtitlesEnabled;
+    
+    // If subtitles are disabled, clear the global subtitle container
+    if (!this.subtitlesEnabled) {
+      this.clearGlobalSubtitles();
+    }
+
+    // Ensure all video tracks are disabled (we handle subtitles globally now)
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+      const tracks = video.textTracks;
+      for (let i = 0; i < tracks.length; i++) {
+        tracks[i].mode = 'disabled'; // Always disabled - we use global container
+      }
+    });
+  }
+
 }

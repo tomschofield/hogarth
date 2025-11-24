@@ -19,12 +19,10 @@ import { MatLegacyChipsModule } from '@angular/material/legacy-chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-<<<<<<< Updated upstream
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input'; 
 import { AcknowledgmentsModalComponent } from './acknowledgments-modal/acknowledgments-modal.component';
-=======
->>>>>>> Stashed changes
+import { IntroModalComponent } from './intro-modal/intro-modal.component';
 
 
 @NgModule({
@@ -33,7 +31,8 @@ import { AcknowledgmentsModalComponent } from './acknowledgments-modal/acknowled
     MiradorTestComponent,
     IntroComponent,
     ViewerComponent,
-    AcknowledgmentsModalComponent
+    AcknowledgmentsModalComponent,
+    IntroModalComponent
   ],
   imports: [
     BrowserModule,
@@ -50,13 +49,9 @@ import { AcknowledgmentsModalComponent } from './acknowledgments-modal/acknowled
     MatTooltipModule, // Add this for tooltips
     FormsModule,
     MatProgressBarModule,
-<<<<<<< Updated upstream
     DragDropModule,
     MatFormFieldModule,
     MatInputModule
-=======
-    DragDropModule
->>>>>>> Stashed changes
   ],
   providers: [],
   bootstrap: [AppComponent]

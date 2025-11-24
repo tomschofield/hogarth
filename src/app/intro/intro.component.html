@@ -2,19 +2,16 @@
   <video #backgroundVideo 
        class="background-video"
        autoplay 
-       muted 
        playsinline
        (canplay)="onVideoCanPlay()"
        (error)="onVideoError($event)"
        (ended)="onVideoEnded()">
   </video>
   
-<<<<<<< Updated upstream
   <h1 class="intro-title">William Hogarth's Humours of an Election
-=======
-  <h1 class="intro-title">Hogarth's Election Series
->>>>>>> Stashed changes
-    <div class="progress-bar-container" *ngIf="!isVideoLoading && !showContent">
+    <div class="progress-bar-container" 
+         *ngIf="!isVideoLoading && !showContent"
+         (click)="onProgressBarClick($event)">
       <mat-progress-bar mode="determinate" [value]="videoProgress" class="video-progress-bar"></mat-progress-bar>
     </div>
     <div class="title-controls" *ngIf="!showPlayButton">
@@ -34,7 +31,6 @@
         Play Again
       </button>
     </div>
-<<<<<<< Updated upstream
     
     <!-- Menu Button - always visible, positioned independently -->
     <div class="menu-button-container">
@@ -48,10 +44,6 @@
     </div>
   </h1>
 
-=======
-  </h1>
-  
->>>>>>> Stashed changes
   <!-- Play button overlay -->
   <div class="play-button-overlay" *ngIf="showPlayButton">
     <button mat-fab color="primary" (click)="onPlayButtonClick()" class="play-button">
