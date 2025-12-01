@@ -107,6 +107,7 @@
         "duration":9.0,
         "hideControls": false,
         "showSubtitles": true,
+        "playbackRate": 1.1,
         "subtitles": "assets/subtitles/fiddling-nan_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -122,6 +123,7 @@
         "duration":9.0,
         "hideControls": false,
         "showSubtitles": true,
+        "playbackRate": 1.1,
         "subtitles": "assets/subtitles/Clerk_Tailor_Wife_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -140,6 +142,7 @@
         "viewportY": 0.5,
         "viewportZoom": 0.8,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/The_Election_Agent_eng.vtt",
         "subtitleLanguage": "en"
     },
@@ -160,6 +163,7 @@
         "viewportY": 0.32,
         "viewportZoom": 1,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/1-Candidate_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -178,6 +182,7 @@
         "viewportY": 0.32,
         "viewportZoom": 1,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/Women_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -197,6 +202,7 @@
         "viewportY": 0.32,
         "viewportZoom": 1,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/1-Candidate_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -216,6 +222,7 @@
         "viewportY": 0.32,
         "viewportZoom": 1,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/Women_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -234,6 +241,7 @@
         "viewportY": 0.32,
         "viewportZoom": 1,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/1-Candidate_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -252,6 +260,7 @@
         "viewportY": 0.32,
         "viewportZoom": 1,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/Women_eng.vtt",
         "subtitleLanguage": "en"
     },
@@ -271,6 +280,7 @@
         "viewportY": 0.274,
         "viewportZoom": 2.0,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/Sign_eng.vtt",
         "subtitleLanguage": "en"
     },
@@ -287,6 +297,7 @@
         "height":0.278,
         "hideControls": false,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/7-Canvassing_eng.vtt",
         "subtitleLanguage": "en"
     },
@@ -337,6 +348,7 @@
         "viewportY": 0.7,
         "viewportZoom": 2,
         "showSubtitles": true,
+        "playbackRate": 1.25,
         "subtitles": "assets/subtitles/Former_Soldier_eng.vtt",
         "subtitleLanguage": "en",
         "navigationCues": [
@@ -380,6 +392,7 @@
         "height":0.404,
         "duration":5.0,
         "showSubtitles": true,
+        "playbackRate": 1.25,
         "subtitles": "assets/subtitles/ThresherSailor_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -397,6 +410,7 @@
         "viewportY": 0.3766,
         "viewportZoom": 1,
         "showSubtitles": true,
+        "playbackRate": 1.2,
         "subtitles": "assets/subtitles/Candidate-chairing_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -411,6 +425,7 @@
         "height":0.113,
         "duration":5.0,
         "showSubtitles": true,
+        "playbackRate": 1.1,
         "subtitles": "assets/subtitles/Servants_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -425,6 +440,7 @@
         "height":0.1015,
         "duration":5.0,
         "showSubtitles": true,
+        "playbackRate": 1.1,
         "subtitles": "assets/subtitles/window_eng.vtt",
         "subtitleLanguage": "en",
         "navigationCues": [
