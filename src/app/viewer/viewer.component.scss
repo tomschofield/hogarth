@@ -838,6 +838,25 @@
         }
     }
 
+    .annotation-images {
+        .annotation-image {
+            margin-bottom: 12px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .image-caption {
+            margin-top: 6px;
+            color: #9aa0a6;
+            font-style: italic;
+            font-size: 0.75rem;
+            font-weight: 300;
+            line-height: 1.2;
+        }
+    }
+
     .exploration-buttons {
         text-align: center;
         padding: 20px;

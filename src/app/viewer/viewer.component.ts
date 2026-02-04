@@ -38,7 +38,7 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   private videoVisibilityState: Map<HTMLVideoElement, boolean> = new Map();
   private currentlyPlayingVideo: HTMLVideoElement | null = null;
   isPlaying: boolean = false;
-  annotationImages: string[] = [];
+  annotationImages: { src: string; caption?: string }[] = [];
   videoProgress: number = 0;
   videoDuration: number = 0;
   dragPosition = { x: 0, y: 0 };
@@ -942,22 +942,54 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private loadImagesFromFilename(imageFilename: string) {
+  private loadImagesFromFilename(imageFilename: string, imageCaption?: string) {
     this.annotationImages = [];
     if (imageFilename && imageFilename.trim() !== '') {
-      const filenames = imageFilename.trim().split(' ');
-      filenames.forEach(filename => {
-        if (filename.trim() !== '') {
-          this.annotationImages.push(`assets/panelImages/${filename.trim()}`);
-        }
+      const filenames = imageFilename.trim().split(' ').filter(name => name.trim() !== '');
+      const captions = this.parseImageCaptions(imageCaption);
+
+      filenames.forEach((filename, index) => {
+        const caption = captions[index] ?? (captions.length === 1 ? captions[0] : '');
+        this.annotationImages.push({
+          src: `assets/panelImages/${filename.trim()}`,
+          caption: caption || undefined
+        });
       });
     }
+  }
+
+  private parseImageCaptions(imageCaption?: string): string[] {
+    if (!imageCaption) {
+      return [];
+    }
+
+    const trimmed = imageCaption.trim();
+    if (!trimmed) {
+      return [];
+    }
+
+    if (trimmed.includes('|')) {
+      return trimmed
+        .split('|')
+        .map(caption => caption.trim())
+        .filter(caption => caption.length > 0);
+    }
+
+    if (trimmed.includes('\n')) {
+      return trimmed
+        .split(/\r?\n/)
+        .map(caption => caption.trim())
+        .filter(caption => caption.length > 0);
+    }
+
+    return [trimmed];
   }
 
   updateImagesForCurrentPanel() {
     // Get images for the current panel
     const imageFilename = this.annotations[this.currentAnnotationIndex][`image filename ${this.panelTextIndex}`];
-    this.loadImagesFromFilename(imageFilename);
+    const imageCaption = this.annotations[this.currentAnnotationIndex][`image caption ${this.panelTextIndex}`];
+    this.loadImagesFromFilename(imageFilename, imageCaption);
   }
 
   previousPanel() {
@@ -979,7 +1011,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           );
           // Update images for introduction
           const imageFilename = introAnnotation[`image filename ${this.panelTextIndex}`];
-          this.loadImagesFromFilename(imageFilename);
+          const imageCaption = introAnnotation[`image caption ${this.panelTextIndex}`];
+          this.loadImagesFromFilename(imageFilename, imageCaption);
         }
       } else {
         // For regular annotations
@@ -1011,7 +1044,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
           );
           // Update images for introduction
           const imageFilename = introAnnotation[`image filename ${this.panelTextIndex}`];
-          this.loadImagesFromFilename(imageFilename);
+          const imageCaption = introAnnotation[`image caption ${this.panelTextIndex}`];
+          this.loadImagesFromFilename(imageFilename, imageCaption);
         }
       } else {
         // For regular annotations
@@ -2325,7 +2359,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
       
       // Get images for the introduction if any
       const imageFilename = introAnnotation[`image filename 0`];
-      this.loadImagesFromFilename(imageFilename);
+      const imageCaption = introAnnotation[`image caption 0`];
+      this.loadImagesFromFilename(imageFilename, imageCaption);
     } 
   }
 

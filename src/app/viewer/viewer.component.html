@@ -201,11 +201,13 @@
           
            <!-- Annotation Images at the top -->
           <div *ngIf="annotationImages.length > 0" class="annotation-images" style="margin-bottom: 15px;">
-            <img *ngFor="let imageSrc of annotationImages" 
-                 [src]="imageSrc" 
-                 [alt]="'Annotation image'"
-                 style="max-width: 100%; height: auto; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
-                 (error)="onImageError($event)">
+            <div *ngFor="let image of annotationImages" class="annotation-image">
+              <img [src]="image.src" 
+                   [alt]="'Annotation image'"
+                   style="max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                   (error)="onImageError($event)">
+              <div *ngIf="image.caption" class="image-caption">{{ image.caption }}</div>
+            </div>
           </div>
           
           <div [innerHTML]="panelText" class="annotation-content"></div>
