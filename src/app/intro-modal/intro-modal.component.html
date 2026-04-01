@@ -1,16 +1,22 @@
 <!-- Intro Modal Overlay -->
 <div class="intro-modal-overlay" 
      *ngIf="isOpen" 
+  aria-hidden="true"
      (click)="onOverlayClick($event)"></div>
 
 <!-- Intro Modal -->
 <div class="intro-modal" 
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="intro-modal-title"
      *ngIf="isOpen">
   <mat-card class="intro-card">
     <mat-card-header>
-      <mat-card-title>{{ currentIntro.title }}</mat-card-title>
+      <mat-card-title id="intro-modal-title">{{ currentIntro.title }}</mat-card-title>
       <button mat-icon-button 
               class="close-button"
+              type="button"
+              aria-label="Close introduction"
               (click)="onCloseModal()"
               matTooltip="Close">
         <mat-icon>close</mat-icon>
@@ -28,6 +34,7 @@
     <mat-card-actions align="end">
       <button mat-raised-button 
               color="primary" 
+              type="button"
               (click)="onCloseModal()">
         Explore the Painting
       </button>

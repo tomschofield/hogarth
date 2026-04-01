@@ -1,16 +1,22 @@
 <!-- Acknowledgments Modal Overlay -->
 <div class="about-modal-overlay" 
      *ngIf="isOpen" 
+  aria-hidden="true"
      (click)="onOverlayClick($event)"></div>
 
 <!-- Acknowledgments Modal -->
 <div class="about-modal" 
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="about-modal-title"
      *ngIf="isOpen">
   <mat-card class="about-card">
     <mat-card-header>
-      <mat-card-title>Acknowledgments</mat-card-title>
+      <mat-card-title id="about-modal-title">Acknowledgments</mat-card-title>
       <button mat-icon-button 
               class="close-button"
+              type="button"
+              aria-label="Close acknowledgments"
               (click)="onCloseModal()"
               matTooltip="Close">
         <mat-icon>close</mat-icon>
@@ -38,7 +44,7 @@
         
         <p>
           This project was made possible by a Follow-On grant from the Arts and Humanities Research Council (AHRC), running from March to July 2025 ('Humours of an Election: Annotation, Animation, Education', AH/Z507556/1). It developed from an earlier AHRC grant, 'Eighteenth-Century Political Participation and Electoral Culture' (ECPPEC) that ran from 2020 to 2023, the main output of which can be found at
-          <a href="https://ecppec.ncl.ac.uk/" target="_blank">https://ecppec.ncl.ac.uk/</a>.
+          <a href="https://ecppec.ncl.ac.uk/" target="_blank" rel="noopener noreferrer">https://ecppec.ncl.ac.uk/</a>.
         </p>
         
         <p>

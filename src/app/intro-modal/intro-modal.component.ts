@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-intro-modal',
@@ -50,6 +50,13 @@ The painting completes the cycle, showing how the corruption depicted throughout
   onOverlayClick(event: Event) {
     // Close modal when clicking on overlay (not the modal content)
     if (event.target === event.currentTarget) {
+      this.onCloseModal();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscKey(): void {
+    if (this.isOpen) {
       this.onCloseModal();
     }
   }
