@@ -9,6 +9,8 @@
      role="dialog"
      aria-modal="true"
      aria-labelledby="about-modal-title"
+  cdkTrapFocus
+  [cdkTrapFocusAutoCapture]="true"
      *ngIf="isOpen">
   <mat-card class="about-card">
     <mat-card-header>
@@ -25,19 +27,19 @@
     
     <mat-card-content class="about-content">
       <!-- Logos Section -->
-      <div class="logos-section" style="display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 30px; flex-wrap: wrap;">
+       <div class="logos-section">
         <img src="assets/images/ahrc-logo.png" 
              alt="Arts and Humanities Research Council" 
-             style="height: 50px; width: auto; padding-bottom: 5px;">
+           class="logo-ahrc">
         <img src="assets/images/newcastle-logo.png" 
              alt="Newcastle University" 
-             style="height: 45px; width: auto;">
+           class="logo-newcastle">
         <img src="assets/images/soane-logo.png" 
              alt="Sir John Soane's Museum London" 
-             style="height: 65px; width: auto; padding-bottom: 10px;">
+           class="logo-soane">
       </div>
       
-            <div class="about-text" style="text-align: left;">
+          <div class="about-text">
         <p>
           This online resource has been designed to present, explain and 'bring to life' the four paintings by William Hogarth that comprise his 'Humours of an Election' series. Painted in 1754-55, they have hung in the Picture Room of Sir John Soane's Museum in London since 1823.
         </p>
@@ -76,7 +78,7 @@
         </p>
       </div>
       
-      <mat-divider style="margin: 20px 0;"></mat-divider>
+      <mat-divider class="about-divider"></mat-divider>
       
       <div class="credits">
         <p class="copyright">

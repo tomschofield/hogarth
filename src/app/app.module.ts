@@ -19,6 +19,7 @@ import { MatLegacyChipsModule } from '@angular/material/legacy-chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { A11yModule } from '@angular/cdk/a11y';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -52,6 +53,7 @@ import { ChatService } from './chat.service';
     FormsModule,
     MatProgressBarModule,
     DragDropModule,
+    A11yModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule

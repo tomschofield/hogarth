@@ -6,8 +6,8 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   z-index: 102000;
   opacity: 0;
   animation: fadeIn 0.3s ease forwards;
@@ -120,6 +120,30 @@
         }
         
         .logos-section {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 40px;
+          margin-bottom: 30px;
+          flex-wrap: wrap;
+
+          .logo-ahrc {
+            height: 50px;
+            width: auto;
+            padding-bottom: 5px;
+          }
+
+          .logo-newcastle {
+            height: 45px;
+            width: auto;
+          }
+
+          .logo-soane {
+            height: 65px;
+            width: auto;
+            padding-bottom: 10px;
+          }
+
           @media (max-width: 768px) {
             gap: 20px !important;
             
@@ -148,6 +172,10 @@
             text-align: center;
             font-style: italic;
           }
+        }
+
+        .about-divider {
+          margin: 20px 0;
         }
       }
     }

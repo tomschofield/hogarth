@@ -5,6 +5,111 @@
     background-color: black;
 }
 
+.viewer-root {
+    width: 100vw;
+    height: 100vh;
+    background-color: #d3d4d7;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.control-icon-notes {
+    width: 24px;
+    height: 24px;
+}
+
+.help-icon {
+    font-size: 18px;
+    font-weight: bold;
+    transform: translateY(-2px);
+    display: inline-block;
+}
+
+.help-icon-inline {
+    margin-right: 8px;
+}
+
+.mobile-menu-action {
+    width: 100%;
+    justify-content: flex-start;
+    background-color: white;
+    text-align: left;
+}
+
+.menu-leading-icon {
+    margin-right: 8px;
+}
+
+.menu-leading-image {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+.panel-card {
+    height: 100%;
+}
+
+.panel-card-content {
+    height: calc(100% - 80px);
+    overflow-y: auto;
+    text-align: left;
+}
+
+.annotation-images-spaced {
+    margin-bottom: 15px;
+}
+
+.annotation-image-element {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.exploration-item-spaced {
+    margin-top: 15px;
+}
+
+.panel-navigation-spaced {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.panel-counter {
+    margin: 0 10px;
+}
+
+.chat-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chat-character-selection {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.chat-with-label {
+    font-size: 12px;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.message-image-preview {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.animation-secondary-controls {
+    display: flex;
+    align-items: center;
+}
+
 .annotation-panel {
     position: fixed;
     top: 20px;
@@ -224,6 +329,8 @@
         .control-button-sm {
             padding: 12px 2px;
             width: 30px;
+            border: none;
+            background: none;
         }
     }
 

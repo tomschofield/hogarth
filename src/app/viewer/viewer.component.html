@@ -1,4 +1,4 @@
-<section id="main-content" tabindex="-1" style="width:100vw;height:100vh; background-color: #d3d4d7;vertical-align: middle; text-align: center;">
+<section id="main-content" tabindex="-1" class="viewer-root">
   
   <!-- Top Menu Bar -->
   <div class="top-menu-bar">
@@ -53,7 +53,7 @@
     </button>
     <button id="annotations-toggle" mat-icon-button matTooltip="Notes" [class.active]="showingAnnotations" type="button" aria-label="Toggle annotations" [attr.aria-pressed]="showingAnnotations"
       (click)="toggleAnnotations(!showingAnnotations)">
-      <img src="assets/icons/push_pin_white.svg" alt="Notes" style="width: 24px; height: 24px;">
+      <img src="assets/icons/push_pin_white.svg" alt="Notes" class="control-icon-notes">
     </button>
     <button id="chat-toggle" 
             *ngIf="chatUnlocked"
@@ -67,7 +67,7 @@
       <mat-icon>chat</mat-icon>
     </button>
     <button id="help" mat-icon-button matTooltip="Help" type="button" aria-label="Open help" (click)="showHelp()">
-      <span style="font-size: 18px; font-weight: bold; transform: translateY(-2px); display: inline-block;">?</span>
+      <span class="help-icon">?</span>
     </button>
     <button id="home" mat-icon-button matTooltip="Home View" type="button" aria-label="Return to home view">
       <mat-icon>home</mat-icon>
@@ -89,6 +89,8 @@
       role="dialog"
       aria-modal="true"
       aria-label="Viewer menu"
+      cdkTrapFocus
+      [cdkTrapFocusAutoCapture]="true"
        [class.menu-open]="isMenuOpen">
     <div class="menu-content">
       <h3>William Hogarth's Humours of an Election</h3>
@@ -101,8 +103,8 @@
                   [class.active]="showingAnimations"
               type="button"
                   (click)="toggleAnimations(!showingAnimations)"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <mat-icon style="margin-right: 8px;">movie_filter</mat-icon>
+                  class="mobile-menu-action">
+            <mat-icon class="menu-leading-icon">movie_filter</mat-icon>
             Animations {{ showingAnimations ? '(ON)' : '(OFF)' }}
           </button>
         </div>
@@ -112,8 +114,8 @@
                   [class.active]="showingAnnotations"
               type="button"
                   (click)="toggleAnnotations(!showingAnnotations)"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <img src="assets/icons/push_pin_white.svg" alt="Notes" style="width: 24px; height: 24px; margin-right: 8px;">
+                  class="mobile-menu-action">
+            <img src="assets/icons/push_pin_white.svg" alt="Notes" class="menu-leading-image">
             Annotations {{ showingAnnotations ? '(ON)' : '(OFF)' }}
           </button>
         </div>
@@ -123,8 +125,8 @@
                   [class.active]="showingChat"
               type="button"
                   (click)="toggleChat(!showingChat)"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <mat-icon style="margin-right: 8px;">chat</mat-icon>
+                  class="mobile-menu-action">
+            <mat-icon class="menu-leading-icon">chat</mat-icon>
             Chat {{ showingChat ? '(ON)' : '(OFF)' }} 🔓
           </button>
         </div>
@@ -133,8 +135,8 @@
                   color="primary"
               type="button"
                   (click)="showHelp()"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <span style="font-size: 18px; font-weight: bold; transform: translateY(-2px); display: inline-block; margin-right: 8px;">?</span>
+                  class="mobile-menu-action">
+            <span class="help-icon help-icon-inline">?</span>
             Help
           </button>
         </div>
@@ -142,8 +144,8 @@
           <button mat-stroked-button 
                   color="primary"
               type="button"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <mat-icon style="margin-right: 8px;">home</mat-icon>
+                  class="mobile-menu-action">
+            <mat-icon class="menu-leading-icon">home</mat-icon>
             Home View
           </button>
         </div>
@@ -151,8 +153,8 @@
           <button mat-stroked-button 
                   color="primary"
               type="button"
-                  style="width: 100%; justify-content: flex-start; background-color: white; text-align: left;">
-            <mat-icon style="margin-right: 8px;">fullscreen</mat-icon>
+                  class="mobile-menu-action">
+            <mat-icon class="menu-leading-icon">fullscreen</mat-icon>
             Full Screen
           </button>
         </div>
@@ -208,7 +210,7 @@
     <!-- Annotation Panel - Right Side -->
     <div *ngIf="(panelText && showingAnnotations && currentAnnotationIndex !== -1) || (panelText && currentAnnotationIndex === -1 && !showingChat && showIntroductionPanel)" 
          class="annotation-panel-right">
-      <mat-card style="height: 100%;">
+      <mat-card class="panel-card">
         <mat-card-header>
           <mat-card-title>{{panelTitle}}</mat-card-title>
             <button mat-icon-button 
@@ -220,15 +222,15 @@
               <mat-icon>close</mat-icon>
             </button>
         </mat-card-header>
-        <mat-card-content style="height: calc(100% - 80px); overflow-y: auto; text-align: left;">
+        <mat-card-content class="panel-card-content">
           
            <!-- Annotation Images at the top -->
-          <div *ngIf="annotationImages.length > 0" class="annotation-images" style="margin-bottom: 15px;">
+          <div *ngIf="annotationImages.length > 0" class="annotation-images annotation-images-spaced">
             <div *ngFor="let image of annotationImages" class="annotation-image">
               <img [src]="image.src" 
                    [alt]="'Annotation image'"
                     title="Annotation image"
-                   style="max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                    class="annotation-image-element"
                    (error)="onImageError($event)">
               <div *ngIf="image.caption" class="image-caption">{{ image.caption }}</div>
             </div>
@@ -250,7 +252,7 @@
               </div>
 
 
-              <div class="menu-item" style="margin-top: 15px;">
+              <div class="menu-item exploration-item-spaced">
                 <mat-slide-toggle 
                   [(ngModel)]="showingAnnotations" 
                   (change)="toggleAnnotations($event.checked)"
@@ -262,7 +264,7 @@
           </div>
 
           <!-- Panel Navigation -->
-          <div *ngIf="numPanels > 1" class="panel-navigation" style="margin-top: 20px; text-align: center;">
+          <div *ngIf="numPanels > 1" class="panel-navigation panel-navigation-spaced">
             <button mat-icon-button 
                     [disabled]="panelTextIndex === 0" 
                   type="button"
@@ -271,7 +273,7 @@
               <mat-icon>navigate_before</mat-icon>
             </button>
             
-            <span style="margin: 0 10px;">{{panelTextIndex + 1}} of {{numPanels}}</span>
+            <span class="panel-counter">{{panelTextIndex + 1}} of {{numPanels}}</span>
             
             <button mat-icon-button 
                     [disabled]="panelTextIndex === numPanels - 1" 
@@ -287,9 +289,9 @@
 
     <!-- Chat Panel - Right Side -->
     <div *ngIf="showingChat" class="chat-panel-right">
-      <mat-card style="height: 100%;">
+      <mat-card class="panel-card">
         <mat-card-header>
-          <mat-card-title style="display: flex; align-items: center; gap: 8px;">
+          <mat-card-title class="chat-title">
             <mat-icon>chat</mat-icon>
             Chat with {{ selectedCharacter }}
           </mat-card-title>
@@ -305,8 +307,8 @@
 
         <mat-card-content class="chat-content">
           <!-- Character Selection -->
-          <div class="character-selection" style="padding: 10px; border-bottom: 1px solid #eee; margin-bottom: 10px;">
-            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">Chat with:</label>
+          <div class="character-selection chat-character-selection">
+            <label class="chat-with-label">Chat with:</label>
             <mat-chip-listbox [(ngModel)]="selectedCharacter" (ngModelChange)="selectCharacter($event)">
               <mat-chip-option *ngFor="let character of availableCharacters" 
                                [value]="character"
@@ -333,7 +335,7 @@
                 <div *ngIf="msg.imageData" class="message-image">
                   <img [src]="msg.imageData" 
                        alt="Selected image section"
-                       style="max-width: 100%; border-radius: 8px; margin-bottom: 8px;">
+                    class="message-image-preview">
                 </div>
                 
                 <div class="message-text">{{ msg.content }}</div>
@@ -441,7 +443,7 @@
                 <mat-icon>skip_next</mat-icon>
             </button>
             
-            <div style="display: flex; align-items: center;">
+            <div class="animation-secondary-controls">
             
               <!-- Mute Toggle -->
               <button mat-icon-button 
@@ -451,8 +453,7 @@
                       [attr.aria-pressed]="!isMuted"
                       [attr.aria-label]="isMuted ? 'Unmute animation audio' : 'Mute animation audio'"
                       class="control-button mute-button control-button-sm"
-                      matTooltip="Toggle Audio"
-                      style="border: none; background: none;">
+                        matTooltip="Toggle Audio">
                   <mat-icon>{{ isMuted ? 'volume_off' : 'volume_up' }}</mat-icon>
               </button>
 
@@ -465,8 +466,7 @@
                       [attr.aria-pressed]="subtitlesEnabled"
                       [attr.aria-label]="subtitlesEnabled ? 'Turn subtitles off' : 'Turn subtitles on'"
                       class="control-button subtitle-button control-button-sm"
-                      matTooltip="Toggle Subtitles"
-                      style="border: none; background: none;">
+                        matTooltip="Toggle Subtitles">
                   <mat-icon>{{ subtitlesEnabled ? 'closed_caption' : 'closed_caption_disabled' }}</mat-icon>
               </button>
 
