@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -275,6 +275,18 @@ export class IntroComponent implements AfterViewInit {
   }
 
   // Menu functionality methods
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    if (this.isAboutModalOpen) {
+      this.closeAboutModal();
+      return;
+    }
+
+    if (this.isMenuOpen) {
+      this.closeMenu();
+    }
+  }
+
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
   }

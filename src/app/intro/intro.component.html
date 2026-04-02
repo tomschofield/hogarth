@@ -1,4 +1,4 @@
-<div class="intro-container">
+<main class="intro-container" id="main-content" tabindex="-1">
   <video #backgroundVideo 
        class="background-video"
        autoplay 
@@ -19,14 +19,16 @@
               (click)="toggleVideoPause()" 
               class="pause-button"
               *ngIf="!showContent"
+              type="button"
+              [attr.aria-label]="isVideoPaused ? 'Resume introduction video' : 'Pause introduction video'"
               [matTooltip]="isVideoPaused ? 'Resume Video' : 'Pause Video'">
         <mat-icon>{{ isVideoPaused ? 'play_arrow' : 'pause' }}</mat-icon>
       </button>
-      <button mat-stroked-button (click)="skipVideo()" *ngIf="!showContent" class="skip-button" matTooltip="Skip Video">
+      <button mat-stroked-button (click)="skipVideo()" *ngIf="!showContent" class="skip-button" matTooltip="Skip Video" type="button" aria-label="Skip introduction video">
         <mat-icon>skip_next</mat-icon>
         Skip
       </button>
-      <button mat-stroked-button (click)="playAgain()" *ngIf="showContent" class="play-again-button" matTooltip="Play Video Again">
+      <button mat-stroked-button (click)="playAgain()" *ngIf="showContent" class="play-again-button" matTooltip="Play Video Again" type="button" aria-label="Play introduction video again">
         <mat-icon>replay</mat-icon>
         Play Again
       </button>
@@ -38,6 +40,10 @@
               (click)="toggleMenu()"
               [class.menu-open]="isMenuOpen"
               class="menu-button-inline"
+              type="button"
+              [attr.aria-expanded]="isMenuOpen"
+              aria-controls="intro-menu-panel"
+              [attr.aria-label]="isMenuOpen ? 'Close menu' : 'Open menu'"
               matTooltip="Menu">
         <mat-icon>{{ isMenuOpen ? 'close' : 'menu' }}</mat-icon>
       </button>
@@ -46,14 +52,14 @@
 
   <!-- Play button overlay -->
   <div class="play-button-overlay" *ngIf="showPlayButton">
-    <button mat-fab color="primary" (click)="onPlayButtonClick()" class="play-button">
+    <button mat-fab color="primary" (click)="onPlayButtonClick()" class="play-button" type="button" aria-label="Play introduction video">
       <mat-icon>play_arrow</mat-icon>
     </button>
     <p>Click to start the experience</p>
   </div>
   
   <div class="intro-content" [class.show]="showContent">
-    <button mat-raised-button color="primary" (click)="startViewer()" *ngIf="showStartButton">
+    <button mat-raised-button color="primary" (click)="startViewer()" *ngIf="showStartButton" type="button" aria-label="Explore the paintings viewer">
       Explore
     </button>
   </div>
@@ -61,10 +67,15 @@
   <!-- Menu Overlay -->
   <div class="menu-overlay" 
        *ngIf="isMenuOpen" 
+      aria-hidden="true"
        (click)="closeMenu()"></div>
 
   <!-- Menu Panel -->
-  <div class="menu-panel" 
+    <div class="menu-panel" 
+      id="intro-menu-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Main menu"
        [class.menu-open]="isMenuOpen">
     <div class="menu-content">
       <h3>William Hogarth's Humours of an Election</h3>
@@ -72,6 +83,7 @@
       <div class="menu-item">
         <button mat-stroked-button 
                 (click)="startViewer()"
+          type="button"
                 class="about-button"> 
           View Paintings →
         </button>
@@ -80,6 +92,7 @@
       <div class="menu-item">
         <button mat-stroked-button 
                 (click)="openAboutModal()"
+                type="button"
                 class="about-button"> 
           Acknowledgments
         </button>
@@ -92,4 +105,4 @@
        [isOpen]="isAboutModalOpen"
        (closeModal)="onModalClose()">
   </app-acknowledgments-modal>
-</div>
+</main>

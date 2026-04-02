@@ -91,6 +91,25 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.isAboutModalOpen) {
+        this.closeAboutModal();
+        return;
+      }
+      if (this.isIntroModalOpen) {
+        this.closeIntroModal();
+        return;
+      }
+      if (this.isMenuOpen) {
+        this.closeMenu();
+        return;
+      }
+      if (this.showingChat) {
+        this.toggleChat(false);
+      }
+      return;
+    }
+
     if (event.code === this.konamiCode[this.konamiIndex]) {
       this.konamiIndex++;
       if (this.konamiIndex === this.konamiCode.length) {

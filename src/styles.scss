@@ -73,3 +73,26 @@ body {
   margin: 0; 
   font-family: "Figgins", "Helvetica Neue", sans-serif; 
 }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 20000;
+  background: #862633;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.skip-link:focus {
+  left: 8px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #862633;
+  outline-offset: 2px;
+}
