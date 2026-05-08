@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, NgZone, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ManifestService } from '../manifest.service';
 import { AnnotationsService } from '../annotations.service';
 import { AnimationsService } from '../animations.service';
@@ -16,7 +17,7 @@ declare var OpenSeadragon: any;
 })
 export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   viewer: any;
-  panelText: string = "";
+  panelText: SafeHtml | string = "";
   canvasData: CanvasDatum[] = [];
   annotations: any[] = [];
   animations: Animation[] = [];
@@ -82,7 +83,8 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     private manifestService: ManifestService,
     private annotationsService: AnnotationsService,
     private animationsService: AnimationsService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit() {
@@ -902,21 +904,21 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  formatPanelText(text: string): string {
-    // If the text already contains HTML links, return as-is
-    if (text.includes('<a ') || text.includes('href=')) {
-      return text;
+  formatPanelText(text: string): SafeHtml {
+    let formattedText = text;
+
+    // If the text doesn't already contain HTML links, auto-link plain URLs and emails
+    if (!text.includes('<a ') && !text.includes('href=')) {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      formattedText = formattedText.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
+      const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
+      formattedText = formattedText.replace(emailRegex, '<a href="mailto:$1">$1</a>');
     }
 
-    // Convert plain URLs to clickable links
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    let formattedText = text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-
-    // Convert email addresses to clickable links
-    const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
-    formattedText = formattedText.replace(emailRegex, '<a href="mailto:$1">$1</a>');
-
-    return formattedText;
+    // Bypass sanitization so embedded media tags (e.g. <audio>) survive innerHTML binding.
+    // Source content is bundled JSON, not user input.
+    return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
 
   jumpToAnimation(index: number) {

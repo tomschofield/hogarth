@@ -8,8 +8,12 @@
        (ended)="onVideoEnded()">
   </video>
   
-  <h1 class="intro-title">William Hogarth's Humours of an Election
-    <div class="progress-bar-container" 
+  <h1 class="intro-title">
+    <a href="https://www.soane.org/" target="_blank" rel="noopener" class="sjsm-logo-link" aria-label="Sir John Soane's Museum (opens in a new tab)">
+      <img class="sjsm-logo" src="assets/icons/sjsm-logo.svg" alt="Sir John Soane's Museum" />
+    </a>
+    <span class="intro-title-text">Explore &lsquo;An Election&rsquo;</span>
+    <div class="progress-bar-container"
          *ngIf="!isVideoLoading && !showContent"
          (click)="onProgressBarClick($event)">
       <mat-progress-bar mode="determinate" [value]="videoProgress" class="video-progress-bar"></mat-progress-bar>

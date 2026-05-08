@@ -107,7 +107,7 @@
         "duration":9.0,
         "hideControls": false,
         "showSubtitles": true,
-        "playbackRate": 1.1,
+        "playbackRate": 1,
         "subtitles": "assets/subtitles/fiddling-nan_eng.vtt",
         "subtitleLanguage": "en"
     },{
@@ -445,11 +445,19 @@
         "subtitleLanguage": "en",
         "navigationCues": [
             {
-                "time":34,
+                "time":32,
                 "x": 0.5,
                 "y": 0.4,
                 "width": 0.6,
                 "height": 0.6,
+                "description": "Newcastle"
+            },
+            {
+                "time":40,
+                "x": 0.1225,
+                "y": 0.2877,
+                "width":0.105,
+                "height":0.1015,
                 "description": "Newcastle"
             }
         ]

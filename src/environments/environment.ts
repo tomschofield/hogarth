@@ -4,3 +4,4 @@ export const environment = {
   apiKey: '',
   connectionId: ''
 };
+
