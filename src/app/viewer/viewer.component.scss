@@ -27,6 +27,7 @@
 
 .help-icon-inline {
     margin-right: 8px;
+    transform: none;
 }
 
 .mobile-menu-action {
@@ -34,6 +35,14 @@
     justify-content: flex-start;
     background-color: white;
     text-align: left;
+
+    // The mdc button label is inline by default, so img/span icons fall back
+    // to baseline alignment and look offset from the text. Flex it so every
+    // icon type (mat-icon, img, span) lines up with the label.
+    ::ng-deep .mdc-button__label {
+        display: inline-flex;
+        align-items: center;
+    }
 }
 
 .menu-leading-icon {
@@ -44,6 +53,7 @@
     width: 24px;
     height: 24px;
     margin-right: 8px;
+    flex-shrink: 0;
 }
 
 .panel-card {

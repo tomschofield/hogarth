@@ -84,13 +84,33 @@
         [cdkTrapFocusAutoCapture]="true"
        [class.menu-open]="isMenuOpen">
     <div class="menu-content">
-      <h3>William Hogarth's Humours of an Election</h3>
-      
+      <h3>Explore &lsquo;An Election&rsquo;</h3>
+
+      <div class="menu-title-controls" *ngIf="!showPlayButton">
+        <button mat-icon-button
+                (click)="toggleVideoPause()"
+                class="pause-button"
+                *ngIf="!showContent"
+                type="button"
+                [attr.aria-label]="isVideoPaused ? 'Resume introduction video' : 'Pause introduction video'"
+                [matTooltip]="isVideoPaused ? 'Resume Video' : 'Pause Video'">
+          <mat-icon>{{ isVideoPaused ? 'play_arrow' : 'pause' }}</mat-icon>
+        </button>
+        <button mat-stroked-button (click)="skipVideo()" *ngIf="!showContent" class="skip-button" matTooltip="Skip Video" type="button" aria-label="Skip introduction video">
+          <mat-icon>skip_next</mat-icon>
+          Skip
+        </button>
+        <button mat-stroked-button (click)="playAgain()" *ngIf="showContent" class="play-again-button" matTooltip="Play Video Again" type="button" aria-label="Play introduction video again">
+          <mat-icon>replay</mat-icon>
+          Play Again
+        </button>
+      </div>
+
       <div class="menu-item">
-        <button mat-stroked-button 
+        <button mat-stroked-button
                 (click)="startViewer()"
           type="button"
-                class="about-button"> 
+                class="about-button">
           View Paintings →
         </button>
       </div>
