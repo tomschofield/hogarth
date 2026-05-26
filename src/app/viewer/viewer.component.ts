@@ -1608,6 +1608,9 @@ export class ViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     var video = document.createElement("video");
     video.src = videoUrl;
     video.controls = false;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
     video.style.width = "100%";
     video.style.height = "100%";
     video.style.cursor = "pointer";
